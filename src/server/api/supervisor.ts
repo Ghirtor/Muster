@@ -1,4 +1,5 @@
 import http from 'node:http'
+import os from 'node:os'
 
 import { serveDashboard } from '../dashboard'
 import { Hub } from './hub'
@@ -165,7 +166,7 @@ export const createSupervisor = (options: SupervisorOptions): Supervisor => {
     ) {
       return failure(415, 'send application/json')
     }
-    if (pathname === '/api/health') return [200, { ok: true }]
+    if (pathname === '/api/health') return [200, { ok: true, hostname: os.hostname() }]
     if (pathname === '/api/apps' && method === 'GET') {
       return [200, await Promise.all(registry.list().map(viewOf))]
     }

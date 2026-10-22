@@ -52,7 +52,16 @@ An action runs as a `flotilla` CLI process, so the lock and queue see it exactly
 agent. The WebSocket at `/api/ws` takes `{type: 'subscribe' | 'unsubscribe', topics}` with topics
 `status` (a snapshot per app whenever it changes), `jobs` (job changes and output) and
 `log:<app>:<key>` (the tail, then what is appended). Requests from another origin than the
-dashboard's, or with a non-loopback `Host`, get 403.
+dashboard's, or with a non-loopback `Host`, get 403. Health also gives the machine's `hostname`.
+
+## Dashboard
+
+`src/web/` rebuilds the four `design/` screens: Fleet (`#/`), an app's detail (`#/apps/:id`), its
+config (`#/apps/:id/config`) and the launch-blocked dialog, offered when a launch finds the rig
+held by another checkout (join the queue, or stop it and take it over). It talks to the API with
+axios and RTK Query (`src/web/api/flotillaApi.ts`); the WebSocket topics keep the query caches
+current, so nothing polls. The config page edits the YAML text and validates it on the supervisor;
+its structured summary is read-only.
 
 ## Check
 

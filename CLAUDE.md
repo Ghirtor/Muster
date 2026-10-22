@@ -16,8 +16,8 @@ It generalises Demo's `rig-ctl` skill. **`rig.mjs` is the behaviour to match**;
 
 Mirrors Demo's `Frontend/` — same versions (the lockfile was seeded from it), same rules:
 
-- **Web**: React 19 + React Compiler (`babel-plugin-react-compiler`), Vite 7, Tailwind CSS 4. No state
-  library yet; add one only when a screen needs it, and ask first.
+- **Web**: React 19 + React Compiler (`babel-plugin-react-compiler`), Vite 7, Tailwind CSS 4. API state
+  is RTK Query over axios (`src/web/api/`), fed by the WebSocket; ask before adding another library.
 - **Server**: Node ≥ 22 + TypeScript, run with `tsx`. Node built-ins only until a dependency earns
   its place; ask before adding a framework.
 - **Tests**: Jest 30 + ts-jest (ESM) + Testing Library, two projects (`web` jsdom, `server` node).

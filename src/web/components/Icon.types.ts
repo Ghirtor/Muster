@@ -1,0 +1,13 @@
+export type IconName =
+  | 'search'
+  | 'fleet'
+  | 'plus'
+  | 'monitor'
+  | 'lock'
+  | 'check'
+  | 'close'
+  | 'copy'
+  | 'play'
+  | 'stop'
+  | 'restart'
+  | 'clock'
