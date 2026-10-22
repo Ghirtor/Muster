@@ -3,8 +3,8 @@ name: issue-start
 description: >
   Use when starting work on a tracked issue on this repo — fetching the triaged ticket, marking
   it started, cutting its feature branch in a worktree of its own and agreeing its test seams
-  with the user. Refuses issues that are not `ready-for-agent`. Triggers on "start FEAT-xxx",
-  "start #12", "create the branch for this ticket", or as the first step of `/issue-work`.
+  with the user. Refuses issues that are not `ready-for-agent`. Triggers on "start this issue",
+  "create the branch for this ticket", or as the first step of `/issue-work`.
 ---
 
 # Issue start — fetch the issue and cut its branch
@@ -13,8 +13,8 @@ Fetch the issue and check it has been triaged `ready-for-agent`, mark it started
 branch, open the branch's work log (`.claude/skills/implement-change/worklog.md`) from the
 issue's Agent Brief, then agree the test seams with the user.
 
-Every tracker operation named in **bold** below is done as `docs/agents/issue-tracker.md`
-describes it; this skill never assumes which tracker that is.
+A **bold** name after "the project doc's", "the tracker doc's" or "the code-host doc's" is a
+section of `docs/agents/project.md`, `docs/agents/issue-tracker.md` or `docs/agents/code-host.md`.
 
 The ticket's open questions were settled at triage, by `/mattpocock-skills:triage`, which
 grills the ticket into shape and posts an **Agent Brief** comment: category, current and
@@ -25,18 +25,18 @@ that brief instead of grilling the ticket again.
 
 - **`ISSUE`** — the issue, as its key or its reference (the tracker doc's **Identifiers**). Work
   out both; the rest of the flow uses **`ISSUE_KEY`** for commits and branches.
-- **`SOURCE_BRANCH`** — the branch to create the new branch from (e.g. `dev`).
-  If it was not given, ask the user before continuing.
+- **`SOURCE_BRANCH`** — the branch to create the new branch from, usually one of the code-host
+  doc's **Default branches**. If it was not given, ask the user before continuing.
 
 ## Step 1 — Fetch the issue
 
-**Fetch an issue**, comments included.
+The tracker doc's **Fetch an issue**, comments included.
 
 ## Step 2 — Check it is ready for an agent
 
-Check **Is it ready for an agent?**. If it is not, stop here: change nothing on the issue or in
-git. Tell the user what is missing — the triage label or the Agent Brief — and the issue's
-current triage label, if any (`needs-info` means it is waiting on its reporter,
+Check the tracker doc's **Is it ready for an agent?**. If it is not, stop here: change nothing
+on the issue or in git. Tell the user what is missing — the triage label or the Agent Brief —
+and the issue's current triage label, if any (`needs-info` means it is waiting on its reporter,
 `ready-for-human` that triage judged it should not be delegated), and suggest they triage it
 first with:
 
@@ -47,18 +47,17 @@ first with:
 Triage is user-invoked only, so do not try to run it yourself.
 
 Otherwise take the brief's **Category** as the kind of change: `bug` is a **bug fix**,
-`enhancement` a **feature / task**. Then **Mark started**.
+`enhancement` a **feature / task**. Then the tracker doc's **Mark started**.
 
 ## Step 3 — Create the branch in its own worktree
 
 Name it by the tracker doc's **Branch name** rule. Cut it into its own worktree, leaving the
-main checkout untouched (`npm ci` also installs the git hooks). If the worktree already exists,
-the ticket was started before: reuse it.
+main checkout untouched, then do the project doc's **Install a checkout** in it. If the worktree
+already exists, the ticket was started before: reuse it.
 
 ```
 git fetch origin
 git worktree add -b <branch-name> .claude/worktrees/<branch-name> origin/<source-branch>
-cd .claude/worktrees/<branch-name> && npm ci
 ```
 
 From here on **the worktree is the ticket's checkout**: every edit, build, test and git
@@ -68,10 +67,10 @@ command runs there. The session stays in the main checkout, where `.claude/` liv
 
 Create `.claude/worklog/<branch-name>.md` in the main checkout as `worklog.md` describes, with
 the worktree's path at its top. Fill its **Ticket** section from the Agent Brief: the issue key,
-reference and title, bug fix or feature, `SOURCE_BRANCH`, the brief's acceptance criteria one per
-line, and its out-of-scope items marked as such. Log each choice the brief records (a desired
-behaviour picked over another, an edge case settled) under **Decisions** with source
-`ticket comment`.
+its reference when that differs, its title, bug fix or feature, `SOURCE_BRANCH`, the brief's
+acceptance criteria one per line, and its out-of-scope items marked as such. Log each choice the
+brief records (a desired behaviour picked over another, an edge case settled) under
+**Decisions** with source `ticket comment`.
 
 ## Step 5 — Check the brief against the code and agree the seams
 

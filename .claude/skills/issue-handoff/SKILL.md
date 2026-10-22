@@ -2,16 +2,15 @@
 name: issue-handoff
 description: >
   Use when a feature branch on this repo has been approved at `implement-change`'s review
-  checkpoint and is ready to go to review — push it, write its test plan, open its pull request,
-  watch CI, and mark the issue in review. Triggers on "ship this branch", "open the PR and move
-  the ticket", or as the last step of `/issue-work`.
+  checkpoint and is ready to go to review — push it, write its test plan, open its change
+  request, watch CI, and mark the issue in review. Triggers on "ship this branch", "open the PR
+  and move the ticket", or as the last step of `/issue-work`.
 ---
 
 # Issue handoff — push, change request, CI, review
 
-Tracker operations are done as `docs/agents/issue-tracker.md` describes them, and code-host
-operations (push, change request, CI) as `docs/agents/code-host.md` does; this skill names them
-in **bold** and never assumes which tracker or host that is.
+A **bold** name after "the project doc's", "the tracker doc's" or "the code-host doc's" is a
+section of `docs/agents/project.md`, `docs/agents/issue-tracker.md` or `docs/agents/code-host.md`.
 
 ## Inputs
 
@@ -32,7 +31,7 @@ approved commit under **Checkpoint** in the work log. Push only that commit: com
 `git rev-parse HEAD`. If there is no approval logged, or HEAD has moved past it, do not
 push — run `implement-change`'s checkpoint (its Step 3) first, and come back once approved.
 
-Then **Push**.
+Then the code-host doc's **Push**.
 
 ## Step 2 — Write a test plan
 
@@ -45,11 +44,10 @@ Before opening the change request, write a **test plan** that covers what was im
   criteria, plus the obvious negative cases (invalid input, disabled state, permission
   boundary, etc.).
 - **Always** include the **special / border cases** considered while implementing —
-  empty values, zero, sign boundaries, min/max bounds, ports already taken, processes that
-  exit, Windows paths, async/error states, simultaneous launches, anything that had to be
-  reasoned about explicitly while writing the code. If a tricky case was handled in code, it
-  goes in the test plan. The work log's **Decisions** and **App verification** sections are
-  where to look for them.
+  empty values, zero, sign boundaries, min/max bounds, async/error states, the project doc's
+  **Test-plan edge cases**, anything that had to be reasoned about explicitly while writing the
+  code. If a tricky case was handled in code, it goes in the test plan. The work log's
+  **Decisions** and **App verification** sections are where to look for them.
 
 Write it as a checklist, one item per scenario, so a non-author can execute each item without
 reading the code. It goes on the issue in Step 5; the change request's description carries
@@ -57,7 +55,8 @@ evidence, not the plan.
 
 ## Step 3 — Open the change request
 
-**REQUIRED SUB-SKILL:** Use `open-pr`.
+**REQUIRED SUB-SKILL:** Use `open-pr` with `TARGET_BRANCH`. Keep the URL it hands back for
+Step 5.
 
 ## Step 4 — Watch CI through to a result
 
@@ -67,13 +66,14 @@ The push in Step 1 started CI. Do not move on to Step 5 while it is still runnin
 `TARGET_BRANCH` = the change request's target. It owns the waiting, the failure triage and the
 pre-existing-failure check.
 
-Two things it needs from this skill's context: any fix it commits uses the
-`{ISSUE_KEY}: <summary>` message format, and CI's verdict — green, fixed-then-green, or a
+Two things it needs from this skill's context: any fix it commits uses the project doc's
+**Commit messages** format with `ISSUE_KEY`, and CI's verdict — green, fixed-then-green, or a
 stated reason it cannot be fixed here — goes into your report to the user.
 
 ## Step 5 — Mark the issue in review and post the test plan
 
 Once the change request is open:
 
-1. **Mark in review**.
-2. **Post the test plan** — the same plan as Step 2, with the change request's URL.
+1. The tracker doc's **Mark in review**.
+2. The tracker doc's **Post the test plan** — the same plan as Step 2, with the change request's
+   URL from Step 3.

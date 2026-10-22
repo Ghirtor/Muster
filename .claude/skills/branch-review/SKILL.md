@@ -14,16 +14,18 @@ Review the current branch against its ticket and for bugs, then deal with what t
 find. Run it before checking the branch in the real app, so that check runs on the code that
 will be pushed.
 
+A **bold** name after "the project doc's", "the tracker doc's" or "the code-host doc's" is a
+section of `docs/agents/project.md`, `docs/agents/issue-tracker.md` or `docs/agents/code-host.md`.
+
 ## Inputs
 
 - **The branch** — the one checked out.
 - **`BASE`** — what the branch is compared against. Take it from the work log's **Ticket**
-  section, else the target of the branch's open change request
-  (`docs/agents/code-host.md`, **Find the change request for a branch**), else ask the user.
-- **The ticket** — the issue the branch is named after; `code-review` fetches it
-  through `docs/agents/issue-tracker.md`. When the change has no issue, the work log's
-  **Ticket** section holds the user's request and the criteria derived from it, and that is
-  the spec instead.
+  section, else the target of the branch's open change request (the code-host doc's **Find the
+  change request for a branch**), else ask the user.
+- **The ticket** — the issue the branch is named after; `code-review` fetches it through the
+  tracker doc. When the change has no issue, the work log's **Ticket** section holds the user's
+  request and the criteria derived from it, and that is the spec instead.
 
 The work log is `.claude/worklog/<branch-name>.md` (`.claude/skills/implement-change/worklog.md`
 describes it). The ticket alone is not the scope: the log holds what was decided while the
@@ -41,12 +43,11 @@ name given here.
   - **Spec** — the work log, and each acceptance criterion as **met**, **partly met** or
     **missing**, with the file:line and the test that show it; logged decisions it thinks are
     wrong, and why; behaviour the ticket asks for that no test covers.
-  - **Standards** — `.claude/rules/testing.md` when the branch changes a test, and
-    `.claude/rules/conventions.md` when it changes a `.ts` or `.tsx` file under
-    `src/`; they sit outside its usual search. Tell the sub-agent to read each in full
-    and weigh first what the linter cannot catch: a component doing more than one job, a mode
-    flag or extra branch added to a shared component, the hooks → derived → handlers → render
-    order, and comments that are not docstrings on a function.
+  - **Standards** — the project doc's **Test rules** when the branch changes a test, and the
+    project doc's **Code conventions** when it changes a file they cover; they sit outside its
+    usual search.
+    Tell the sub-agent to read each in full and weigh first what the conventions say the
+    linter cannot catch.
 - **Bug review.** Run Claude Code's built-in `code-review` skill at `high` on the branch,
   without `--fix`.
 

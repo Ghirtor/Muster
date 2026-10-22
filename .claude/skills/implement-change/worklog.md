@@ -25,7 +25,7 @@ superseded.
 Worktree: <absolute path> (omitted when the branch is worked in the main checkout)
 
 ## Ticket
-<ISSUE_KEY> (<issue reference>) — <title>. Bug fix | Feature/task. Source branch: <SOURCE_BRANCH>.
+<ISSUE_KEY> (<issue reference>, if it differs) — <title>. Bug fix | Feature/task. Source branch: <SOURCE_BRANCH>.
 Acceptance criteria, one per line. Clarifications the user gave.
 (No issue: the user's request in their words, the base branch, and the criteria
 derived from it.)

@@ -11,8 +11,8 @@ another host means rewriting this file, not the skills.
 ## Identifiers
 
 - **Change request** — a GitHub pull request, `#<n>`. Issues and PRs share one number space.
-- **Default branch** — `dev`: every change request targets it. `master` takes only merges of `dev`,
-  which release (see **CI**); never target it with a feature.
+- **Default branches** — `dev`: every change request targets it. `master` takes only merges of
+  `dev`, which release (see **CI**); never target it with a feature.
 - **Reviewers** — none set yet. Add GitHub logins here (`--reviewer a,b`) once the team is on the
   repo; until then open PRs without reviewers and say so in the report.
 

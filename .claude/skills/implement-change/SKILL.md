@@ -13,16 +13,19 @@ Run three sub-skills in order on the current branch: `tdd-implement`, `branch-re
 `app-verify`, then hold a review checkpoint with the user, looping back until they approve.
 It stops before anything leaves the machine — no push, no change request, no tracker update.
 
+A **bold** name after "the project doc's", "the tracker doc's" or "the code-host doc's" is a
+section of `docs/agents/project.md`, `docs/agents/issue-tracker.md` or `docs/agents/code-host.md`.
+
 ## Inputs
 
 - **What to build** — the issue the branch is named after, or the user's request when
   there is no issue.
 - **`BASE`** — what the branch is compared against in review. Take it from the work log's
-  **Ticket** section, else the target of the branch's open change request
-  (`docs/agents/code-host.md`, **Find the change request for a branch**), else ask the user.
+  **Ticket** section, else the target of the branch's open change request (the code-host doc's
+  **Find the change request for a branch**), else ask the user.
 
-Work on the branch that is checked out. If it is `dev` or `master`, stop and
-ask which branch to use.
+Work on the branch that is checked out. If it is one of the project doc's **Protected
+branches**, stop and ask which branch to use.
 
 ## Step 1 — Make sure the work log exists
 
@@ -43,8 +46,8 @@ confirmed every seam; log what it settles as `issue-start` Step 5 does.
 ## Step 2 — Run the sequence
 
 1. **`tdd-implement`** — implement test-first, logging decisions and TDD exemptions.
-2. **`branch-review`** with `BASE` — review against the spec, the standards and for bugs, refactor and fix the confirmed findings
-   through `tdd-implement`.
+2. **`branch-review`** with `BASE` — review against the spec, the standards and for bugs,
+   refactor and fix the confirmed findings through `tdd-implement`.
 3. **`app-verify`** — check the reviewed branch in the running app, fixing what it turns
    up through `tdd-implement`.
 

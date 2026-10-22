@@ -74,8 +74,9 @@ gh label create in-review --color 0E8A16 --description "Its pull request awaits 
   - [ ] <scenario>
   ```
 
-- **Has it been started?** — it carries `in-progress` or `in-review`, or an open PR names it
-  (`gh pr list --search "FEAT-<n> in:title" --state open`).
+- **Has it been started?** — it carries `in-progress` or `in-review`, an open PR names it
+  (`gh pr list --search "FEAT-<n> in:title" --state open`), or this machine has its work log or
+  worktree (`.claude/worklog/FEAT-<n>*` or `.claude/worktrees/FEAT-<n>*` exists).
 - **List my ready issues** (for `/issue-batch`), most urgent first:
   `gh issue list --assignee @me --label ready-for-agent --state open --json number,title,labels`.
   There is no priority field: put issues labelled `priority:high` first, then oldest first.
