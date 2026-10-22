@@ -18,19 +18,20 @@ Mirrors Demo's `Frontend/` — same versions (the lockfile was seeded from it), 
 
 - **Web**: React 19 + React Compiler (`babel-plugin-react-compiler`), Vite 7, Tailwind CSS 4. API state
   is RTK Query over axios (`src/web/api/`), fed by the WebSocket; ask before adding another library.
-- **Server**: Node ≥ 22 + TypeScript, run with `tsx`. The API (`src/server/api/`) is NestJS 12 on
-  Express, its WebSocket a `@nestjs/platform-ws` gateway; the engine and the CLI stay Nest-free.
-  esbuild emits no decorator metadata, so inject by explicit token (`@Inject(Registry)`). Ask before
-  adding another dependency.
-- **Tests**: Jest 30 + ts-jest + Testing Library, two projects: `web` (jsdom, CommonJS so `jest.mock`
-  hoists) and `server` (node, native ESM since Nest ships ESM only: import `jest` from
-  `@jest/globals`). `npm test` passes Node the `--experimental-vm-modules` this needs.
+- **Server**: Node ≥ 22 + TypeScript, compiled by SWC everywhere: `@swc-node/register` in
+  development, `unplugin-swc` in the build and the tests. The API (`src/server/api/`) is NestJS 12
+  on Express, its WebSocket a `@nestjs/platform-ws` gateway; the engine and the CLI stay Nest-free.
+  SWC emits decorator metadata, so classes are injected by type; `@Inject(TOKEN)` only for a
+  non-class token (`SUPERVISOR_OPTIONS`). A class in a decorated constructor is imported as a
+  value, never `import type`. Ask before adding another dependency.
+- **Tests**: Vitest + Testing Library, two projects in `vitest.config.ts`: `web` (jsdom) and
+  `server` (node, SWC). `describe`, `it`, `expect` and `vi` are globals.
 - **Lint**: oxlint, type-aware, rule lists from the typescript-eslint presets everywhere and the
   eslint-react one in `src/web` only, house rules in `oxlint-plugins/house.js` (module shape, colour
   tokens).
 - **Desktop**: Tauri 2.11 (`src-tauri/`, same versions as Demo's), wrapping the
   dashboard and starting the supervisor.
-- **Types**: tsgo (`typescript7`). Each package has its own `tsconfig.json`, which the editor, Jest
+- **Types**: tsgo (`typescript7`). Each package has its own `tsconfig.json`, which the editor, Vitest
   and oxlint pick up by nearness: `src/web` (DOM, JSX, Vite, no Node), `src/server` (Node and
   decorators, no DOM or JSX), and the root one for the tooling files beside it. All extend
   `tsconfig.base.json`; `npm run type-check` checks the three separately.
@@ -48,7 +49,7 @@ npm run flotilla -- status --config design/sample.yaml   # this checkout's CLI: 
 FLOTILLA_CONFIGS=a.yaml;b.yaml npm run dev             # apps the supervisor serves (README: API)
 node --run lint
 npm run type-check
-npm test                            # --selectProjects web|server for one
+npm test                            # --project web|server for one
 node --run format                   # format:check to only report
 npm run build                       # dashboard → dist/web, supervisor → dist/server
 npm run dev:desktop                 # Tauri window over the dev servers, CDP on :4872

@@ -127,7 +127,13 @@ beforeEach(async () => {
   ]
   supervisor = await createSupervisor({
     configs: files,
-    cli: [process.execPath, '--import', 'tsx', path.resolve('src/server/cli.ts')],
+    cli: [
+      process.execPath,
+      '--import',
+      '@swc-node/register/esm-register',
+      path.resolve('src/server/cli.ts')
+    ],
+    env: { ...process.env, SWC_NODE_PROJECT: 'src/server/tsconfig.json' },
     hub: { statusMs: 200, logMs: 100 }
   })
   await new Promise<void>((resolve) => {

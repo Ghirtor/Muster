@@ -20,8 +20,9 @@ const configFiles = (): string[] => {
 }
 
 /**
- * How to run the CLI beside this file: the same node with the same loaders (tsx in development,
- * none once built), minus watch and inspector flags, which would make each action a server.
+ * How to run the CLI beside this file: the same node with the same loaders (swc-node in
+ * development, none once built), minus watch and inspector flags, which would make each action a
+ * server.
  */
 const cliCommand = (): string[] => {
   const flags = process.execArgv.filter((flag) => !/^--(watch|inspect)/.test(flag))

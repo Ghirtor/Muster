@@ -14,8 +14,8 @@ import { SUPERVISOR_OPTIONS } from './supervisor.options'
 import type { SupervisorOptions } from './supervisor.types'
 
 /**
- * The supervisor's API over the apps in `options.configs`. Its providers are built by factories
- * with explicit tokens: tsx and the build compile with esbuild, which emits no decorator metadata.
+ * The supervisor's API over the apps in `options.configs`. Classes are injected by type, from the
+ * decorator metadata SWC emits; the providers built from `options` come from factories.
  */
 @Module({})
 export class SupervisorModule implements NestModule {

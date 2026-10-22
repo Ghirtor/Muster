@@ -83,7 +83,7 @@ its structured summary is read-only.
 ```bash
 node --run lint        # oxlint, type-aware, house rules in oxlint-plugins/
 npm run type-check     # tsgo, web and server separately
-npm test               # jest: web (jsdom) and server (node) projects
+npm test               # vitest: web (jsdom) and server (node) projects
 node --run format      # oxfmt; format:check to only report
 npm run build          # dashboard into dist/web, supervisor into dist/server
 ```
@@ -123,7 +123,7 @@ Then merge `dev` into `main`, by pull request or `git merge` and push.
 
 | Path            | What                                                             |
 | --------------- | ---------------------------------------------------------------- |
-| `src/server/`   | The supervisor (Node + TS, run with tsx): engine, NestJS API, CLI |
+| `src/server/`   | The supervisor (Node + TS, run with SWC): engine, NestJS API, CLI |
 | `src/web/`      | The dashboard (React 19, Vite, Tailwind 4, React Compiler)       |
 | `design/`       | Screens (`*.dc.html`), tokens (`tokens.json`), Demo's config     |
 | `reference/`    | `rig.mjs`, the behaviour the engine must match                   |

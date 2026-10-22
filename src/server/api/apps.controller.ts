@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Inject, Param, Post, Put, Query } from '@nestjs/common'
+import { Body, Controller, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common'
 
 import type { RigSnapshot } from '../engine/rig.types'
 import { ApiFailure } from './failure'
@@ -39,8 +39,8 @@ const textOf = (body: unknown): string => {
 @Controller('apps')
 export class AppsController {
   constructor(
-    @Inject(Registry) private readonly registry: Registry,
-    @Inject(Jobs) private readonly jobs: Jobs
+    private readonly registry: Registry,
+    private readonly jobs: Jobs
   ) {}
 
   /** Every app, whether or not its config loads. */

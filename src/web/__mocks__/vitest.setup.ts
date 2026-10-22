@@ -1,4 +1,4 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
 
 /**
  * jsdom implements no `matchMedia`; the dashboard reads `prefers-reduced-motion` through it.

@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Inject, Param } from '@nestjs/common'
+import { Controller, Delete, Get, Param } from '@nestjs/common'
 
 import { ApiFailure } from './failure'
 import { Jobs } from './jobs'
@@ -6,7 +6,7 @@ import { Jobs } from './jobs'
 /** The actions the supervisor has run, with their output. */
 @Controller('jobs')
 export class JobsController {
-  constructor(@Inject(Jobs) private readonly jobs: Jobs) {}
+  constructor(private readonly jobs: Jobs) {}
 
   /** Every job, newest first. */
   @Get()

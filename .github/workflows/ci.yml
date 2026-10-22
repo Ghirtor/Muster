@@ -64,7 +64,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund --ignore-scripts
-      - run: npm test -- --ci --coverage
+      - run: npm test -- --coverage
       - uses: actions/upload-artifact@v4
         if: always()
         with:

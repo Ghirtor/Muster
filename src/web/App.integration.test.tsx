@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { Provider } from 'react-redux'
+import type { Mock } from 'vitest'
 
 import { appOf, jobOf, lockOf, REPO, snapshotOf } from './__mocks__/fixtures'
 import type { AppView, HttpRequest, Job } from './api/flotillaApi.types'
@@ -8,14 +9,14 @@ import App from './App'
 import { makeStore } from './store/store'
 
 // The API boundary: axios and the shared WebSocket are the only things jsdom cannot provide.
-jest.mock('./api/http', () => ({ http: { request: jest.fn() } }))
-jest.mock('./api/socket', () => ({
-  subscribe: jest.fn(() => () => undefined),
-  waitForJob: jest.fn()
+const { request } = vi.hoisted(() => ({ request: vi.fn() }))
+vi.mock('./api/http', () => ({ http: { request } }))
+vi.mock('./api/socket', () => ({
+  subscribe: vi.fn(() => () => undefined),
+  waitForJob: vi.fn()
 }))
 
-const request = jest.requireMock<{ http: { request: jest.Mock } }>('./api/http').http.request
-const waitFor_ = waitForJob as unknown as jest.Mock
+const waitFor_ = waitForJob as unknown as Mock
 
 interface Server {
   apps: AppView[]
@@ -71,13 +72,13 @@ const settled = async (): Promise<void> => {
 const actionsOf = (server: Server): unknown[] => server.posted.map((post) => post.data)
 
 beforeEach(() => {
-  jest.useFakeTimers({ now: Date.parse('2026-10-22T10:00:00.000Z'), advanceTimers: true })
+  vi.useFakeTimers({ now: Date.parse('2026-10-22T10:00:00.000Z'), shouldAdvanceTime: true })
   request.mockReset()
   waitFor_.mockReset()
 })
 
 afterEach(() => {
-  jest.useRealTimers()
+  vi.useRealTimers()
 })
 
 describe('Fleet', () => {

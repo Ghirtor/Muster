@@ -25,9 +25,9 @@ them in another project means writing this file for it, not changing the skills.
 
 ## Code
 
-- **Test rules** — `.claude/rules/testing.md`: Jest, in the `web` (jsdom, `src/web/`) or `server`
+- **Test rules** — `.claude/rules/testing.md`: Vitest, in the `web` (jsdom, `src/web/`) or `server`
   (node, `src/server/`) project.
-- **Untestable changes** — a change no Jest suite can observe: pure styling, config, or OS
+- **Untestable changes** — a change no Vitest suite can observe: pure styling, config, or OS
   behaviour (Windows process trees, shells) no test can stand in for.
 - **Code conventions** — `.claude/rules/conventions.md`, for every `.ts` or `.tsx` file under
   `src/`; it loads on its own once you touch one. When the next behaviour needs a mode flag on a

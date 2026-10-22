@@ -1,4 +1,3 @@
-import { Inject } from '@nestjs/common'
 import { WebSocketGateway } from '@nestjs/websockets'
 import type { OnGatewayConnection } from '@nestjs/websockets'
 import type { WebSocket } from 'ws'
@@ -11,7 +10,7 @@ import { Hub } from './hub'
  */
 @WebSocketGateway({ path: '/api/ws' })
 export class HubGateway implements OnGatewayConnection {
-  constructor(@Inject(Hub) private readonly hub: Hub) {}
+  constructor(private readonly hub: Hub) {}
 
   /** Hands a new client to the hub. */
   handleConnection(client: WebSocket): void {

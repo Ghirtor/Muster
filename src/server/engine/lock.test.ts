@@ -5,8 +5,6 @@ import type { AddressInfo } from 'node:net'
 import os from 'node:os'
 import path from 'node:path'
 
-import { jest } from '@jest/globals'
-
 import type { InstanceMode, InstancesConfig } from './config.types'
 import { acquire, holders, isStale, readLock, recordPid, slotFiles } from './lock'
 import type { Lock, LockContext } from './lock.types'
@@ -43,7 +41,7 @@ const context = (repo: string, mode: InstanceMode = 'one-per-machine', max = 1):
 const options = {
   reason: 'testing',
   wait: false,
-  onStale: jest.fn<() => Promise<unknown>>().mockResolvedValue(undefined)
+  onStale: vi.fn<() => Promise<unknown>>().mockResolvedValue(undefined)
 }
 
 const hold = (file: string, repo: string, extra: Partial<Lock> = {}): void => {

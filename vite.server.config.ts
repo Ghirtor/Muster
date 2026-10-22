@@ -1,9 +1,11 @@
+import swc from 'unplugin-swc'
 import { type PluginOption, defineConfig } from 'vite'
 
 /**
  * The supervisor and the CLI, bundled with every dependency: the desktop app ships `dist/server`
  * without `node_modules`. What stays out is what Nest and ws only try to load, and do without; ws
- * is told to skip its native add-ons outright, as their bundled stand-ins are empty.
+ * is told to skip its native add-ons outright, as their bundled stand-ins are empty. SWC compiles
+ * the TypeScript rather than esbuild, which emits none of the decorator metadata Nest injects by.
  */
 const OPTIONAL = [
   '@nestjs/microservices',
@@ -35,7 +37,7 @@ const bundleWs = (): PluginOption => ({
 })
 
 export default defineConfig({
-  plugins: [bundleWs()],
+  plugins: [bundleWs(), swc.vite({ tsconfigFile: 'src/server/tsconfig.json' })],
   define: {
     'process.env.WS_NO_BUFFER_UTIL': '"1"',
     'process.env.WS_NO_UTF_8_VALIDATE': '"1"'
