@@ -8,6 +8,7 @@ import type {
   AcquireOptions,
   AcquireResult,
   HeldSlot,
+  LaunchVerdict,
   Lock,
   LockContext,
   QueueEntry
@@ -169,6 +170,59 @@ const reportBusy = (ctx: LockContext, held: HeldSlot[]): void => {
   if (queued > 0) ctx.out.write(`  ${queued} waiting ahead in the queue\n`)
 }
 
+type Decision =
+  | { kind: 'held'; slot: HeldSlot }
+  | { kind: 'stale'; slots: HeldSlot[] }
+  | { kind: 'foreign' }
+  | { kind: 'free'; file: string }
+  | { kind: 'queue'; held: HeldSlot[] }
+
+/**
+ * The one rule for what a launch from `ctx.repo` meets, in the order `acquire` acts on it: its own
+ * slot, then stale locks to take over, then one per machine's ports up with nobody holding them,
+ * then a free slot when nobody is queued ahead, else the queue. It only reads.
+ */
+const decide = async (ctx: LockContext): Promise<Decision> => {
+  const held = holders(ctx)
+  const own = held.find((slot) => isMine(slot.lock, ctx.repo))
+  if (own !== undefined) return { kind: 'held', slot: own }
+  const stale: HeldSlot[] = []
+  for (const slot of held) if (await isStale(ctx, slot.lock)) stale.push(slot)
+  if (stale.length > 0) return { kind: 'stale', slots: stale }
+  if (ctx.instances.mode === 'one-per-machine' && held.length === 0 && (await anyUp(ctx.ports))) {
+    return { kind: 'foreign' }
+  }
+  const free = slotFiles(ctx.instances, ctx.repo).find((file) => readLock(file) === null)
+  if (free !== undefined && firstInLine(ctx)) return { kind: 'free', file: free }
+  return { kind: 'queue', held }
+}
+
+/** Who a launch would wait behind: the first in the queue, else whoever has held a slot longest. */
+const behindOf = (ctx: LockContext, held: HeldSlot[]): Lock | null => {
+  const head = readQueue(ctx).at(0)
+  if (head !== undefined) {
+    return { repo: head.repo, branch: head.branch, reason: head.reason, since: head.since }
+  }
+  const locks = held.map((slot) => slot.lock)
+  return locks.sort((a, b) => Date.parse(a.since) - Date.parse(b.since)).at(0) ?? null
+}
+
+/**
+ * What a launch from `ctx.repo` would meet right now, by the same rule `acquire` follows. A stale
+ * lock counts as free, since the launch takes it over, unless others are queued ahead of it.
+ */
+export const launchVerdict = async (ctx: LockContext): Promise<LaunchVerdict> => {
+  const decision = await decide(ctx)
+  if (decision.kind === 'held') return { kind: 'held', lock: decision.slot.lock }
+  if (decision.kind === 'foreign') return { kind: 'foreign' }
+  if (decision.kind === 'free') return { kind: 'free', takesOver: null }
+  if (decision.kind === 'stale' && firstInLine(ctx)) {
+    return { kind: 'free', takesOver: decision.slots.at(0)?.lock ?? null }
+  }
+  const held = decision.kind === 'queue' ? decision.held : []
+  return { kind: 'queue', behind: behindOf(ctx, held), ahead: readQueue(ctx).length }
+}
+
 /**
  * Takes a slot for `ctx.repo`. The exclusive create is the atomic step: two checkouts racing for a
  * free slot cannot both win it. Waiting joins a queue, so slots go to waiters in the order they
@@ -182,26 +236,24 @@ export const acquire = async (
   let queued = false
   for (;;) {
     const now = new Date().toISOString()
-    const held = holders(ctx)
-    const own = held.find((slot) => isMine(slot.lock, ctx.repo))
-    if (own !== undefined) {
+    const decision = await decide(ctx)
+    if (decision.kind === 'held') {
+      const own = decision.slot
       const reason = options.reason === '' ? own.lock.reason : options.reason
       writeLock(own.file, { ...own.lock, reason, touched: now }, false)
       recordPid(ctx, process.pid)
       leaveQueue(ctx)
       return { held: true, file: own.file }
     }
-    const stale: HeldSlot[] = []
-    for (const slot of held) if (await isStale(ctx, slot.lock)) stale.push(slot)
-    if (stale.length > 0) {
-      for (const slot of stale) {
+    if (decision.kind === 'stale') {
+      for (const slot of decision.slots) {
         ctx.out.write(`  stale lock from ${describeLock(slot.lock)} — taking it over\n`)
         dropLock(slot.file)
       }
       if (machine) await options.onStale()
       continue
     }
-    if (machine && held.length === 0 && (await anyUp(ctx.ports))) {
+    if (decision.kind === 'foreign') {
       ctx.out.write(
         '  BUSY: its ports are in use but no checkout holds the rig — it was started by hand or\n' +
           '  outside Muster. Which code it runs is unknown, so ask before stopping it with `down`,\n' +
@@ -210,20 +262,20 @@ export const acquire = async (
       leaveQueue(ctx)
       return { held: false, foreign: true }
     }
-    const free = slotFiles(ctx.instances, ctx.repo).find((file) => readLock(file) === null)
-    if (free !== undefined && firstInLine(ctx)) {
+    if (decision.kind === 'free') {
       const branch = branchOf(ctx.repo)
       try {
         const lock = { repo: ctx.repo, branch, reason: options.reason, since: now, touched: now }
-        writeLock(free, { ...lock, pids: [process.pid] }, true)
+        writeLock(decision.file, { ...lock, pids: [process.pid] }, true)
         ctx.out.write(`  rig taken for ${ctx.repo} (${branch})\n`)
         leaveQueue(ctx)
-        return { held: true, file: free }
+        return { held: true, file: decision.file }
       } catch (error) {
         if ((error as NodeJS.ErrnoException).code === 'EEXIST') continue
         throw error
       }
     }
+    const { held } = decision
     if (!options.wait) {
       reportBusy(ctx, held)
       ctx.out.write('  rerun with --wait to queue for it\n')

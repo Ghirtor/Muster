@@ -21,7 +21,8 @@ const ROW = 'flex gap-3 border-b border-surface px-4 py-3 last:border-b-0'
 
 /**
  * Shown when a launch finds the rig held by another checkout (or by processes Muster did not
- * start): wait in the queue for it, or stop it and take it over. Escape cancels.
+ * start): wait in the queue behind the launch verdict's `behind`, or stop it and take it over.
+ * Escape cancels.
  */
 const BusyDialog: FC<BusyDialogProps> = ({ app, now, onCancel, onWait, onTakeOver }) => {
   const [choice, setChoice] = useState<Choice>('wait')
@@ -41,8 +42,9 @@ const BusyDialog: FC<BusyDialogProps> = ({ app, now, onCancel, onWait, onTakeOve
     }
   }, [onCancel])
 
-  const holder = app.snapshot.holders.at(0)
-  const { listening, total } = app.snapshot
+  const { launch, listening, total } = app.snapshot
+  const holder = launch.kind === 'queue' ? (launch.behind ?? undefined) : undefined
+  const ahead = launch.kind === 'queue' ? launch.ahead : 0
 
   const option = (value: Choice): string =>
     `flex cursor-pointer gap-3 rounded-md p-3.5 ${choice === value ? `border-2 ${value === 'take' ? 'border-status-error' : 'border-brand'} bg-brand-soft` : 'border border-line bg-surface'}`
@@ -83,7 +85,7 @@ const BusyDialog: FC<BusyDialogProps> = ({ app, now, onCancel, onWait, onTakeOve
         {holder === undefined ? null : (
           <dl className="m-0 rounded-md bg-surface-sunken text-sm">
             <div className={ROW}>
-              <dt className={TERM}>Held by</dt>
+              <dt className={TERM}>{ahead === 0 ? 'Held by' : 'Next up'}</dt>
               <dd className="m-0 font-semibold">
                 {baseName(holder.repo)}
                 {knownBranch(holder.branch) === '' ? null : (
@@ -99,7 +101,7 @@ const BusyDialog: FC<BusyDialogProps> = ({ app, now, onCancel, onWait, onTakeOve
               <dd className="m-0">{holder.reason || '—'}</dd>
             </div>
             <div className={ROW}>
-              <dt className={TERM}>Held for</dt>
+              <dt className={TERM}>{ahead === 0 ? 'Held for' : 'Waiting for'}</dt>
               <dd className="m-0">
                 {since(holder.since, now)} ·{' '}
                 <span className={listening === total ? 'text-status-ok' : 'text-ink-muted'}>
@@ -129,10 +131,8 @@ const BusyDialog: FC<BusyDialogProps> = ({ app, now, onCancel, onWait, onTakeOve
               <span>
                 <span className="block text-[15px] font-semibold">Wait in the queue</span>
                 <span className="mt-0.5 block text-[13px] text-ink-muted">
-                  {app.snapshot.queue.length === 0
-                    ? 'You are first in line.'
-                    : `${app.snapshot.queue.length} ahead of you.`}{' '}
-                  It launches from your checkout as soon as it is released.
+                  {ahead === 0 ? 'You are first in line.' : `${ahead} ahead of you.`} It launches
+                  from your checkout as soon as it is released.
                 </span>
               </span>
             </label>

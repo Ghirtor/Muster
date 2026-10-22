@@ -1,7 +1,7 @@
 import type { FC } from 'react'
 
 import type { ReadyApp } from '../../api/musterApi.types'
-import { baseName, clock, duration, heldFrom, knownBranch, since } from '../../format'
+import { baseName, clock, duration, knownBranch, since } from '../../format'
 
 type LockCardProps = Readonly<{ app: ReadyApp; now: number }>
 
@@ -35,7 +35,7 @@ const LockCard: FC<LockCardProps> = ({ app, now }) => {
             <dd className="m-0 font-semibold">
               {baseName(lock.repo)}{' '}
               <span className="font-normal text-ink-faint">
-                {heldFrom(lock, app.config.repo) ? 'this checkout' : 'another checkout'}
+                {lock.mine ? 'this checkout' : 'another checkout'}
               </span>
             </dd>
           </div>

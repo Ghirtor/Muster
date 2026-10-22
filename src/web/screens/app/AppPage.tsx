@@ -3,10 +3,10 @@ import type { FC } from 'react'
 import type { AppView, Job, ReadyApp } from '../../api/musterApi.types'
 import Button from '../../components/Button'
 import Panel from '../../components/Panel'
-import { baseName, modeLabel } from '../../format'
+import { baseName, checkoutOf, modeLabel } from '../../format'
 import type { UseActionsReturn } from '../../hooks/useActions.types'
 import { hrefOf } from '../../routes'
-import { appName, isTaken, ownHold } from '../appStatus'
+import { appName } from '../appStatus'
 import { DASHBOARD_REASON } from '../reasons'
 import JobPanel from './JobPanel'
 import LockCard from './LockCard'
@@ -27,16 +27,19 @@ type AppControlsProps = Readonly<{ app: ReadyApp; actions: UseActionsReturn }>
 const LAUNCH = { action: 'up', reason: DASHBOARD_REASON } as const
 
 /**
- * What this checkout may do with the rig: launch it when free; restart, release or stop it when it
- * holds it; and when another holds it, launch (which offers the queue) or stop it anyway.
+ * What this checkout may do with the rig, by its launch verdict: restart, release or stop it when
+ * held; launch it when free; launch (which offers the queue) or stop it anyway when it would queue;
+ * and only stop a foreign rig.
  */
 const AppControls: FC<AppControlsProps> = ({ app, actions }) => {
   const disabled = actions.busy !== null
+  const { launch } = app.snapshot
+
   const run = (steps: Parameters<UseActionsReturn['run']>[1]): void => {
     void actions.run(app.id, steps)
   }
 
-  if (ownHold(app) !== null) {
+  if (launch.kind === 'held') {
     return (
       <>
         <Button
@@ -69,16 +72,39 @@ const AppControls: FC<AppControlsProps> = ({ app, actions }) => {
     )
   }
 
-  if (!isTaken(app.snapshot)) {
+  if (launch.kind === 'free') {
+    return (
+      <>
+        <Button
+          tone="primary"
+          disabled={disabled}
+          onClick={() => {
+            run([LAUNCH])
+          }}
+        >
+          Launch
+        </Button>
+        {launch.takesOver === null ? null : (
+          <p className="m-0 basis-full text-[13px] text-ink-faint">
+            Takes over a stale lock from {checkoutOf(launch.takesOver)}
+          </p>
+        )}
+      </>
+    )
+  }
+
+  if (launch.kind === 'foreign') {
     return (
       <Button
-        tone="primary"
+        tone="danger"
         disabled={disabled}
         onClick={() => {
-          run([LAUNCH])
+          if (window.confirm(`Stop ${app.config.name}, started outside Muster?`)) {
+            run([{ action: 'down', force: true }])
+          }
         }}
       >
-        Launch
+        Stop
       </Button>
     )
   }

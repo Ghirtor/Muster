@@ -1,4 +1,4 @@
-import type { Lock, QueueEntry } from './lock.types'
+import type { LaunchVerdict, Lock, QueueEntry } from './lock.types'
 import type { Output } from './output.types'
 
 export interface RigOptions {
@@ -25,11 +25,16 @@ export interface PortRow {
 
 export type RigState = 'up' | 'partial' | 'down'
 
+export interface Holder extends Lock {
+  mine: boolean
+}
+
 export interface RigSnapshot {
   state: RigState
-  holders: Lock[]
+  holders: Holder[]
   queue: QueueEntry[]
   foreign: boolean
+  launch: LaunchVerdict
   ports: PortRow[]
   listening: number
   total: number

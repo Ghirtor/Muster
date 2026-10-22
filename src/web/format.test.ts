@@ -1,13 +1,5 @@
 import type { ProcessView } from './api/musterApi.types'
-import {
-  baseName,
-  checkoutOf,
-  duration,
-  heldFrom,
-  knownBranch,
-  modeLabel,
-  processStatus
-} from './format'
+import { baseName, checkoutOf, duration, knownBranch, modeLabel, processStatus } from './format'
 
 describe('format', () => {
   it.each([
@@ -26,11 +18,7 @@ describe('format', () => {
     expect(modeLabel('up-to-n', 3)).toBe('Up to 3')
   })
 
-  it('compares checkouts the way Windows does', () => {
-    const lock = { repo: 'C:\\Dev\\Demo\\', branch: 'main', reason: '', since: '' }
-
-    expect(heldFrom(lock, 'c:/dev/demo')).toBe(true)
-    expect(heldFrom(lock, 'c:/dev/other')).toBe(false)
+  it('names a checkout by its folder', () => {
     expect(baseName('C:\\dev\\Demo\\')).toBe('Demo')
   })
 

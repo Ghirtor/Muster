@@ -109,8 +109,8 @@ export class AppsController {
   @Get(':id/lock')
   async lock(@Param('id') id: string): Promise<object> {
     const entry = this.loadedOf(id)
-    const { holders, foreign } = await this.registry.rigOf(entry).snapshot()
-    return { mode: entry.config.instances.mode, holders, foreign }
+    const { holders, foreign, launch } = await this.registry.rigOf(entry).snapshot()
+    return { mode: entry.config.instances.mode, holders, foreign, launch }
   }
 
   /** Who waits for the rig. */

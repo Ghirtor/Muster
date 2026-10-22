@@ -10,6 +10,7 @@ import {
   dropLock,
   holders,
   isMine,
+  launchVerdict,
   mySlot,
   readLock,
   recordPid,
@@ -90,11 +91,15 @@ export class Rig {
   }
 
   /**
-   * Who holds the rig, who waits for it and which ports listen, read without touching the lock.
-   * Foreign means one per machine's ports listen while nobody holds it: started outside Muster.
+   * Who holds the rig, who waits for it, which ports listen and what a launch from this checkout
+   * would meet, read without touching the lock. Foreign means one per machine's ports listen while
+   * nobody holds it: started outside Muster.
    */
   async snapshot(): Promise<RigSnapshot> {
-    const held = holders(this.ctx).map((slot) => slot.lock)
+    const held = holders(this.ctx).map(({ lock }) => ({
+      ...lock,
+      mine: isMine(lock, this.ctx.repo)
+    }))
     const ports = await this.ports()
     const listening = ports.filter((row) => row.up).length
     const state = listening === ports.length ? 'up' : listening === 0 ? 'down' : 'partial'
@@ -105,7 +110,8 @@ export class Rig {
       foreign: this.machine && held.length === 0 && listening > 0,
       ports,
       listening,
-      total: ports.length
+      total: ports.length,
+      launch: await launchVerdict(this.ctx)
     }
   }
 
@@ -118,7 +124,7 @@ export class Rig {
       )
     }
     for (const lock of snapshot.holders) {
-      const mine = isMine(lock, this.ctx.repo) ? '  ← this checkout' : ''
+      const mine = lock.mine ? '  ← this checkout' : ''
       this.line(`  holder: ${describeLock(lock)}${mine}`)
     }
     if (this.config.instances.mode === 'up-to-n') {

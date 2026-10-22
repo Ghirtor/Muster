@@ -126,7 +126,6 @@ Then merge `dev` into `main`, by pull request or `git merge` and push.
 | `src/server/`   | The supervisor (Node + TS, run with SWC): engine, NestJS API, CLI |
 | `src/web/`      | The dashboard (React 19, Vite, Tailwind 4, React Compiler)       |
 | `design/`       | Screens (`*.dc.html`), tokens (`tokens.json`), Demo's config     |
-| `reference/`    | `rig.mjs`, the behaviour the engine must match                   |
 | `src-tauri/`    | The desktop app (Tauri 2): window + supervisor process           |
 | `docs/agents/`  | How the agent skills reach the issue tracker and the code host   |
 | `gitHooks/`     | pre-commit (oxfmt), post-commit, commit-msg (issue key required) |

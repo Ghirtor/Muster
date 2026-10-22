@@ -1,6 +1,5 @@
-import type { AppView, Lock, RigSnapshot } from '../api/musterApi.types'
+import type { AppView } from '../api/musterApi.types'
 import type { ProcessStatus } from '../components/StatusBadge.types'
-import { heldFrom } from '../format'
 
 const STATES = {
   up: { status: 'ok', label: 'Running' },
@@ -28,11 +27,3 @@ export const matches = (app: AppView, search: string): boolean => {
     : [app.id, app.file]
   return words.some((word) => word.toLowerCase().includes(needle))
 }
-
-/** Whether the rig is held, by a lock or by processes started outside Muster. */
-export const isTaken = (snapshot: RigSnapshot): boolean =>
-  snapshot.holders.length > 0 || snapshot.foreign
-
-/** The holder that is this app's own checkout, if one is. */
-export const ownHold = (app: AppView): Lock | null =>
-  app.ok ? (app.snapshot.holders.find((lock) => heldFrom(lock, app.config.repo)) ?? null) : null

@@ -77,11 +77,22 @@ export interface PortRow {
 
 export type RigState = 'up' | 'partial' | 'down'
 
+export interface Holder extends Lock {
+  mine: boolean
+}
+
+export type LaunchVerdict =
+  | { kind: 'held'; lock: Lock }
+  | { kind: 'free'; takesOver: Lock | null }
+  | { kind: 'queue'; behind: Lock | null; ahead: number }
+  | { kind: 'foreign' }
+
 export interface RigSnapshot {
   state: RigState
-  holders: Lock[]
+  holders: Holder[]
   queue: QueueEntry[]
   foreign: boolean
+  launch: LaunchVerdict
   ports: PortRow[]
   listening: number
   total: number

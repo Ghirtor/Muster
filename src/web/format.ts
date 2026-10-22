@@ -1,4 +1,4 @@
-import type { InstanceMode, Lock, PortRow, ProcessView } from './api/musterApi.types'
+import type { InstanceMode, PortRow, ProcessView } from './api/musterApi.types'
 import type { ProcessStatus } from './components/StatusBadge.types'
 
 const MODES: Record<InstanceMode, string> = {
@@ -42,16 +42,6 @@ export const knownBranch = (branch: string): string => (branch === '?' ? '' : br
 /** A checkout in words: its folder, then its branch when it is known. */
 export const checkoutOf = (held: { repo: string; branch: string }): string =>
   [baseName(held.repo), knownBranch(held.branch)].filter(Boolean).join(' · ')
-
-/** Whether a lock was taken from `repo`, paths compared the way Windows compares them. */
-export const heldFrom = (lock: Lock, repo: string): boolean => {
-  const normal = (file: string): string =>
-    file
-      .replace(/[\\/]+/g, '/')
-      .replace(/\/$/, '')
-      .toLowerCase()
-  return normal(lock.repo) === normal(repo)
-}
 
 /** A process's state from its ports: all listening, some, or none. */
 export const processStatus = (proc: ProcessView, ports: PortRow[]): ProcessStatus => {

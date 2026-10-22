@@ -1,8 +1,13 @@
 import { appOf, lockOf, REPO, snapshotOf } from '../__mocks__/fixtures'
 import type { BrokenApp } from '../api/musterApi.types'
-import { appName, appStatus, isTaken, matches, ownHold } from './appStatus'
+import { appName, appStatus, matches } from './appStatus'
 
-const broken: BrokenApp = { id: 'demo', file: 'sample.yaml', ok: false, problems: ['name: missing'] }
+const broken: BrokenApp = {
+  id: 'demo',
+  file: 'sample.yaml',
+  ok: false,
+  problems: ['name: missing']
+}
 
 describe('appStatus', () => {
   it('names the rig state', () => {
@@ -26,19 +31,5 @@ describe('matches', () => {
     expect(matches(appOf(), '7002')).toBe(true)
     expect(matches(appOf(), 'postgres')).toBe(false)
     expect(matches(appOf(), '  ')).toBe(true)
-  })
-})
-
-describe('isTaken and ownHold', () => {
-  it('tells this checkout’s hold from another’s and from a foreign rig', () => {
-    const mine = appOf(snapshotOf([lockOf('c:/dev/demo/')]))
-    const theirs = appOf(snapshotOf([lockOf('C:\\dev\\Other')]))
-    const foreign = snapshotOf([], { foreign: true })
-
-    expect(ownHold(mine)?.repo).toBe('c:/dev/demo/')
-    expect(ownHold(theirs)).toBeNull()
-    expect(isTaken(theirs.snapshot)).toBe(true)
-    expect(isTaken(foreign)).toBe(true)
-    expect(isTaken(snapshotOf())).toBe(false)
   })
 })

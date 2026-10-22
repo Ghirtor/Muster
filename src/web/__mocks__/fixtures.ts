@@ -1,4 +1,11 @@
-import type { ConfigView, Job, Lock, ReadyApp, RigSnapshot } from '../api/musterApi.types'
+import type {
+  ConfigView,
+  Holder,
+  Job,
+  LaunchVerdict,
+  ReadyApp,
+  RigSnapshot
+} from '../api/musterApi.types'
 
 export const REPO = 'C:\\dev\\Demo'
 
@@ -45,17 +52,28 @@ export const configOf = (overrides: Partial<ConfigView> = {}): ConfigView => ({
   ...overrides
 })
 
-/** A lock taken from `repo` an hour before 2026-10-22 10:00 UTC. */
-export const lockOf = (repo: string): Lock => ({
+/** A lock taken from `repo` an hour before 2026-10-22 10:00 UTC, this checkout's when it is `REPO`. */
+export const lockOf = (repo: string): Holder => ({
   repo,
   branch: 'main',
   reason: 'demo',
-  since: '2026-10-22T09:00:00.000Z'
+  since: '2026-10-22T09:00:00.000Z',
+  mine: repo === REPO
 })
+
+/** What the engine says a launch meets under `holders`: held when one is ours, else queued behind the first. */
+const verdictOf = (holders: Holder[]): LaunchVerdict => {
+  const mine = holders.find((holder) => holder.mine)
+  if (mine !== undefined) return { kind: 'held', lock: mine }
+  const first = holders.at(0)
+  return first === undefined
+    ? { kind: 'free', takesOver: null }
+    : { kind: 'queue', behind: first, ahead: 0 }
+}
 
 /** The rig stopped, or running under `holders` when there are any. */
 export const snapshotOf = (
-  holders: Lock[] = [],
+  holders: Holder[] = [],
   overrides: Partial<RigSnapshot> = {}
 ): RigSnapshot => {
   const up = holders.length > 0
@@ -64,6 +82,7 @@ export const snapshotOf = (
     holders,
     queue: [],
     foreign: false,
+    launch: verdictOf(holders),
     ports: [
       { port: 7001, key: 'api', label: 'API', up },
       { port: 7002, key: 'web', label: 'Web', up }

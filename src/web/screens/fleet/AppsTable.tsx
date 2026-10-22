@@ -5,7 +5,7 @@ import Button from '../../components/Button'
 import StatusBadge from '../../components/StatusBadge'
 import { baseName, knownBranch, modeLabel, since } from '../../format'
 import { hrefOf } from '../../routes'
-import { appName, appStatus, isTaken, ownHold } from '../appStatus'
+import { appName, appStatus } from '../appStatus'
 import PortBar from './PortBar'
 
 type AppsTableProps = Readonly<{
@@ -38,7 +38,7 @@ const AppsTable: FC<AppsTableProps> = ({ apps, now, busy, onLaunch, onRelease })
         {apps.map((app) => {
           const badge = appStatus(app)
           const holder = app.ok ? app.snapshot.holders.at(0) : undefined
-          const mine = ownHold(app)
+          const launch = app.ok ? app.snapshot.launch.kind : null
           const working = busy === app.id
           return (
             <tr key={app.id} className="border-t border-line-subtle hover:bg-brand-soft">
@@ -85,7 +85,7 @@ const AppsTable: FC<AppsTableProps> = ({ apps, now, busy, onLaunch, onRelease })
                   >
                     Open
                   </a>
-                  {app.ok && mine !== null ? (
+                  {launch === 'held' ? (
                     <Button
                       small
                       disabled={working}
@@ -96,7 +96,7 @@ const AppsTable: FC<AppsTableProps> = ({ apps, now, busy, onLaunch, onRelease })
                       Release
                     </Button>
                   ) : null}
-                  {app.ok && !isTaken(app.snapshot) ? (
+                  {launch === 'free' ? (
                     <Button
                       small
                       disabled={working}

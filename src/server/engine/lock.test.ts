@@ -6,8 +6,8 @@ import os from 'node:os'
 import path from 'node:path'
 
 import type { InstanceMode, InstancesConfig } from './config.types'
-import { acquire, holders, isStale, readLock, recordPid, slotFiles } from './lock'
-import type { Lock, LockContext } from './lock.types'
+import { acquire, holders, isStale, launchVerdict, readLock, recordPid, slotFiles } from './lock'
+import type { LaunchVerdict, Lock, LockContext } from './lock.types'
 
 interface Recorder {
   text: string
@@ -181,6 +181,177 @@ describe('acquire', () => {
       /waiting: the rig is held by .*theirs.*position 1 in the queue/
     )
     expect(JSON.parse(fs.readFileSync(path.join(dir, 'lock.queue.json'), 'utf8'))).toEqual([])
+  })
+})
+
+/** A checkout queued for the rig in `file`, kept alive by this test's parent process. */
+const queue = (file: string, repo: string): void => {
+  const entry = {
+    repo: path.join(dir, repo),
+    branch: 'main',
+    reason: 'next',
+    since: new Date().toISOString(),
+    pid: process.ppid
+  }
+  fs.writeFileSync(file, JSON.stringify([entry]))
+}
+
+/** A server listening on a free port, and how to close it. */
+const listening = async (): Promise<{ port: number; close: () => Promise<unknown> }> => {
+  const server = net.createServer()
+  await new Promise<void>((resolve) => {
+    server.listen(0, '127.0.0.1', resolve)
+  })
+  return {
+    port: (server.address() as AddressInfo).port,
+    close: async () =>
+      await new Promise((resolve) => {
+        server.close(resolve)
+      })
+  }
+}
+
+describe('launchVerdict', () => {
+  describe('one per machine', () => {
+    it('finds a free rig free', async () => {
+      await expect(launchVerdict(context('mine'))).resolves.toEqual({
+        kind: 'free',
+        takesOver: null
+      })
+    })
+
+    it("finds this checkout's own lock held", async () => {
+      hold(path.join(dir, 'lock.json'), 'mine')
+
+      await expect(launchVerdict(context('mine'))).resolves.toMatchObject({
+        kind: 'held',
+        lock: { repo: path.join(dir, 'mine') }
+      })
+    })
+
+    it('queues behind another checkout', async () => {
+      hold(path.join(dir, 'lock.json'), 'theirs')
+
+      await expect(launchVerdict(context('mine'))).resolves.toMatchObject({
+        kind: 'queue',
+        behind: { repo: path.join(dir, 'theirs') },
+        ahead: 0
+      })
+    })
+
+    it('queues behind the first waiter rather than the holder', async () => {
+      hold(path.join(dir, 'lock.json'), 'theirs')
+      queue(path.join(dir, 'lock.queue.json'), 'next')
+
+      await expect(launchVerdict(context('mine'))).resolves.toEqual({
+        kind: 'queue',
+        behind: expect.objectContaining({ repo: path.join(dir, 'next') }) as Lock,
+        ahead: 1
+      })
+    })
+
+    it('finds a stale lock free, naming the lock it takes over', async () => {
+      hold(path.join(dir, 'lock.json'), 'theirs', { pids: [await deadPid()] })
+
+      await expect(launchVerdict(context('mine'))).resolves.toMatchObject({
+        kind: 'free',
+        takesOver: { repo: path.join(dir, 'theirs') }
+      })
+    })
+
+    it('finds ports up with nobody holding them foreign', async () => {
+      const server = await listening()
+      const ctx = { ...context('mine'), ports: [server.port] }
+
+      await expect(launchVerdict(ctx)).resolves.toEqual({ kind: 'foreign' })
+      await server.close()
+    })
+  })
+
+  describe('one per checkout', () => {
+    it('finds the rig free while another checkout holds its own', async () => {
+      await acquire(context('theirs', 'one-per-checkout'), options)
+
+      await expect(launchVerdict(context('mine', 'one-per-checkout'))).resolves.toEqual({
+        kind: 'free',
+        takesOver: null
+      })
+    })
+  })
+
+  describe('up to N', () => {
+    it('finds a slot free while another checkout holds one of them', async () => {
+      hold(path.join(dir, 'lock-1.json'), 'theirs')
+
+      await expect(launchVerdict(context('mine', 'up-to-n', 2))).resolves.toEqual({
+        kind: 'free',
+        takesOver: null
+      })
+    })
+
+    it('queues behind the longest holder once every slot is taken', async () => {
+      hold(path.join(dir, 'lock-1.json'), 'later')
+      hold(path.join(dir, 'lock-2.json'), 'earlier', {
+        since: new Date(Date.now() - 60_000).toISOString()
+      })
+
+      await expect(launchVerdict(context('mine', 'up-to-n', 2))).resolves.toMatchObject({
+        kind: 'queue',
+        behind: { repo: path.join(dir, 'earlier') },
+        ahead: 0
+      })
+    })
+  })
+
+  describe('agrees with acquire', () => {
+    const expected = (verdict: LaunchVerdict): object => {
+      if (verdict.kind === 'foreign') return { held: false, foreign: true }
+      return verdict.kind === 'queue' ? { held: false, foreign: false } : { held: true }
+    }
+
+    it.each([
+      ['a free rig', (): void => undefined],
+      [
+        'its own lock',
+        (): void => {
+          hold(path.join(dir, 'lock.json'), 'mine')
+        }
+      ],
+      [
+        'another holder',
+        (): void => {
+          hold(path.join(dir, 'lock.json'), 'theirs')
+        }
+      ],
+      [
+        'a waiter ahead',
+        (): void => {
+          queue(path.join(dir, 'lock.queue.json'), 'next')
+        }
+      ]
+    ])('with %s', async (_, arrange) => {
+      arrange()
+      const verdict = await launchVerdict(context('mine'))
+
+      await expect(acquire(context('mine'), options)).resolves.toMatchObject(expected(verdict))
+    })
+
+    it('with a stale lock', async () => {
+      hold(path.join(dir, 'lock.json'), 'theirs', { pids: [await deadPid()] })
+      const verdict = await launchVerdict(context('mine'))
+
+      expect(verdict.kind).toBe('free')
+      await expect(acquire(context('mine'), options)).resolves.toMatchObject(expected(verdict))
+    })
+
+    it('with ports up and nobody holding them', async () => {
+      const server = await listening()
+      const ctx = { ...context('mine'), ports: [server.port] }
+      const verdict = await launchVerdict(ctx)
+
+      await expect(acquire(ctx, options)).resolves.toMatchObject(expected(verdict))
+      await server.close()
+    })
   })
 })
 

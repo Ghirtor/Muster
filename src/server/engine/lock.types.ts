@@ -38,3 +38,9 @@ export interface AcquireOptions {
 }
 
 export type AcquireResult = { held: true; file: string } | { held: false; foreign: boolean }
+
+export type LaunchVerdict =
+  | { kind: 'held'; lock: Lock }
+  | { kind: 'free'; takesOver: Lock | null }
+  | { kind: 'queue'; behind: Lock | null; ahead: number }
+  | { kind: 'foreign' }

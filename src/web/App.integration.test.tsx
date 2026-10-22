@@ -166,6 +166,39 @@ describe('App detail', () => {
     await settled()
   })
 
+  it('launches over a stale lock and says whose it takes over', async () => {
+    const stale = lockOf('C:\\dev\\Other')
+    serve({
+      apps: [appOf(snapshotOf([], { launch: { kind: 'free', takesOver: stale } }))],
+      posted: []
+    })
+    renderAt('#/apps/demo')
+
+    expect(await screen.findByRole('button', { name: 'Launch' })).toBeInTheDocument()
+    expect(screen.getByText('Takes over a stale lock from Other · main')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Stop anyway' })).not.toBeInTheDocument()
+  })
+
+  it('only stops a foreign rig, after asking', async () => {
+    const server: Server = {
+      apps: [appOf(snapshotOf([], { foreign: true, launch: { kind: 'foreign' } }))],
+      posted: []
+    }
+    serve(server)
+    waitFor_.mockResolvedValue(jobOf({ action: 'down' }))
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    renderAt('#/apps/demo')
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Stop' }))
+    expect(screen.queryByRole('button', { name: 'Launch' })).not.toBeInTheDocument()
+    expect(confirm).toHaveBeenCalledOnce()
+    await waitFor(() => {
+      expect(actionsOf(server)).toEqual([{ action: 'down', force: true }])
+    })
+    await settled()
+    confirm.mockRestore()
+  })
+
   it('reports a failed action and dismisses it', async () => {
     serve({ apps: [appOf()], posted: [] })
     waitFor_.mockResolvedValue(jobOf({ outcome: 'failed', exitCode: 1 }))
