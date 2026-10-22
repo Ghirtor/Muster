@@ -2,29 +2,6 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "dashboard",
-      "type": "npm",
-      "script": "start:web",
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "vite",
-        "pattern": {
-          "regexp": "^$"
-        },
-        "background": {
-          "activeBegins": true,
-          "beginsPattern": "VITE v",
-          "endsPattern": "Local:"
-        }
-      }
-    },
-    {
-      "label": "stop dashboard",
-      "command": "${input:terminate}",
-      "type": "shell",
-      "problemMatcher": []
-    },
-    {
       "label": "dev",
       "type": "npm",
       "script": "dev",
@@ -34,7 +11,7 @@
     {
       "label": "desktop",
       "type": "npm",
-      "script": "debug:tauri:cdp",
+      "script": "dev:desktop",
       "isBackground": true,
       "problemMatcher": {
         "owner": "tauri",
@@ -56,12 +33,6 @@
     }
   ],
   "inputs": [
-    {
-      "id": "terminate",
-      "type": "command",
-      "command": "workbench.action.tasks.terminate",
-      "args": "dashboard"
-    },
     {
       "id": "terminateDesktop",
       "type": "command",
