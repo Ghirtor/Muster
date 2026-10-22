@@ -13,6 +13,7 @@
     --color-brand-bright: var(--palette-azure-500);
     --color-brand-deep: var(--palette-azure-800);
     --color-brand-soft: var(--palette-azure-50);
+    --color-brand-mark: var(--palette-coral-700);
     --color-selected: var(--palette-azure-100);
     --color-chip-hover: var(--palette-azure-200);
 
