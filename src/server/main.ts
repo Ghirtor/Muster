@@ -33,8 +33,8 @@ const cliCommand = (): string[] => {
  * The supervisor: the API over every configured app, and with `FLOTILLA_WEB_ROOT` set (the desktop
  * app sets it) the built dashboard too.
  */
-const main = (): void => {
-  const { server } = createSupervisor({
+const main = async (): Promise<void> => {
+  const { server } = await createSupervisor({
     configs: configFiles(),
     cli: cliCommand(),
     ...(process.env.FLOTILLA_WEB_ROOT === undefined
@@ -46,4 +46,7 @@ const main = (): void => {
   })
 }
 
-main()
+main().catch((error: unknown) => {
+  console.error(error)
+  process.exit(1)
+})

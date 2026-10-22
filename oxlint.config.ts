@@ -87,17 +87,12 @@ export default defineConfig({
       plugins: ['typescript'],
       rules: {
         ...rulesOf([
-          reactPreset,
           js.configs.recommended,
           ...tseslint.configs.strictTypeChecked,
           ...tseslint.configs.stylisticTypeChecked
         ]),
         // the one preset rule eslint-config-prettier switched off: it fights the formatter's line breaks
         'no-unexpected-multiline': 'off',
-        // both conflict with react compiler
-        '@eslint-react/no-unstable-context-value': 'off',
-        '@eslint-react/no-unstable-default-props': 'off',
-        'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
         'typescript/restrict-template-expressions': 'off',
         'no-unused-vars': 'error',
         'prefer-const': 'error',
@@ -108,15 +103,21 @@ export default defineConfig({
         eqeqeq: 'error',
         'typescript/no-unnecessary-condition': ['error', { allowConstantLoopConditions: true }],
         'house/module-shape': 'error',
-        'house/colour-tokens': 'error',
         'no-inline-comments': 'error'
       }
     },
-    // the dashboard talks to the supervisor over HTTP only: it must never pull in node code
+    // React lives in the dashboard alone, and it talks to the supervisor over HTTP only: it must
+    // never pull in node code
     {
       files: ['src/web/**/*.ts', 'src/web/**/*.tsx'],
       plugins: ['typescript'],
       rules: {
+        ...rulesOf([reactPreset]),
+        // both conflict with react compiler
+        '@eslint-react/no-unstable-context-value': 'off',
+        '@eslint-react/no-unstable-default-props': 'off',
+        'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
+        'house/colour-tokens': 'error',
         'no-restricted-imports': [
           'error',
           {
@@ -133,7 +134,7 @@ export default defineConfig({
     },
     // a component or a hook is what its file is for: it is default exported, and nothing else is
     {
-      files: ['src/**/[A-Z]*.tsx', 'src/**/use[A-Z]*.ts', 'src/**/use[A-Z]*.tsx'],
+      files: ['src/web/**/[A-Z]*.tsx', 'src/web/**/use[A-Z]*.ts', 'src/web/**/use[A-Z]*.tsx'],
       plugins: ['import'],
       rules: { 'import/no-named-export': 'error' }
     },
@@ -142,10 +143,16 @@ export default defineConfig({
       plugins: ['import'],
       rules: { 'import/no-named-export': 'off' }
     },
-    // colour data, not theme: the token sheets themselves, the server (which paints nothing), and
-    // tests that assert the exact values the app paints
+    // Nest modules, controllers and gateways are classes the decorators give their meaning to
     {
-      files: ['src/web/styles/**', 'src/server/**', '**/*.test.ts', '**/*.test.tsx'],
+      files: ['src/server/**/*.ts'],
+      plugins: ['typescript'],
+      rules: { 'typescript/no-extraneous-class': ['error', { allowWithDecorator: true }] }
+    },
+    // colour data, not theme: the token sheets themselves, and tests that assert the exact values
+    // the app paints
+    {
+      files: ['src/web/styles/**', 'src/web/**/*.test.ts', 'src/web/**/*.test.tsx'],
       rules: { 'house/colour-tokens': 'off' }
     }
   ]

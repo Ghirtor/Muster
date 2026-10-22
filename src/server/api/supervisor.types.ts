@@ -15,5 +15,3 @@ export interface Supervisor {
   server: http.Server
   close: () => Promise<void>
 }
-
-export type Reply = [status: number, body: unknown]

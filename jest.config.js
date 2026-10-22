@@ -1,13 +1,10 @@
 const runningInCi = process.env.CI === 'true'
 
-const transform = {
-  '^.+\\.[jt]sx?$': ['ts-jest', { useESM: true, tsconfig: 'tsconfig.json', diagnostics: false }]
-}
+const transformOf = (useESM, tsconfig) => ({
+  '^.+\\.[jt]sx?$': ['ts-jest', { useESM, tsconfig, diagnostics: false }]
+})
 
 const shared = {
-  preset: 'ts-jest/presets/default-esm',
-  extensionsToTreatAsEsm: ['.ts', '.tsx', '.jsx'],
-  transform,
   moduleNameMapper: { '^(\\.{1,2}/.*)\\.js$': '$1' }
 }
 
@@ -29,6 +26,9 @@ export default {
     {
       ...shared,
       displayName: 'web',
+      // CommonJS, so that jest.mock is hoisted above the imports it replaces
+      preset: 'ts-jest',
+      transform: transformOf(false, '<rootDir>/src/web/tsconfig.json'),
       testEnvironment: 'jsdom',
       roots: ['<rootDir>/src/web'],
       setupFilesAfterEnv: ['<rootDir>/src/web/__mocks__/jest.setup.ts'],
@@ -41,6 +41,10 @@ export default {
     {
       ...shared,
       displayName: 'server',
+      // native ESM (node --experimental-vm-modules): NestJS ships as ES modules only
+      preset: 'ts-jest/presets/default-esm',
+      extensionsToTreatAsEsm: ['.ts'],
+      transform: transformOf(true, '<rootDir>/src/server/tsconfig.json'),
       testEnvironment: 'node',
       roots: ['<rootDir>/src/server']
     }

@@ -33,7 +33,7 @@ gives each instance a slot but not yet its own ports.
 
 ## API
 
-The supervisor (`src/server/main.ts`, port `FLOTILLA_PORT` or 4871, loopback only) serves every
+The supervisor (`src/server/main.ts`, a NestJS app, port `FLOTILLA_PORT` or 4871, loopback only) serves every
 config in `FLOTILLA_CONFIGS` (paths joined by `;` on Windows, `:` elsewhere), else whichever of
 `./flotilla.yaml` and `design/sample.yaml` exist. Each app's id is its name as a slug.
 
@@ -94,7 +94,7 @@ carry the issue as `FEAT-<n>`. CI is `.github/workflows/ci.yml`.
 
 | Path            | What                                                             |
 | --------------- | ---------------------------------------------------------------- |
-| `src/server/`   | The supervisor (Node + TS, run with tsx): engine, API, CLI       |
+| `src/server/`   | The supervisor (Node + TS, run with tsx): engine, NestJS API, CLI |
 | `src/web/`      | The dashboard (React 19, Vite, Tailwind 4, React Compiler)       |
 | `design/`       | Screens (`*.dc.html`), tokens (`tokens.json`), Demo's config     |
 | `reference/`    | `rig.mjs`, the behaviour the engine must match                   |

@@ -18,14 +18,22 @@ Mirrors Demo's `Frontend/` — same versions (the lockfile was seeded from it), 
 
 - **Web**: React 19 + React Compiler (`babel-plugin-react-compiler`), Vite 7, Tailwind CSS 4. API state
   is RTK Query over axios (`src/web/api/`), fed by the WebSocket; ask before adding another library.
-- **Server**: Node ≥ 22 + TypeScript, run with `tsx`. Node built-ins only until a dependency earns
-  its place; ask before adding a framework.
-- **Tests**: Jest 30 + ts-jest (ESM) + Testing Library, two projects (`web` jsdom, `server` node).
-- **Lint**: oxlint, type-aware, rule lists from the typescript-eslint and eslint-react presets, house
-  rules in `oxlint-plugins/house.js` (module shape, colour tokens).
+- **Server**: Node ≥ 22 + TypeScript, run with `tsx`. The API (`src/server/api/`) is NestJS 12 on
+  Express, its WebSocket a `@nestjs/platform-ws` gateway; the engine and the CLI stay Nest-free.
+  esbuild emits no decorator metadata, so inject by explicit token (`@Inject(Registry)`). Ask before
+  adding another dependency.
+- **Tests**: Jest 30 + ts-jest + Testing Library, two projects: `web` (jsdom, CommonJS so `jest.mock`
+  hoists) and `server` (node, native ESM since Nest ships ESM only: import `jest` from
+  `@jest/globals`). `npm test` passes Node the `--experimental-vm-modules` this needs.
+- **Lint**: oxlint, type-aware, rule lists from the typescript-eslint presets everywhere and the
+  eslint-react one in `src/web` only, house rules in `oxlint-plugins/house.js` (module shape, colour
+  tokens).
 - **Desktop**: Tauri 2.11 (`src-tauri/`, same versions as Demo's), wrapping the
   dashboard and starting the supervisor.
-- **Types**: tsgo (`typescript7`), web and server checked separately.
+- **Types**: tsgo (`typescript7`). Each package has its own `tsconfig.json`, which the editor, Jest
+  and oxlint pick up by nearness: `src/web` (DOM, JSX, Vite, no Node), `src/server` (Node and
+  decorators, no DOM or JSX), and the root one for the tooling files beside it. All extend
+  `tsconfig.base.json`; `npm run type-check` checks the three separately.
 - **Format**: oxfmt (no semicolons, single quotes, 100 cols, sorted imports and Tailwind classes).
 - **Git hooks** (`gitHooks/`, wired by `npm install`): pre-commit formats staged files; commit-msg
   requires `FEAT-<n>: <summary>` and notes when the key differs from the

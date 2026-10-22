@@ -38,12 +38,13 @@ integration suite still contributes its coverage to the source files it exercise
 Jest 30 renamed these flags to the plural form; the singular `--testPathPattern` now errors.
 
 ```
-npx jest --testPathIgnorePatterns='\.integration\.'   # unit only — fast inner loop
-npx jest --testPathPatterns='\.integration\.'         # integration only
+npm test -- --testPathIgnorePatterns='\.integration\.'   # unit only — fast inner loop
+npm test -- --testPathPatterns='\.integration\.'         # integration only
 ```
 
-Both run from the repo root. Split them into separate CI jobs only once the integration suites are
-slow enough to be worth it.
+Both run from the repo root. Go through `npm test` rather than a bare `npx jest`: the `server`
+project runs as native ESM and needs the `--experimental-vm-modules` the script passes. Split them
+into separate CI jobs only once the integration suites are slow enough to be worth it.
 
 ## What an integration suite may mock
 

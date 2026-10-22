@@ -1,8 +1,9 @@
+import { WebSocket } from 'ws'
+
 import type { ClientMessage, HubOptions, ServerMessage } from './hub.types'
 import type { Jobs } from './jobs'
 import { readRange, sizeOf, tailLog } from './logs'
 import type { Registry } from './registry'
-import type { WebSocketPeer } from './websocket'
 
 interface Follower {
   app: string
@@ -33,7 +34,7 @@ const isClientMessage = (value: unknown): value is ClientMessage => {
  * polled while nobody listens to it.
  */
 export class Hub {
-  private readonly peers = new Map<WebSocketPeer, Set<string>>()
+  private readonly peers = new Map<WebSocket, Set<string>>()
   private readonly followers = new Map<string, Follower>()
   private readonly sent = new Map<string, string>()
   private statusTimer: NodeJS.Timeout | null = null
@@ -52,12 +53,12 @@ export class Hub {
   }
 
   /** Takes a new client. */
-  add(peer: WebSocketPeer): void {
+  add(peer: WebSocket): void {
     this.peers.set(peer, new Set())
-    peer.onMessage((text) => {
-      this.receive(peer, text)
+    peer.on('message', (data: Buffer) => {
+      this.receive(peer, data.toString('utf8'))
     })
-    peer.onClose(() => {
+    peer.on('close', () => {
       const topics = this.peers.get(peer) ?? new Set<string>()
       this.peers.delete(peer)
       for (const topic of topics) this.release(topic)
@@ -75,7 +76,7 @@ export class Hub {
   }
 
   /** Acts on one client message; anything malformed is answered with an error. */
-  private receive(peer: WebSocketPeer, text: string): void {
+  private receive(peer: WebSocket, text: string): void {
     let message: unknown
     try {
       message = JSON.parse(text)
@@ -101,7 +102,7 @@ export class Hub {
    * Starts what `topic` needs and sends `peer` its current state. False for an unknown topic. The
    * first status subscriber gets it from the first tick, which runs after `peer` is subscribed.
    */
-  private claim(peer: WebSocketPeer, topic: string): boolean {
+  private claim(peer: WebSocket, topic: string): boolean {
     if (topic === 'jobs') return true
     if (topic === 'status') {
       if (this.statusTimer === null) {
@@ -181,7 +182,7 @@ export class Hub {
   }
 
   /** Sends one client every app's state. */
-  private async sendAllStatus(peer: WebSocketPeer): Promise<void> {
+  private async sendAllStatus(peer: WebSocket): Promise<void> {
     for (const message of await this.statusMessages()) this.send(peer, message)
   }
 
@@ -207,8 +208,8 @@ export class Hub {
     for (const [peer, topics] of this.peers) if (topics.has(topic)) this.send(peer, message)
   }
 
-  /** Sends one message to one client. */
-  private send(peer: WebSocketPeer, message: ServerMessage): void {
-    peer.send(JSON.stringify(message))
+  /** Sends one message to one client, unless it is already closing. */
+  private send(peer: WebSocket, message: ServerMessage): void {
+    if (peer.readyState === WebSocket.OPEN) peer.send(JSON.stringify(message))
   }
 }

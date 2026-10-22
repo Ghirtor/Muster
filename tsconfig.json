@@ -1,9 +1,8 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "types": ["vite/client", "jest", "node"],
-    "lib": ["dom", "dom.iterable", "es2022"],
-    "rootDir": ".",
-    "jsx": "react-jsx"
-  }
+    "types": ["node"],
+    "allowJs": true
+  },
+  "include": ["*.ts", "*.js", "*.mjs", "oxlint-plugins/**/*", "scripts/**/*"]
 }

@@ -125,7 +125,7 @@ beforeEach(async () => {
     }),
     writeConfig('broken.yaml', { name: 'Broken' })
   ]
-  supervisor = createSupervisor({
+  supervisor = await createSupervisor({
     configs: files,
     cli: [process.execPath, '--import', 'tsx', path.resolve('src/server/cli.ts')],
     hub: { statusMs: 200, logMs: 100 }
