@@ -1,0 +1,8 @@
+dist/
+tmp/
+.npm
+node_modules
+.DS_Store
+*.tsbuildinfo
+junit.xml
+coverage/

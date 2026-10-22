@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flotilla — Demo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5f8fb}
+a{color:#0f5f9f}a:hover{color:#0b4a7d}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #1a77c2;outline-offset:2px}
+.navrow:hover{background:#eef6fd !important}
+.trow:hover{background:#eef6fd !important}
+</style>
+</helmet>
+<div style="min-height: 1240px; background: #f5f8fb; color: #10203f; font-family: Archivo, system-ui, sans-serif; display: flex; flex-direction: column">
+
+  <header style="height: 64px; background: #0c3b63; color: #ffffff; display: flex; align-items: center; gap: 16px; padding: 0 24px; box-shadow: 0 1px 2px rgba(16,32,63,.04), 0 4px 14px rgba(16,32,63,.06)">
+    <div style="display: flex; align-items: center; gap: 10px; flex: 0 0 auto">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="3" width="10" height="20" rx="4" fill="#1a77c2"></rect><rect x="13" y="3" width="12" height="9" rx="4" fill="#b0d2f2"></rect><rect x="13" y="14" width="12" height="9" rx="4" fill="#ffffff"></rect></svg>
+      <span style="font-family: Newsreader, Georgia, serif; font-size: 24px; letter-spacing: -0.01em">Flotilla</span>
+    </div>
+    <label style="flex: 1 1 280px; max-width: 480px; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 980px; background: rgba(46,86,121,.9); border: 1px solid rgba(255,255,255,.18)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#ffffff" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"></circle><path d="M11 11l3.5 3.5"></path></svg>
+      <input type="search" aria-label="Search apps, processes, ports" placeholder="Search apps, processes, ports" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #ffffff; font: 15px Archivo, sans-serif; outline: none">
+    </label>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 12px">
+      <span style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 980px; background: rgba(46,86,121,.9); border: 1px solid rgba(255,255,255,.18); font-size: 13px; font-weight: 500">DESKTOP-DEV</span>
+      <span aria-label="Aymeric" style="width: 36px; height: 36px; border-radius: 50%; background: #b0d2f2; color: #0c3b63; display: grid; place-items: center; font-weight: 600; font-size: 14px">A</span>
+    </div>
+  </header>
+
+  <div style="display: flex; flex-wrap: wrap; flex: 1">
+    <nav aria-label="Main" style="flex: 1 1 264px; max-width: 100%; background: #ffffff; padding: 24px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid #ecf1f6">
+      <a href="Main.dc.html" class="navrow" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: 10px; color: #10203f; text-decoration: none; font-size: 15px; font-weight: 500">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="1.5" y="1.5" width="5" height="5" rx="1.5"></rect><rect x="9.5" y="1.5" width="5" height="5" rx="1.5"></rect><rect x="1.5" y="9.5" width="5" height="5" rx="1.5"></rect><rect x="9.5" y="9.5" width="5" height="5" rx="1.5"></rect></svg>
+        Fleet
+      </a>
+      <div style="margin: 20px 12px 6px; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: #5a6880">Apps</div>
+      <a href="Rig.dc.html" aria-current="page" class="navrow" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: 10px; background: #d7e9fa; color: #10203f; text-decoration: none; font-size: 15px; font-weight: 600; box-shadow: inset 2px 0 0 #0f5f9f">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: #16733f"></span>
+        <span style="flex: 1">Demo</span>
+        <span style="font: 12px 'JetBrains Mono', monospace; color: #16733f">7/7</span>
+      </a>
+      <div style="margin: 20px 12px 6px; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: #5a6880">Machine</div>
+      <a href="Busy.dc.html" class="navrow" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: 10px; color: #10203f; text-decoration: none; font-size: 15px; font-weight: 500">
+        <span style="flex: 1">Locks &amp; queue</span>
+        <span style="min-width: 22px; height: 22px; padding: 0 6px; box-sizing: border-box; border-radius: 980px; background: #fdf1dc; color: #9a5800; font-size: 12px; font-weight: 600; display: grid; place-items: center">1</span>
+      </a>
+      <a href="#ports" class="navrow" style="display: flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 10px; color: #10203f; text-decoration: none; font-size: 15px; font-weight: 500">Ports</a>
+      <a href="#logs" class="navrow" style="display: flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 10px; color: #10203f; text-decoration: none; font-size: 15px; font-weight: 500">Logs</a>
+      <a href="#settings" class="navrow" style="display: flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 10px; color: #10203f; text-decoration: none; font-size: 15px; font-weight: 500">Settings</a>
+    </nav>
+
+    <main style="flex: 999 1 560px; min-width: 0; padding: 24px 24px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; max-width: 1440px">
+      <nav aria-label="Breadcrumb" style="font-size: 13px; color: #5a6880"><a href="Main.dc.html">Fleet</a> <span aria-hidden="true">/</span> Demo</nav>
+
+      <div style="display: flex; gap: 24px; align-items: flex-end; flex-wrap: wrap">
+        <h1 style="margin: 0; flex: 1 1 420px; display: flex; flex-direction: column; gap: 8px; font-weight: 400">
+          <span style="font-size: 14px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #5a6880; line-height: 1.3">App · one per machine</span>
+          <span style="font-family: Newsreader, Georgia, serif; font-size: 40px; line-height: 1.08; letter-spacing: -0.02em; color: #10203f">Demo</span>
+          <span style="font-family: Newsreader, Georgia, serif; font-style: italic; font-size: 24px; line-height: 1.28; color: #1a77c2">Simulator rig · Demo</span>
+        </h1>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          <button style="height: 44px; padding: 0 18px; border-radius: 980px; border: 1px solid #dde6ef; background: #ffffff; color: #10203f; font-size: 15px; font-weight: 500">Restart all</button>
+          <button style="height: 44px; padding: 0 18px; border-radius: 980px; border: 0; background: #0f5f9f; color: #ffffff; font-size: 15px; font-weight: 500">Release rig</button>
+          <button style="height: 44px; padding: 0 18px; border-radius: 980px; border: 0; background: #b42318; color: #ffffff; font-size: 15px; font-weight: 500">Stop all</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 24px; flex-wrap: wrap">
+        <section aria-labelledby="lock-h" style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+          <h2 id="lock-h" style="margin: 0 4px; font-size: 13px; font-weight: 500; color: #5a6880">Lock</h2>
+          <dl style="margin: 0; background: #ffffff; border-radius: 14px; box-shadow: 0 1px 2px rgba(16,32,63,.04), 0 4px 14px rgba(16,32,63,.06); font-size: 14px">
+            <div style="display: flex; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #ecf1f6"><dt style="flex: 0 0 104px; color: #5a6880">Held by</dt><dd style="margin: 0; font-weight: 600">Claude <span style="font-weight: 400; color: #5a6880">agent session</span></dd></div>
+            <div style="display: flex; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #ecf1f6"><dt style="flex: 0 0 104px; color: #5a6880">Checkout</dt><dd style="margin: 0; min-width: 0; font: 13px 'JetBrains Mono', monospace; overflow-wrap: anywhere">[worktree path]\HSV-412</dd></div>
+            <div style="display: flex; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #ecf1f6"><dt style="flex: 0 0 104px; color: #5a6880">Branch</dt><dd style="margin: 0; font: 13px 'JetBrains Mono', monospace">feature/HSV-412</dd></div>
+            <div style="display: flex; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #ecf1f6"><dt style="flex: 0 0 104px; color: #5a6880">Reason</dt><dd style="margin: 0">Verify pipette move</dd></div>
+            <div style="display: flex; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #ecf1f6"><dt style="flex: 0 0 104px; color: #5a6880">Held for</dt><dd style="margin: 0; font-variant-numeric: tabular-nums">42 m <span style="color: #5a6880">since 10:05</span></dd></div>
+            <div style="display: flex; gap: 12px; padding: 12px 16px"><dt style="flex: 0 0 104px; color: #5a6880">Frees itself</dt><dd style="margin: 0; color: #4c5b75">When every launched process is gone and no port listens, or after 20 m untouched</dd></div>
+          </dl>
+        </section>
+
+        <section aria-labelledby="queue-h" style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+          <h2 id="queue-h" style="margin: 0 4px; font-size: 13px; font-weight: 500; color: #5a6880">Queue · 1 waiting</h2>
+          <div style="background: #ffffff; border-radius: 14px; box-shadow: 0 1px 2px rgba(16,32,63,.04), 0 4px 14px rgba(16,32,63,.06)">
+            <div style="display: flex; gap: 12px; padding: 14px 16px; align-items: center; border-bottom: 1px solid #ecf1f6">
+              <span style="width: 28px; height: 28px; border-radius: 50%; background: #fdf1dc; color: #9a5800; display: grid; place-items: center; font-size: 13px; font-weight: 600">1</span>
+              <div style="flex: 1; min-width: 0">
+                <div style="font-size: 14px; font-weight: 600">Claude · <span style="font: 13px 'JetBrains Mono', monospace; font-weight: 400">feature/HSV-398</span></div>
+                <div style="font-size: 13px; color: #5a6880">Check camera feed · waiting 6 m</div>
+              </div>
+              <button aria-label="Remove from queue" style="width: 36px; height: 36px; border-radius: 980px; border: 1px solid #dde6ef; background: #ffffff; color: #4c5b75; display: grid; place-items: center"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"></path></svg></button>
+            </div>
+            <div style="padding: 14px 16px; font-size: 13px; color: #4c5b75; line-height: 1.5">When the rig is released it goes to the next in line, and Flotilla relaunches it from that checkout.</div>
+          </div>
+          <h2 style="margin: 12px 4px 0; font-size: 13px; font-weight: 500; color: #5a6880">Readiness</h2>
+          <div style="background: #ffffff; border-radius: 14px; box-shadow: 0 1px 2px rgba(16,32,63,.04), 0 4px 14px rgba(16,32,63,.06); font-size: 14px">
+            <div style="display: flex; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #ecf1f6; align-items: center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#16733f" stroke-width="2" aria-hidden="true"><path d="M3 8.5l3 3 7-7"></path></svg><span style="flex: 1">Ports accept a connection</span><span style="color: #16733f; font-weight: 500">7 of 7</span></div>
+            <div style="display: flex; gap: 10px; padding: 12px 16px; align-items: center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#16733f" stroke-width="2" aria-hidden="true"><path d="M3 8.5l3 3 7-7"></path></svg><span style="flex: 1">App UI is usable — <code style="font: 13px 'JetBrains Mono', monospace">Draw</code> button visible</span><span style="color: #16733f; font-weight: 500">Ready</span></div>
+          </div>
+        </section>
+      </div>
+
+      <section id="ports" aria-labelledby="proc-h" style="background: #ffffff; border-radius: 14px; box-shadow: 0 1px 2px rgba(16,32,63,.04), 0 4px 14px rgba(16,32,63,.06); overflow: hidden">
+        <div style="display: flex; align-items: center; gap: 12px; padding: 16px 20px">
+          <h2 id="proc-h" style="margin: 0; font-size: 17px; font-weight: 600; flex: 1">Processes <span style="font-weight: 400; color: #5a6880">in launch order</span></h2>
+          <a href="Config.dc.html" style="font-size: 14px; font-weight: 500">Edit config</a>
+        </div>
+        <div style="overflow-x: auto">
+          <table style="width: 100%; min-width: 1040px; border-collapse: collapse; font-size: 14px; line-height: 1.45">
+            <thead>
+              <tr style="background: #eef3f8; text-align: left; color: #5a6880; font-size: 13px">
+                <th style="padding: 10px 8px 10px 20px; font-weight: 500; width: 28px">#</th>
+                <th style="padding: 10px 12px; font-weight: 500">Process</th>
+                <th style="padding: 10px 12px; font-weight: 500">Ports</th>
+                <th style="padding: 10px 12px; font-weight: 500">Status</th>
+                <th style="padding: 10px 12px; font-weight: 500">PID</th>
+                <th style="padding: 10px 12px; font-weight: 500; text-align: right">CPU</th>
+                <th style="padding: 10px 12px; font-weight: 500; text-align: right">Memory</th>
+                <th style="padding: 10px 12px; font-weight: 500">Up for</th>
+                <th style="padding: 10px 12px; font-weight: 500">Restarts</th>
+                <th style="padding: 10px 20px; font-weight: 500; text-align: right"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody style="font-variant-numeric: tabular-nums">
+              <sc-for list="{{procs}}" as="p" hint-placeholder-count="6">
+                <tr class="trow" style="border-top: 1px solid #ecf1f6; background: {{p.rowBg}}">
+                  <td style="padding: 12px 8px 12px 20px; color: #5a6880">{{p.n}}</td>
+                  <td style="padding: 12px">
+                    <div style="font-weight: 600">{{p.label}}</div>
+                    <div style="font: 12px 'JetBrains Mono', monospace; color: #4c5b75; margin-top: 2px">{{p.cmd}}</div>
+                  </td>
+                  <td style="padding: 12px; font: 13px 'JetBrains Mono', monospace">{{p.ports}}</td>
+                  <td style="padding: 12px"><span style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 980px; background: #e8f5ed; color: #16733f; font-size: 13px; font-weight: 500"><span style="width: 7px; height: 7px; border-radius: 50%; background: #16733f"></span>Listening</span></td>
+                  <td style="padding: 12px; font: 13px 'JetBrains Mono', monospace; color: #4c5b75">{{p.pid}}</td>
+                  <td style="padding: 12px; text-align: right">{{p.cpu}}</td>
+                  <td style="padding: 12px; text-align: right">{{p.mem}}</td>
+                  <td style="padding: 12px">{{p.up}}</td>
+                  <td style="padding: 12px; color: {{p.rColor}}">{{p.restarts}}</td>
+                  <td style="padding: 12px 20px; text-align: right; white-space: nowrap">
+                    <button aria-label="Restart {{p.label}}" style="width: 36px; height: 36px; border-radius: 980px; border: 1px solid #dde6ef; background: #ffffff; color: #10203f; display: inline-grid; place-items: center"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"></path></svg></button>
+                    <button aria-label="Stop {{p.label}}" style="width: 36px; height: 36px; border-radius: 980px; border: 1px solid #dde6ef; background: #ffffff; color: #b42318; display: inline-grid; place-items: center"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="1" y="1" width="10" height="10" rx="2" fill="currentColor"></rect></svg></button>
+                  </td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="logs" aria-labelledby="logs-h" style="background: #ffffff; border-radius: 14px; box-shadow: 0 1px 2px rgba(16,32,63,.04), 0 4px 14px rgba(16,32,63,.06); padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap">
+          <h2 id="logs-h" style="margin: 0; font-size: 17px; font-weight: 600; flex: 1">Logs</h2>
+          <div role="tablist" aria-label="Process" style="display: inline-flex; flex-wrap: wrap; padding: 3px; background: #eef3f8; border-radius: 980px">
+            <button role="tab" aria-selected="false" style="height: 32px; padding: 0 12px; border: 0; border-radius: 980px; background: transparent; color: #4c5b75; font-size: 13px; font-weight: 500">All</button>
+            <button role="tab" aria-selected="false" style="height: 32px; padding: 0 12px; border: 0; border-radius: 980px; background: transparent; color: #4c5b75; font-size: 13px; font-weight: 500">Vision</button>
+            <button role="tab" aria-selected="false" style="height: 32px; padding: 0 12px; border: 0; border-radius: 980px; background: transparent; color: #4c5b75; font-size: 13px; font-weight: 500">Bridge</button>
+            <button role="tab" aria-selected="true" style="height: 32px; padding: 0 12px; border: 0; border-radius: 980px; background: #ffffff; color: #10203f; font-size: 13px; font-weight: 500; box-shadow: 0 1px 2px rgba(16,32,63,.08)">Vite + Tauri</button>
+            <button role="tab" aria-selected="false" style="height: 32px; padding: 0 12px; border: 0; border-radius: 980px; background: transparent; color: #4c5b75; font-size: 13px; font-weight: 500">Api</button>
+          </div>
+          <label style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 980px; border: 1px solid #dde6ef; font-size: 13px; color: #4c5b75"><input type="checkbox" checked style="accent-color: #0f5f9f; width: 16px; height: 16px; margin: 0">Follow</label>
+        </div>
+        <div role="log" aria-label="Vite + Tauri log" style="background: #0a1724; border-radius: 14px; padding: 16px 18px; font: 12.5px/1.65 'JetBrains Mono', ui-monospace, monospace; color: #d6e4f2; overflow-x: auto; white-space: pre">
+<span style="color: #8fa6bf">10:09:02</span>  <span style="color: #f2b84b">WARN </span>  exited 1 — EPERM on a native binary under node_modules
+<span style="color: #8fa6bf">10:09:02</span>  <span style="color: #7ab8ef">INFO </span>  matched rule <span style="color: #ffffff">cleanup on EPERM</span> · stopping stale processes on 5173, 9222
+<span style="color: #8fa6bf">10:09:04</span>  <span style="color: #7ab8ef">INFO </span>  relaunch 1 of 1 · npm run debug:tauri  (VITE_TARGET=module)
+<span style="color: #8fa6bf">10:09:06</span>  <span style="color: #7ab8ef">INFO </span>  alive, not listening yet — slow start allowed up to 15 m
+<span style="color: #8fa6bf">10:11:41</span>  <span style="color: #7ab8ef">INFO </span>  :5173 accepts connections
+<span style="color: #8fa6bf">10:11:58</span>  <span style="color: #7ab8ef">INFO </span>  :9222 accepts connections (WebView2 debug port)
+<span style="color: #8fa6bf">10:12:03</span>  <span style="color: #6fd39a">READY</span>  readiness check passed — Draw button on screen
+<span style="color: #8fa6bf">10:31:17</span>  <span style="color: #ff8f85">ERROR</span>  [placeholder: the app's own stderr line]
+<span style="color: #8fa6bf">10:47:22</span>  <span style="color: #7ab8ef">INFO </span>  …</div>
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const rows = [
+      ['Vision service', 'python -m vision.service', '8766', '18244', '1.2 %', '312 MB', '42 m', '0'],
+      ['Bridge', 'dotnet run --project Backend/Bridge', '8767', '18560', '0.4 %', '96 MB', '42 m', '0'],
+      ['File converter', 'python converter.py', '8765', '18712', '0.1 %', '58 MB', '42 m', '0'],
+      ['REST API', 'dotnet run --project Backend/Api', '1234', '19020', '2.8 %', '284 MB', '41 m', '0'],
+      ['Simulator', 'dotnet run --project …/Simulator', '1232', '19388', '0.6 %', '74 MB', '41 m', '0'],
+      ['Vite + Tauri WebView2', 'npm run debug:tauri', '5173 · 9222', '20116', '6.3 %', '1.1 GB', '38 m', '1 · EPERM cleanup']
+    ];
+    return {
+      procs: rows.map((r, i) => ({
+        n: i + 1, label: r[0], cmd: r[1], ports: r[2], pid: r[3], cpu: r[4], mem: r[5], up: r[6], restarts: r[7],
+        rColor: r[7] === '0' ? '#5a6880' : '#9a5800',
+        rowBg: i === 5 ? '#eef6fd' : '#ffffff'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

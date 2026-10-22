@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flotilla — Demo config</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f5f8fb}
+a{color:#0f5f9f}a:hover{color:#0b4a7d}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #1a77c2;outline-offset:2px}
+.navrow:hover{background:#eef6fd !important}
+.prow:hover{background:#eef6fd !important}
+</style>
+</helmet>
+<div style="min-height: 1500px; background: #f5f8fb; color: #10203f; font-family: Archivo, system-ui, sans-serif; display: flex; flex-direction: column">
+
+  <header style="height: 64px; background: #0c3b63; color: #ffffff; display: flex; align-items: center; gap: 16px; padding: 0 24px; box-shadow: 0 1px 2px rgba(16,32,63,.04), 0 4px 14px rgba(16,32,63,.06)">
+    <div style="display: flex; align-items: center; gap: 10px; flex: 0 0 auto">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="3" width="10" height="20" rx="4" fill="#1a77c2"></rect><rect x="13" y="3" width="12" height="9" rx="4" fill="#b0d2f2"></rect><rect x="13" y="14" width="12" height="9" rx="4" fill="#ffffff"></rect></svg>
+      <span style="font-family: Newsreader, Georgia, serif; font-size: 24px; letter-spacing: -0.01em">Flotilla</span>
+    </div>
+    <label style="flex: 1 1 280px; max-width: 480px; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 980px; background: rgba(46,86,121,.9); border: 1px solid rgba(255,255,255,.18)">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#ffffff" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"></circle><path d="M11 11l3.5 3.5"></path></svg>
+      <input type="search" aria-label="Search apps, processes, ports" placeholder="Search apps, processes, ports" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #ffffff; font: 15px Archivo, sans-serif; outline: none">
+    </label>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 12px">
+      <span style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 980px; background: rgba(46,86,121,.9); border: 1px solid rgba(255,255,255,.18); font-size: 13px; font-weight: 500">DESKTOP-DEV</span>
+      <span aria-label="Aymeric" style="width: 36px; height: 36px; border-radius: 50%; background: #b0d2f2; color: #0c3b63; display: grid; place-items: center; font-weight: 600; font-size: 14px">A</span>
+    </div>
+  </header>
+
+  <div style="display: flex; flex-wrap: wrap; flex: 1">
+    <nav aria-label="Main" style="flex: 1 1 264px; max-width: 100%; background: #ffffff; padding: 24px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px; border-right: 1px solid #ecf1f6">
+      <a href="Main.dc.html" class="navrow" style="display: flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 10px; color: #10203f; text-decoration: none; font-size: 15px; font-weight: 500">Fleet</a>
+      <div style="margin: 20px 12px 6px; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: #5a6880">Apps</div>
+      <a href="Rig.dc.html" aria-current="page" class="navrow" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: 10px; background: #d7e9fa; color: #10203f; text-decoration: none; font-size: 15px; font-weight: 600; box-shadow: inset 2px 0 0 #0f5f9f">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: #16733f"></span>
+        <span style="flex: 1">Demo</span>
+        <span style="font: 12px 'JetBrains Mono', monospace; color: #16733f">7/7</span>
+      </a>
+      <a href="Config.dc.html" class="navrow" style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: 10px; color: #0f5f9f; text-decoration: none; font-size: 15px; font-weight: 500">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 3v10M3 8h10"></path></svg>
+        Add an app
+      </a>
+      <div style="margin: 20px 12px 6px; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: #5a6880">Machine</div>
+      <a href="Busy.dc.html" class="navrow" style="display: flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 10px; color: #10203f; text-decoration: none; font-size: 15px; font-weight: 500">Locks &amp; queue</a>
+      <a href="#settings" class="navrow" style="display: flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: 10px; color: #10203f; text-decoration: none; font-size: 15px; font-weight: 500">Settings</a>
+    </nav>
+
+    <main style="flex: 999 1 560px; min-width: 0; padding: 24px 24px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; max-width: 1440px">
+      <nav aria-label="Breadcrumb" style="font-size: 13px; color: #5a6880"><a href="Main.dc.html">Fleet</a> <span aria-hidden="true">/</span> <a href="Rig.dc.html">Demo</a> <span aria-hidden="true">/</span> Config</nav>
+
+      <div style="display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap">
+        <div style="flex: 1 1 320px">
+          <h1 style="margin: 0; font-size: 30px; line-height: 1.2; font-weight: 600; letter-spacing: -0.015em">Demo config</h1>
+          <p style="margin: 6px 0 0; font-size: 15px; color: #4c5b75">Imported from the rig: <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 1px 6px; border-radius: 6px">.claude/skills/rig-ctl/rig.mjs</code> in Demo.</p>
+        </div>
+        <button style="height: 44px; padding: 0 18px; border-radius: 980px; border: 1px solid #dde6ef; background: #ffffff; color: #10203f; font-size: 15px; font-weight: 500">Validate</button>
+        <button style="height: 44px; padding: 0 20px; border-radius: 980px; border: 0; background: #0f5f9f; color: #ffffff; font-size: 15px; font-weight: 500">Save config</button>
+      </div>
+
+      <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start">
+        <div style="flex: 3 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+
+          <section aria-labelledby="gen-h" style="background: #ffffff; border-radius: 14px; box-shadow: 0 1px 2px rgba(16,32,63,.04), 0 4px 14px rgba(16,32,63,.06); padding: 20px; display: flex; flex-direction: column; gap: 16px">
+            <h2 id="gen-h" style="margin: 0; font-size: 17px; font-weight: 600">General</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+              <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: #4c5b75">Name
+                <input value="Demo" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #64849f; font: 15px Archivo, sans-serif; color: #10203f">
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: #4c5b75">Default checkout
+                <input value="C:\Users\aymer\dev\demo" style="height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #64849f; font: 13px 'JetBrains Mono', monospace; color: #10203f">
+              </label>
+            </div>
+            <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+              <legend style="padding: 0; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: #4c5b75">How many can run at once</legend>
+              <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+                <label style="display: flex; gap: 10px; padding: 14px; border-radius: 14px; border: 2px solid #0f5f9f; background: #eef6fd; cursor: pointer">
+                  <input type="radio" name="inst" checked style="accent-color: #0f5f9f; margin: 2px 0 0; width: 18px; height: 18px">
+                  <span><span style="display: block; font-size: 15px; font-weight: 600">One per machine</span><span style="display: block; font-size: 13px; color: #4c5b75; margin-top: 2px">Fixed ports, and the API’s data under Documents/Demo is shared. Checkouts take turns.</span></span>
+                </label>
+                <label style="display: flex; gap: 10px; padding: 14px; border-radius: 14px; border: 1px solid #dde6ef; cursor: pointer">
+                  <input type="radio" name="inst" style="accent-color: #0f5f9f; margin: 2px 0 0; width: 18px; height: 18px">
+                  <span><span style="display: block; font-size: 15px; font-weight: 600">One per checkout</span><span style="display: block; font-size: 13px; color: #4c5b75; margin-top: 2px">Each worktree gets its own instance on offset ports.</span></span>
+                </label>
+                <label style="display: flex; gap: 10px; padding: 14px; border-radius: 14px; border: 1px solid #dde6ef; cursor: pointer">
+                  <input type="radio" name="inst" style="accent-color: #0f5f9f; margin: 2px 0 0; width: 18px; height: 18px">
+                  <span><span style="display: block; font-size: 15px; font-weight: 600">Up to N</span><span style="display: block; font-size: 13px; color: #4c5b75; margin-top: 2px">Any caller, until the limit. Ports are assigned free.</span></span>
+                </label>
+              </div>
+            </fieldset>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+              <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: #4c5b75">Lock file
+                <input value="~/.rig-ctl/lock.json" style="height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #64849f; font: 13px 'JetBrains Mono', monospace; color: #10203f">
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: #4c5b75">Lock frees itself after
+                <span style="display: flex; align-items: center; gap: 8px"><input value="20" inputmode="numeric" style="width: 72px; height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #64849f; font: 15px Archivo, sans-serif; color: #10203f"><span style="font-size: 14px; color: #4c5b75; font-weight: 400">min, if no PID lives and no port listens</span></span>
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: #4c5b75">When busy
+                <select style="height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #64849f; font: 15px Archivo, sans-serif; color: #10203f; background: #ffffff"><option>Fail and say who holds it (exit 3)</option><option>Join the queue (--wait)</option></select>
+              </label>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <span style="font-size: 13px; font-weight: 500; color: #4c5b75">Stopping — kill each port’s owning process tree, then these images by name</span>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap">
+                <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 4px 10px; border-radius: 980px">Demo.exe</code>
+                <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 4px 10px; border-radius: 980px">Api.exe</code>
+                <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 4px 10px; border-radius: 980px">Simulator.exe</code>
+                <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 4px 10px; border-radius: 980px">Bridge.exe</code>
+              </div>
+            </div>
+          </section>
+
+          <section aria-labelledby="proc-h" style="background: #ffffff; border-radius: 14px; box-shadow: 0 1px 2px rgba(16,32,63,.04), 0 4px 14px rgba(16,32,63,.06); overflow: hidden">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 16px 20px">
+              <h2 id="proc-h" style="margin: 0; font-size: 17px; font-weight: 600; flex: 1">Required processes <span style="font-weight: 400; color: #5a6880">launch order</span></h2>
+              <button style="height: 36px; padding: 0 14px; border-radius: 980px; border: 0; background: #eef6fd; color: #0f5f9f; font-size: 13px; font-weight: 500">Add process</button>
+            </div>
+            <ol style="list-style: none; margin: 0; padding: 0">
+              <sc-for list="{{before}}" as="p" hint-placeholder-count="3">
+                <li class="prow" style="display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-top: 1px solid #ecf1f6; min-height: 56px; box-sizing: border-box">
+                  <svg width="12" height="16" viewBox="0 0 12 16" fill="#5a6880" aria-hidden="true"><circle cx="3" cy="3" r="1.4"></circle><circle cx="9" cy="3" r="1.4"></circle><circle cx="3" cy="8" r="1.4"></circle><circle cx="9" cy="8" r="1.4"></circle><circle cx="3" cy="13" r="1.4"></circle><circle cx="9" cy="13" r="1.4"></circle></svg>
+                  <span style="width: 20px; color: #5a6880; font-size: 13px">{{p.n}}</span>
+                  <span style="flex: 1; min-width: 0">
+                    <span style="display: block; font-size: 15px; font-weight: 600">{{p.label}}</span>
+                    <span style="display: block; font: 12px 'JetBrains Mono', monospace; color: #4c5b75; overflow-wrap: anywhere">{{p.cmd}}</span>
+                  </span>
+                  <span style="font: 13px 'JetBrains Mono', monospace; color: #4c5b75">{{p.ports}}</span>
+                  <span style="font-size: 13px; color: #5a6880; width: 200px; text-align: right">{{p.note}}</span>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#4c5b75" stroke-width="1.6" aria-hidden="true"><path d="M6 3l5 5-5 5"></path></svg>
+                </li>
+              </sc-for>
+
+              <li style="border-top: 1px solid #ecf1f6; background: #ffffff; box-shadow: inset 2px 0 0 #0f5f9f">
+                <div style="display: flex; align-items: center; gap: 12px; padding: 12px 20px; background: #eef6fd">
+                  <svg width="12" height="16" viewBox="0 0 12 16" fill="#5a6880" aria-hidden="true"><circle cx="3" cy="3" r="1.4"></circle><circle cx="9" cy="3" r="1.4"></circle><circle cx="3" cy="8" r="1.4"></circle><circle cx="9" cy="8" r="1.4"></circle><circle cx="3" cy="13" r="1.4"></circle><circle cx="9" cy="13" r="1.4"></circle></svg>
+                  <span style="width: 20px; color: #5a6880; font-size: 13px">4</span>
+                  <span style="flex: 1; font-size: 15px; font-weight: 600">REST API</span>
+                  <span style="font: 13px 'JetBrains Mono', monospace; color: #4c5b75">1234</span>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#4c5b75" stroke-width="1.6" aria-hidden="true"><path d="M3 6l5 5 5-5"></path></svg>
+                </div>
+                <div style="padding: 16px 20px 20px 64px; display: flex; flex-direction: column; gap: 16px">
+                  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+                    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: #4c5b75">Command
+                      <input value='dotnet run --project Backend/Api --launch-profile "Simulated"' style="height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #64849f; font: 13px 'JetBrains Mono', monospace; color: #10203f">
+                    </label>
+                    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+                      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: #4c5b75">Working dir
+                        <input value="." style="height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #64849f; font: 13px 'JetBrains Mono', monospace; color: #10203f">
+                      </label>
+                      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: #4c5b75">Ports it must open
+                        <input value="1234" style="height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #64849f; font: 13px 'JetBrains Mono', monospace; color: #10203f">
+                      </label>
+                    </div>
+                  </div>
+                  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+                    <div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: #4c5b75">Starts after
+                      <span style="display: flex; gap: 6px; flex-wrap: wrap; min-height: 44px; align-items: center"><span style="padding: 4px 10px; border-radius: 980px; background: #d7e9fa; color: #10203f; font-size: 13px">Vision service</span><span style="padding: 4px 10px; border-radius: 980px; background: #d7e9fa; color: #10203f; font-size: 13px">Bridge</span></span>
+                    </div>
+                    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: #4c5b75">Build group
+                      <select style="height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #64849f; font: 14px Archivo, sans-serif; color: #10203f; background: #ffffff"><option>dotnet — one at a time (shared Shared, Utils)</option></select>
+                    </label>
+                    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: #4c5b75">Give up listening after
+                      <span style="display: flex; align-items: center; gap: 8px"><input value="120" style="width: 72px; height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid #64849f; font: 15px Archivo, sans-serif; color: #10203f"><span style="font-size: 14px; font-weight: 400">s</span></span>
+                    </label>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px">
+                    <span style="font-size: 13px; font-weight: 500; color: #4c5b75">Environment <span style="font-weight: 400">— a floor under the launch profile, which silently does nothing if it can’t apply</span></span>
+                    <div style="border-radius: 10px; background: #eef3f8; font: 13px 'JetBrains Mono', monospace">
+                      <div style="display: flex; gap: 12px; padding: 10px 12px; border-bottom: 1px solid #ffffff"><span style="flex: 0 0 240px">DEMO_SIMULATOR_MODE</span><span>1</span></div>
+                      <div style="display: flex; gap: 12px; padding: 10px 12px"><span style="flex: 0 0 240px">ASPNETCORE_ENVIRONMENT</span><span>Development</span></div>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 8px">
+                    <span style="font-size: 13px; font-weight: 500; color: #4c5b75">If it exits — repair once, then retry</span>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px; border-radius: 10px; border: 1px solid #dde6ef; font-size: 14px">
+                      <span style="color: #4c5b75">Output matches</span>
+                      <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 3px 8px; border-radius: 6px">NU110[12]|Unable to find package</code>
+                      <span style="color: #4c5b75">run</span>
+                      <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 3px 8px; border-radius: 6px">dotnet restore --packages .nuget</code>
+                    </div>
+                    <button style="align-self: flex-start; height: 36px; padding: 0 14px; border-radius: 980px; border: 1px solid #dde6ef; background: #ffffff; color: #0f5f9f; font-size: 13px; font-weight: 500">Add a repair rule</button>
+                  </div>
+                </div>
+              </li>
+
+              <sc-for list="{{after}}" as="p" hint-placeholder-count="2">
+                <li class="prow" style="display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-top: 1px solid #ecf1f6; min-height: 56px; box-sizing: border-box">
+                  <svg width="12" height="16" viewBox="0 0 12 16" fill="#5a6880" aria-hidden="true"><circle cx="3" cy="3" r="1.4"></circle><circle cx="9" cy="3" r="1.4"></circle><circle cx="3" cy="8" r="1.4"></circle><circle cx="9" cy="8" r="1.4"></circle><circle cx="3" cy="13" r="1.4"></circle><circle cx="9" cy="13" r="1.4"></circle></svg>
+                  <span style="width: 20px; color: #5a6880; font-size: 13px">{{p.n}}</span>
+                  <span style="flex: 1; min-width: 0">
+                    <span style="display: block; font-size: 15px; font-weight: 600">{{p.label}}</span>
+                    <span style="display: block; font: 12px 'JetBrains Mono', monospace; color: #4c5b75; overflow-wrap: anywhere">{{p.cmd}}</span>
+                  </span>
+                  <span style="font: 13px 'JetBrains Mono', monospace; color: #4c5b75">{{p.ports}}</span>
+                  <span style="font-size: 13px; color: #5a6880; width: 200px; text-align: right">{{p.note}}</span>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#4c5b75" stroke-width="1.6" aria-hidden="true"><path d="M6 3l5 5-5 5"></path></svg>
+                </li>
+              </sc-for>
+            </ol>
+          </section>
+
+          <section aria-labelledby="ready-h" style="background: #ffffff; border-radius: 14px; box-shadow: 0 1px 2px rgba(16,32,63,.04), 0 4px 14px rgba(16,32,63,.06); padding: 20px; display: flex; flex-direction: column; gap: 12px">
+            <h2 id="ready-h" style="margin: 0; font-size: 17px; font-weight: 600">Ready means</h2>
+            <p style="margin: 0; font-size: 14px; color: #4c5b75; line-height: 1.5">Seven open ports are not enough: 9222 opens before Vite has served and React has mounted. Wait for a control before the first click.</p>
+            <div style="display: flex; flex-direction: column; gap: 4px; font-size: 14px">
+              <label style="display: flex; align-items: center; gap: 10px; min-height: 44px"><input type="checkbox" checked style="accent-color: #0f5f9f; width: 18px; height: 18px; margin: 0">Every port accepts a connection on 127.0.0.1 or ::1 <span style="color: #5a6880">(Vite is IPv6-only, Api IPv4-only)</span></label>
+              <label style="display: flex; align-items: center; gap: 10px; min-height: 44px; flex-wrap: wrap"><input type="checkbox" checked style="accent-color: #0f5f9f; width: 18px; height: 18px; margin: 0">Through CDP on <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 2px 6px; border-radius: 6px">9222</code>, the welcome screen shows
+                <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 2px 6px; border-radius: 6px">Draw</code> or <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 2px 6px; border-radius: 6px">Connect</code></label>
+              <label style="display: flex; align-items: center; gap: 10px; min-height: 44px; flex-wrap: wrap"><input type="checkbox" checked style="accent-color: #0f5f9f; width: 18px; height: 18px; margin: 0">Tool available: <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 2px 6px; border-radius: 6px">dev-browser --help</code> <span style="color: #5a6880">— installs on failure</span></label>
+            </div>
+          </section>
+        </div>
+
+        <aside aria-labelledby="yaml-h" style="flex: 2 1 380px; min-width: 0; background: #ffffff; border-radius: 14px; box-shadow: 0 1px 2px rgba(16,32,63,.04), 0 4px 14px rgba(16,32,63,.06); overflow: hidden">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 14px 20px; background: #e6f1fb">
+            <h2 id="yaml-h" style="margin: 0; font: 500 14px 'JetBrains Mono', monospace; flex: 1">flotilla/sample.yaml</h2>
+            <button style="height: 36px; padding: 0 14px; border-radius: 980px; border: 1px solid #dde6ef; background: #ffffff; color: #10203f; font-size: 13px; font-weight: 500">Copy</button>
+          </div>
+          <pre style="margin: 16px; padding: 16px 18px; background: #0a1724; border-radius: 14px; color: #d6e4f2; font: 12.5px/1.65 'JetBrains Mono', ui-monospace, monospace; overflow-x: auto">{{yaml}}</pre>
+        </aside>
+      </div>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const yaml = [
+      'name: Demo',
+      'repo: C:/Users/aymer/dev/demo',
+      'instances:',
+      '  mode: one-per-machine      # fixed ports + shared Documents/Demo',
+      '  lock: ~/.rig-ctl/lock.json',
+      '  staleAfter: 20m',
+      '  whenBusy: fail             # exit 3; --wait to queue',
+      '  killImages: [Demo.exe, Api.exe, Simulator.exe, Bridge.exe]',
+      'buildGroups:',
+      '  dotnet: { sequential: true, cmd: dotnet build {project} --nologo -v q }',
+      'repairs:',
+      '  venv: &venv',
+      '    match: ENOENT|cannot find|is not recognized|No such file|ModuleNotFoundError',
+      '    run: "[python -m venv .venv &&] .venv\\\\Scripts\\\\python.exe -m pip install -e .{extras}"',
+      '  nuget: &nuget',
+      '    match: NU110[12]|Unable to find package',
+      '    run: dotnet restore --packages .nuget',
+      'processes:                  # launched in this order',
+      '  - key: vision',
+      '    label: Vision service',
+      '    ports: [8766]',
+      '    cwd: vision',
+      '    cmd: .venv\\Scripts\\python.exe -m vision.service --host 127.0.0.1 --port 8766',
+      '    onFailure: [{ <<: *venv, extras: "[dev,service]" }]',
+      '  - key: bridge',
+      '    label: Bridge',
+      '    ports: [8767]',
+      '    cmd: dotnet run --project Backend/Bridge',
+      '    build: dotnet',
+      '    onFailure: [*nuget]',
+      '  - key: converter',
+      '    label: File converter',
+      '    ports: [8765]',
+      '    cwd: converter',
+      '    cmd: .venv\\Scripts\\python.exe converter.py',
+      '    onFailure: [{ <<: *venv, extras: "[dev]" }]',
+      '  - key: api',
+      '    label: REST API',
+      '    ports: [1234]',
+      '    after: [vision, bridge]   # Bridge delegates INIT to Vision',
+      '    cmd: dotnet run --project Backend/Api --launch-profile "Simulated"',
+      '    env: { DEMO_SIMULATOR_MODE: "1", ASPNETCORE_ENVIRONMENT: Development }',
+      '    build: dotnet',
+      '    onFailure: [*nuget]',
+      '  - key: simulator',
+      '    label: Simulator',
+      '    ports: [1232]',
+      '    cmd: dotnet run --project Backend/Simulator',
+      '    build: dotnet',
+      '    onFailure: [*nuget]',
+      '  - key: tauri',
+      '    label: Vite + Tauri WebView2 (CDP)',
+      '    ports: [5173, 9222]',
+      '    cwd: Frontend',
+      '    cmd: npm run debug:tauri',
+      '    env:',
+      '      VITE_TARGET: module',
+      '      WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: --remote-debugging-port=9222',
+      '      DEMO_KEEP_PAGE_VISIBLE: "1"',
+      '    slow: { startFirst: true, timeout: 15m }   # other caps: 120 s',
+      '    onFailure:',
+      '      - { match: EPERM, cleanup: true }',
+      '      - { match: not recognized|not found|ENOENT|Cannot find module,',
+      '          run: npm install --cache .npm --no-audit --no-fund }',
+      'ready:',
+      '  - ports: all                # probe 127.0.0.1 and ::1',
+      '  - cdp: { port: 9222, anyOf: [Draw, Connect] }',
+      'tools:',
+      '  - key: dev-browser',
+      '    probe: dev-browser --help',
+      '    onFailure:',
+      '      - { match: Embedded daemon dependencies are missing, run: dev-browser install }',
+      '      - { match: not found|not recognized|ENOENT,',
+      '          run: npm install -g dev-browser && dev-browser install }',
+      'logs: "%TEMP%/rig-ctl-logs/{key}.log"'
+    ].join('\n');
+    return {
+      yaml,
+      before: [
+        { n: 1, label: 'Vision service', cmd: '.venv\\Scripts\\python.exe -m vision.service --host 127.0.0.1 --port 8766', ports: '8766', note: 'venv · repair: pip install -e .[dev,service]' },
+        { n: 2, label: 'Bridge', cmd: 'dotnet run --project Backend/Bridge', ports: '8767', note: 'dotnet group · repair: restore' },
+        { n: 3, label: 'File converter', cmd: '.venv\\Scripts\\python.exe converter.py', ports: '8765', note: 'venv · repair: pip install -e .[dev]' }
+      ],
+      after: [
+        { n: 5, label: 'Simulator', cmd: 'dotnet run --project Backend/Simulator', ports: '1232', note: 'dotnet group · raw TCP probe' },
+        { n: 6, label: 'Vite + Tauri WebView2', cmd: 'npm run debug:tauri  (VITE_TARGET=module, CDP 9222)', ports: '5173 · 9222', note: 'slow · launched first, awaited last, 15 m' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

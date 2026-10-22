@@ -1,0 +1,41 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Flotilla (supervisor + dashboard)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 4870
+    },
+    {
+      "name": "Flotilla dashboard (Vite)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "start:web"
+      ],
+      "port": 4870
+    },
+    {
+      "name": "Flotilla supervisor",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "start:server"
+      ],
+      "port": 4871
+    },
+    {
+      "name": "Flotilla desktop (Tauri)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "debug:tauri:cdp"
+      ],
+      "port": 4870
+    }
+  ]
+}

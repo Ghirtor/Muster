@@ -1,0 +1,83 @@
+/* What each colour is for. Tailwind classes use these (bg-surface, text-ink-muted, …); the names
+   follow design/tokens.json so a token's `usage` note there is the rule for its class here. */
+
+/* Tailwind's default palette is switched off, so every colour comes from a role below. */
+@theme {
+    --color-*: initial;
+}
+
+@theme static {
+    /* brand */
+    --color-brand: var(--palette-azure-600);
+    --color-brand-hover: var(--palette-azure-700);
+    --color-brand-bright: var(--palette-azure-500);
+    --color-brand-deep: var(--palette-azure-800);
+    --color-brand-soft: var(--palette-azure-50);
+    --color-selected: var(--palette-azure-100);
+    --color-chip-hover: var(--palette-azure-200);
+
+    /* surfaces */
+    --color-surface-page: var(--palette-mist-50);
+    --color-surface: var(--palette-white);
+    --color-surface-sunken: var(--palette-mist-100);
+    --color-surface-accent: var(--palette-mist-150);
+    --color-material-sheet: rgba(255, 255, 255, 0.82);
+    --color-material-window: rgba(46, 86, 121, 0.9);
+    --color-scrim: rgba(8, 19, 31, 0.48);
+
+    /* text */
+    --color-ink: var(--palette-ink-900);
+    --color-ink-muted: var(--palette-slate-700);
+    --color-ink-faint: var(--palette-slate-600);
+    --color-ink-on-fill: var(--palette-white);
+
+    /* lines */
+    --color-line-subtle: var(--palette-mist-200);
+    --color-line: var(--palette-mist-300);
+    --color-line-strong: var(--palette-slate-500);
+    --color-focus-ring: var(--palette-azure-500);
+
+    /* status: never colour alone — a badge always carries the word */
+    --color-status-ok: var(--palette-green-700);
+    --color-status-ok-soft: var(--palette-green-50);
+    --color-status-warn: var(--palette-amber-700);
+    --color-status-warn-soft: var(--palette-amber-50);
+    --color-status-error: var(--palette-red-700);
+    --color-status-error-soft: var(--palette-red-50);
+    --color-status-idle: var(--palette-slate-600);
+    --color-status-idle-soft: var(--palette-mist-100);
+
+    /* the log console: the one dark surface */
+    --color-console: var(--palette-night-950);
+    --color-console-ink: var(--palette-night-100);
+    --color-console-muted: var(--palette-night-400);
+    --color-console-info: var(--palette-night-sky);
+    --color-console-ok: var(--palette-night-green);
+    --color-console-warn: var(--palette-night-amber);
+    --color-console-error: var(--palette-night-red);
+
+    /* charts */
+    --color-chart-1: var(--palette-azure-600);
+    --color-chart-2: var(--palette-coral-700);
+}
+
+@theme {
+    --font-display: Newsreader, 'Iowan Old Style', Georgia, serif;
+    --font-sans: Archivo, system-ui, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --radius-xs: 6px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-pill: 980px;
+
+    --shadow-elevation-1: 0 1px 2px rgba(16, 32, 63, 0.04), 0 4px 14px rgba(16, 32, 63, 0.06);
+    --shadow-elevation-2: 0 2px 6px rgba(16, 32, 63, 0.05), 0 14px 36px rgba(16, 32, 63, 0.09);
+
+    --spacing-header: 64px;
+    --spacing-sidebar: 264px;
+    --spacing-row: 48px;
+    --container-content: 1440px;
+
+    --ease-settle: cubic-bezier(0.32, 0.72, 0, 1);
+}

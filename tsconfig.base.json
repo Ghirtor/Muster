@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "preserveSymlinks": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "verbatimModuleSyntax": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true,
+    "stripInternal": true,
+    "target": "es2022",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "noEmit": true
+  },
+  "exclude": ["node_modules/", ".npm/", "dist/", "coverage/", "tmp/", "design/", "reference/", "src-tauri/"]
+}

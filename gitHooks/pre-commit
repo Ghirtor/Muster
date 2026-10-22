@@ -1,0 +1,120 @@
+#!/bin/sh
+
+PREFIX="pre-commit:"
+
+# Asking git beats deriving the root from $0: git hands the hook a path
+# relative to core.hooksPath, so "$0" is gitHooks/pre-commit rather than the
+# .git/hooks/pre-commit this used to assume.
+PROJECT_ROOT_DIRECTORY="$(git rev-parse --show-toplevel)"
+NPM_ROOT_DIRECTORY="${PROJECT_ROOT_DIRECTORY}"
+
+### FUNCTIONS ###
+
+executeCmdWithFiles () {
+  local cmd=$1
+  shift 1
+  local files=$@
+  if [ ${#files} -gt 0 ]; then
+    echo ${cmd}
+    if ! eval ${cmd}; then
+      return 1
+    fi
+  fi
+  return 0
+}
+
+FormatJsTsFiles () {
+  local projectPath=$1
+  shift 1
+  local files=$@
+  # One thread: oxfmt forks a Node process per thread for Tailwind class sorting, and
+  # forking one per core costs far more than the formatting itself.
+  local cmd="(cd ${projectPath} && node_modules/.bin/oxfmt --threads=1 --no-error-on-unmatched-pattern ${files})"
+  executeCmdWithFiles "${cmd}" ${files}
+  return $?
+}
+
+# Puts back what was set aside, and drops the patch only once the work it holds is
+# in the tree. A patch that reverse-applies cleanly is one already back — a plain
+# apply reports that as "does not apply", which read as loss when it was nothing of
+# the sort. The three-way pass is the last resort, and only after those two, since a
+# genuine conflict leaves markers in the file. The patch is kept on every failure: it
+# is the only copy of that work, and the next commit refuses to run while it is there.
+RestoreUnstagedChanges () {
+  [ -f "${unstagedPatch}" ] || return 0
+  if git apply --whitespace=nowarn "${unstagedPatch}" 2>/dev/null; then
+    rm -f "${unstagedPatch}"
+    return 0
+  fi
+  if git apply --reverse --check "${unstagedPatch}" 2>/dev/null; then
+    rm -f "${unstagedPatch}"
+    return 0
+  fi
+  if git apply --3way --whitespace=nowarn "${unstagedPatch}" 2>/dev/null; then
+    rm -f "${unstagedPatch}"
+    return 0
+  fi
+  echo "${PREFIX} Could not put your unstaged changes back automatically." >&2
+  echo "${PREFIX} They are the only copy, kept in ${unstagedPatch}." >&2
+  echo "${PREFIX} No further commit will run until you have them back:" >&2
+  echo "${PREFIX}   git apply --3way ${unstagedPatch} && rm ${unstagedPatch}" >&2
+  echo "${PREFIX} A three-way apply can leave conflict markers — check the files it names." >&2
+  return 1
+}
+
+### FUNCTIONS ###
+
+# Collect staged files except deleted ones because we don't want to lint/format them, they are not anymore in the repo
+stagedFilesToProcess=$(git diff --diff-filter=d --cached --name-only)
+
+# Set aside unstaged changes to tracked files so the checks below see exactly
+# the content being committed. They go back on every exit path, including a
+# failed check or a Ctrl-C, and the commit reads the index rather than the
+# working tree, so restoring here cannot alter what gets committed.
+#
+# This deliberately avoids a temporary commit: moving HEAD underneath `git
+# commit --amend` makes it abort with "cannot lock ref 'HEAD'", leaving the
+# branch on the parent and the amended commit reachable only via the reflog.
+unstagedPatch="$(git rev-parse --git-dir)/pre-commit-unstaged.patch"
+
+# A patch still sitting here is work an earlier run set aside and could not put
+# back. Deleting it to make room for this run's own — which is what used to
+# happen — destroys the only copy of it, with nothing in the stash or the reflog
+# to recover from. The commit stands down instead.
+if [ -f "${unstagedPatch}" ]; then
+  echo "${PREFIX} Unstaged changes from an earlier commit were never put back." >&2
+  echo "${PREFIX} They are the only copy, kept in ${unstagedPatch}." >&2
+  echo "${PREFIX} Put them back before committing again:" >&2
+  echo "${PREFIX}   git apply --3way ${unstagedPatch} && rm ${unstagedPatch}" >&2
+  echo "${PREFIX} Or discard them knowingly with: rm ${unstagedPatch}" >&2
+  exit 1
+fi
+
+trap RestoreUnstagedChanges EXIT HUP INT TERM
+
+if ! git diff --quiet; then
+  git diff --binary --no-color > "${unstagedPatch}"
+  git checkout --quiet -- :/
+fi
+
+### Format ###
+
+# The npm project is the repo root, so staged paths are already relative to it
+# and need no workspace prefix stripped. Only the code oxfmt owns is handed to
+# it: JS/TS sources, outside design/ (exported screens, kept as exported) and
+# reference/ (rig.mjs, kept byte-for-byte as the behaviour to match).
+files=$(echo "${stagedFilesToProcess}" \
+  | grep -E '\.(js|jsx|ts|tsx|mjs|cjs)$' \
+  | grep -Ev '^(design|reference|node_modules|dist|coverage)/')
+
+FormatJsTsFiles "${NPM_ROOT_DIRECTORY}" ${files}
+
+# All is ok
+
+# Add back the modified files to staging. A commit that only deletes files
+# leaves the list empty, and a bare `git add` errors out instead of no-opping.
+if [ -n "${stagedFilesToProcess}" ]; then
+  git add ${stagedFilesToProcess}
+fi
+
+exit 0

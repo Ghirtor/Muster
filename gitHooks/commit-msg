@@ -1,0 +1,61 @@
+#!/bin/sh
+
+PREFIX="commit-msg:"
+
+commitMsgFile="$1"
+commitMsgSource="$2"
+
+# git names the source of the message it is about to use. A merge or a squash
+# gets its subject generated, so there is nothing the author could fix.
+# "commit" (-c / -C / --amend) is deliberately not exempt: those messages are
+# authored and should still carry a key.
+case "${commitMsgSource}" in
+  merge|squash)
+    exit 0
+    ;;
+esac
+
+# An empty message is git's own error to report; gating it here would replace
+# "Aborting commit due to empty commit message" with a confusing format error.
+if [ -z "$(grep -v '^#' "${commitMsgFile}" | tr -d '[:space:]')" ]; then
+  exit 0
+fi
+
+# The subject is the first line that is neither a comment nor blank, so a
+# configured commit template does not shift it out from under us.
+firstLine=$(grep -v '^#' "${commitMsgFile}" | grep -m 1 -v '^[[:space:]]*$')
+
+# Allow git-internal commits we shouldn't gate. These reach us as source
+# "message", so the case above cannot catch them:
+#   - merge / revert / fixup / squash / amend autosquash
+case "$firstLine" in
+  "Merge "*|"Revert "*|"fixup! "*|"squash! "*|"amend! "*)
+    exit 0
+    ;;
+esac
+
+# Required format: <ISSUE_KEY>: <summary>
+# ISSUE_KEY is the FEAT project's key: FEAT, a hyphen, then digits (e.g. FEAT-12).
+KEY_PATTERN='FEAT-[0-9]+'
+
+if ! echo "$firstLine" | grep -Eq "^${KEY_PATTERN}: .+"; then
+  echo "${PREFIX} Commit message must start with a FEAT issue key, e.g.:" >&2
+  echo "${PREFIX}   FEAT-12: Add the lock and queue to the engine" >&2
+  echo "${PREFIX} Got: $firstLine" >&2
+  exit 1
+fi
+
+# Branches are named after the issue they implement, so a key that disagrees
+# with the branch is usually a typo or a copied message. Worth saying out loud,
+# not worth blocking: a branch legitimately carries the odd commit for another
+# issue, and there is no key at all on a detached HEAD. The key may sit anywhere
+# in the branch name (FEAT-12, feature/FEAT-12-lock-queue).
+branchName=$(git symbolic-ref --quiet --short HEAD 2>/dev/null)
+branchKey=$(echo "${branchName}" | grep -Eo "${KEY_PATTERN}" | head -n 1)
+messageKey=$(echo "${firstLine}" | grep -Eo "^${KEY_PATTERN}")
+
+if [ -n "${branchKey}" ] && [ "${branchKey}" != "${messageKey}" ]; then
+  echo "${PREFIX} Note: message says ${messageKey} but the branch is ${branchKey}." >&2
+fi
+
+exit 0

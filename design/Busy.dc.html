@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flotilla — Rig is held</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0f5f9f}a:hover{color:#0b4a7d}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #1a77c2;outline-offset:2px}
+</style>
+</helmet>
+<div style="position: relative; width: 1440px; height: 900px; overflow: hidden; background: #f5f8fb; color: #10203f; font-family: Archivo, system-ui, sans-serif">
+  <div aria-hidden="true" style="position: absolute; inset: 0; display: flex; flex-direction: column">
+    <div style="height: 64px; background: #0c3b63; display: flex; align-items: center; padding: 0 24px; gap: 10px">
+      <svg width="26" height="26" viewBox="0 0 26 26"><rect x="1" y="3" width="10" height="20" rx="4" fill="#1a77c2"></rect><rect x="13" y="3" width="12" height="9" rx="4" fill="#b0d2f2"></rect><rect x="13" y="14" width="12" height="9" rx="4" fill="#ffffff"></rect></svg>
+      <span style="font-family: Newsreader, Georgia, serif; font-size: 24px; color: #ffffff">Flotilla</span>
+    </div>
+    <div style="flex: 1; display: flex">
+      <div style="width: 264px; background: #ffffff"></div>
+      <div style="flex: 1; padding: 32px 24px; display: flex; flex-direction: column; gap: 24px">
+        <div style="width: 240px; height: 36px; border-radius: 10px; background: #dde6ef"></div>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px"><div style="height: 120px; border-radius: 14px; background: #ffffff"></div><div style="height: 120px; border-radius: 14px; background: #ffffff"></div><div style="height: 120px; border-radius: 14px; background: #ffffff"></div><div style="height: 120px; border-radius: 14px; background: #ffffff"></div></div>
+        <div style="height: 300px; border-radius: 14px; background: #ffffff"></div>
+      </div>
+    </div>
+  </div>
+  <div style="position: absolute; inset: 0; background: rgba(8,19,31,.48)"></div>
+
+  <div role="dialog" aria-modal="true" aria-labelledby="busy-h" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 560px; box-sizing: border-box; background: rgba(255,255,255,.96); border-radius: 14px; box-shadow: 0 2px 6px rgba(16,32,63,.05), 0 14px 36px rgba(16,32,63,.09); padding: 32px; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; gap: 14px; align-items: flex-start">
+      <span style="flex: 0 0 44px; height: 44px; border-radius: 50%; background: #fdf1dc; color: #9a5800; display: grid; place-items: center">
+        <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.5"></rect><path d="M5 7V5a3 3 0 0 1 6 0v2"></path></svg>
+      </span>
+      <div style="flex: 1">
+        <h2 id="busy-h" style="margin: 0; font-size: 20px; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em">Demo’s simulator rig is held by another checkout</h2>
+        <p style="margin: 6px 0 0; font-size: 15px; line-height: 1.55; color: #4c5b75">Only one rig runs on this machine. You asked from <code style="font: 13px 'JetBrains Mono', monospace; background: #eef3f8; padding: 1px 6px; border-radius: 6px">feature/HSV-398</code>.</p>
+      </div>
+    </div>
+
+    <dl style="margin: 0; border-radius: 14px; background: #eef3f8; font-size: 14px">
+      <div style="display: flex; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #ffffff"><dt style="flex: 0 0 96px; color: #5a6880">Held by</dt><dd style="margin: 0; font-weight: 600">Claude · <span style="font: 13px 'JetBrains Mono', monospace; font-weight: 400">feature/HSV-412</span></dd></div>
+      <div style="display: flex; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #ffffff"><dt style="flex: 0 0 96px; color: #5a6880">Reason</dt><dd style="margin: 0">Verify pipette move</dd></div>
+      <div style="display: flex; gap: 12px; padding: 12px 16px"><dt style="flex: 0 0 96px; color: #5a6880">Held for</dt><dd style="margin: 0">42 m · <span style="color: #16733f">7 of 7 up, in use</span></dd></div>
+    </dl>
+
+    <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+      <legend style="padding: 0; margin-bottom: 8px; font-size: 13px; font-weight: 500; color: #4c5b75">What should happen</legend>
+      <label style="display: flex; gap: 12px; padding: 14px; border-radius: 14px; border: 2px solid #0f5f9f; background: #eef6fd; cursor: pointer">
+        <input type="radio" name="busy" checked style="accent-color: #0f5f9f; margin: 2px 0 0; width: 18px; height: 18px">
+        <span><span style="display: block; font-size: 15px; font-weight: 600">Wait in the queue</span><span style="display: block; font-size: 13px; color: #4c5b75; margin-top: 2px">You are first in line. It relaunches from your checkout as soon as it is released.</span></span>
+      </label>
+      <label style="display: flex; gap: 12px; padding: 14px; border-radius: 14px; border: 1px solid #dde6ef; background: #ffffff; cursor: pointer">
+        <input type="radio" name="busy" style="accent-color: #0f5f9f; margin: 2px 0 0; width: 18px; height: 18px">
+        <span><span style="display: block; font-size: 15px; font-weight: 600">Ask the holder to release</span><span style="display: block; font-size: 13px; color: #4c5b75; margin-top: 2px">Sends a note to the session holding it, then queues you.</span></span>
+      </label>
+      <label style="display: flex; gap: 12px; padding: 14px; border-radius: 14px; border: 1px solid #dde6ef; background: #ffffff; cursor: pointer">
+        <input type="radio" name="busy" style="accent-color: #b42318; margin: 2px 0 0; width: 18px; height: 18px">
+        <span><span style="display: block; font-size: 15px; font-weight: 600; color: #b42318">Take it over now</span><span style="display: block; font-size: 13px; color: #4c5b75; margin-top: 2px">Stops every rig process and interrupts the other session’s work.</span></span>
+      </label>
+    </fieldset>
+
+    <div style="display: flex; justify-content: flex-end; gap: 8px">
+      <button style="height: 44px; padding: 0 18px; border-radius: 980px; border: 1px solid #dde6ef; background: #ffffff; color: #10203f; font-size: 15px; font-weight: 500">Cancel</button>
+      <button style="height: 44px; padding: 0 20px; border-radius: 980px; border: 0; background: #0f5f9f; color: #ffffff; font-size: 15px; font-weight: 500">Join queue</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+/* Raw values from design/tokens.json (the Flotilla design system, built on auxBulles new).
+   Nothing outside semantic.css reads these: a component uses a role, never a swatch. */
+
+:root {
+    --palette-azure-50: #eef6fd;
+    --palette-azure-100: #d7e9fa;
+    --palette-azure-200: #b0d2f2;
+    --palette-azure-500: #1a77c2;
+    --palette-azure-600: #0f5f9f;
+    --palette-azure-700: #0b4a7d;
+    --palette-azure-800: #0c3b63;
+    --palette-azure-900: #0b2b47;
+
+    --palette-white: #ffffff;
+    --palette-mist-50: #f5f8fb;
+    --palette-mist-100: #eef3f8;
+    --palette-mist-150: #e6f1fb;
+    --palette-mist-200: #ecf1f6;
+    --palette-mist-300: #dde6ef;
+    --palette-slate-500: #64849f;
+    --palette-slate-600: #5a6880;
+    --palette-slate-700: #4c5b75;
+    --palette-ink-900: #10203f;
+
+    --palette-green-700: #16733f;
+    --palette-green-50: #e8f5ed;
+    --palette-amber-700: #9a5800;
+    --palette-amber-50: #fdf1dc;
+    --palette-red-700: #b42318;
+    --palette-red-50: #fde9e7;
+    --palette-coral-700: #c2571a;
+
+    --palette-night-950: #0a1724;
+    --palette-night-100: #d6e4f2;
+    --palette-night-400: #8fa6bf;
+    --palette-night-sky: #7ab8ef;
+    --palette-night-green: #6fd39a;
+    --palette-night-amber: #f2b84b;
+    --palette-night-red: #ff8f85;
+}

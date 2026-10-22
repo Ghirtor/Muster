@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dev-browser *)",
+      "Bash(npx dev-browser *)"
+    ],
+    "defaultMode": "bypassPermissions"
+  },
+  "enabledPlugins": {
+    "figma@claude-plugins-official": true,
+    "mattpocock-skills@claude-plugins-official": true,
+    "dev-browser@dev-browser-marketplace": true
+  },
+  "extraKnownMarketplaces": {
+    "dev-browser-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "SawyerHood/dev-browser"
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# Clears the staged copy the pre-commit hook could not update itself.
+#
+# pre-commit reformats the files being committed and re-stages them, which is
+# right for an ordinary commit: the commit reads the index, so the formatted
+# content is what lands. A commit given paths — `git commit -- <path>` — reads
+# the working tree instead, and runs against a temporary index (git points
+# GIT_INDEX_FILE at .git/next-index-<pid>.lock) that it discards afterwards. So
+# the formatted content still lands, but pre-commit's `git add` goes into the
+# copy git throws away, and the real index keeps whatever was staged before it
+# ran: the file reads as staged-and-modified, and the next commit made without
+# paths would put that stale, unformatted copy back.
+#
+# pre-commit cannot put this right on its own. git holds .git/index.lock for the
+# whole of the commit it is running inside, so any write to the real index there
+# fails with "Unable to create index.lock". This hook is the first moment the
+# lock is gone.
+#
+# Only files this commit touched are considered, and only where the working tree
+# already agrees with the commit while the index does not. That pair is the
+# signature of the reformat, and it is what makes re-staging safe: the content
+# being staged is the content just committed, so nothing can be lost that is not
+# already in the history. A file the operator is still editing has a working
+# tree that differs from HEAD, and is left alone.
+
+for file in $(git diff-tree --no-commit-id --name-only --diff-filter=d -r HEAD); do
+  git diff --quiet HEAD -- "${file}" || continue
+  git diff --quiet --cached -- "${file}" && continue
+  git add -- "${file}"
+done
+
+exit 0

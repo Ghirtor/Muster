@@ -1,0 +1,14 @@
+{
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/coverage/**": true,
+    "**/.git/objects/**": true,
+    "**/.claude/worktrees/**": true
+  },
+  "search.exclude": {
+    "**/dist": true,
+    "**/coverage": true,
+    "**/.claude/worktrees": true
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "name": "flotilla",
+  "version": "0.1.0",
+  "description": "Launch, watch and hand over local app rigs",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "preinstall": "npm run hooks",
+    "hooks": "node gitHooks/setup.mjs",
+    "check-deps": "node scripts/check-deps.mjs",
+    "start": "concurrently -n server,web -c magenta,blue --kill-others-on-fail \"npm:start:server\" \"npm:start:web\"",
+    "dev": "npm run check-deps && npm run start",
+    "start:web": "vite",
+    "start:server": "tsx watch src/server/main.ts",
+    "build": "npm run build:web && npm run build:server",
+    "build:web": "vite build",
+    "build:server": "vite build --ssr src/server/main.ts --outDir dist/server --emptyOutDir && vite build --ssr src/server/cli.ts --outDir dist/server",
+    "preview": "vite preview",
+    "lint": "oxlint --report-unused-disable-directives-severity=warn",
+    "type-check:web": "node node_modules/typescript7/bin/tsc -p src/web/tsconfig.check.json",
+    "type-check:server": "node node_modules/typescript7/bin/tsc -p src/server/tsconfig.check.json",
+    "type-check": "concurrently -n web,server -c blue,magenta --kill-others-on-fail \"npm:type-check:web\" \"npm:type-check:server\"",
+    "format": "oxfmt --threads=1",
+    "format:check": "oxfmt --threads=1 --check",
+    "test": "jest",
+    "coverage": "jest --coverage",
+    "react-devtools": "react-devtools",
+    "debug:tauri": "tauri dev",
+    "debug:tauri:cdp": "cross-env WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=4872 tauri dev",
+    "dev:desktop": "npm run check-deps && npm run debug:tauri",
+    "package": "tauri build --no-bundle",
+    "bundle": "tauri build",
+    "flotilla": "tsx src/server/cli.ts"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.0",
+    "@tauri-apps/api": "~2.11.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@eslint-react/eslint-plugin": "^5.7.4",
+    "@eslint/js": "^10.0.1",
+    "@tauri-apps/cli": "~2.11.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.6.2",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.3",
+    "babel-plugin-react-compiler": "1.0.0",
+    "concurrently": "^9.0.1",
+    "cross-env": "^7.0.3",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
+    "jest-junit": "^17.0.0",
+    "oxfmt": "0.72.0",
+    "oxlint": "1.87.0",
+    "oxlint-tsgolint": "7.0.2003",
+    "react-devtools": "^7.0.0",
+    "tailwindcss": "^4.3.0",
+    "ts-jest": "^29.4.11",
+    "tsx": "^4.20.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.2",
+    "typescript7": "npm:typescript@^7.0.2",
+    "vite": "^7.1.5"
+  }
+}
