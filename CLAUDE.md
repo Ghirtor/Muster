@@ -38,26 +38,34 @@ Mirrors Demo's `Frontend/` — same versions (the lockfile was seeded from it), 
 - **Git hooks** (`gitHooks/`, wired by `npm install`): pre-commit formats staged files; commit-msg
   requires `FEAT-<n>: <summary>` and notes when the key differs from the
   branch's. `npm install` wires them (`core.hooksPath`); in a clone made before `git init`, run
-  `npm run hooks` once.
+  `node gitHooks/setup.mjs` once.
 
 ## Commands
 
 ```bash
 npm run dev                         # supervisor :4871 + dashboard :4870
-npm run flotilla -- status --config design/sample.yaml   # CLI: status|up|release|down, rig.mjs's flags
+npm run flotilla -- status --config design/sample.yaml   # this checkout's CLI: status|up|release|down
 FLOTILLA_CONFIGS=a.yaml;b.yaml npm run dev             # apps the supervisor serves (README: API)
 node --run lint
 npm run type-check
 npm test                            # --selectProjects web|server for one
 node --run format                   # format:check to only report
 npm run build                       # dashboard → dist/web, supervisor → dist/server
-npm run dev:desktop                 # Tauri window over the dev servers (debug:tauri:cdp: CDP :4872)
+npm run dev:desktop                 # Tauri window over the dev servers, CDP on :4872
 npm run package                     # release exe, no installer (bundle: with installers)
+./version.sh 0.2.0 FEAT-12          # next version, on dev (.\version.bat); merge into master tags it
 ```
 
 The desktop app (`src-tauri/`, Tauri 2) needs Rust (`rustup`) to build and Node ≥ 22 on PATH to
 run: the packaged app starts the bundled supervisor with the machine's `node`, and the supervisor
 serves the built dashboard (`FLOTILLA_WEB_ROOT`) so page and API share one origin.
+
+`flotilla` on PATH belongs to the installed app only, a shim (`src-tauri/cli/`) over the bundled
+`server/cli.js`: Windows' installers add its `bin` to PATH (`tauri.windows.conf.json`,
+`src-tauri/windows/`), Linux's deb/rpm link `/usr/bin/flotilla` (`tauri.linux.conf.json`,
+`src-tauri/linux/`), and on macOS the app menu's *Install Command Line Tool* links
+`/usr/local/bin/flotilla` (`src-tauri/src/cli_tool.rs`). Development never links it; use
+`npm run flotilla` from the checkout.
 
 Run lint, type-check and the tests before calling any change done.
 

@@ -9,7 +9,7 @@ Start the desktop app with Chrome DevTools Protocol on **`http://localhost:4872`
 background (it runs the supervisor and Vite first, like `npm run dev`):
 
 ```bash
-npm run debug:tauri:cdp
+npm run dev:desktop
 ```
 
 `4872` sits next to Flotilla's own ports because Demo's rig already holds `9222`. Attach to it
@@ -25,7 +25,7 @@ timeouts, the look → act → verify loop. This skill only covers what is true 
 
 ## Four rules for this app
 
-**1. Attach only to the dashboard target.** In `debug:tauri` the window loads
+**1. Attach only to the dashboard target.** In `dev:desktop` the window loads
 `http://localhost:4870/`; a packaged build loads `http://127.0.0.1:4871/` from the supervisor.
 `:4872` also exposes DevTools and internal frames, and an evaluate against the wrong one silently
 runs in the wrong context.

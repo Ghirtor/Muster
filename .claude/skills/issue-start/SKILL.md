@@ -25,7 +25,7 @@ that brief instead of grilling the ticket again.
 
 - **`ISSUE`** — the issue, as its key or its reference (the tracker doc's **Identifiers**). Work
   out both; the rest of the flow uses **`ISSUE_KEY`** for commits and branches.
-- **`SOURCE_BRANCH`** — the branch to create the new branch from (e.g. `main`).
+- **`SOURCE_BRANCH`** — the branch to create the new branch from (e.g. `dev`).
   If it was not given, ask the user before continuing.
 
 ## Step 1 — Fetch the issue

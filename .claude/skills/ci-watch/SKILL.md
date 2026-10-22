@@ -23,7 +23,7 @@ thresholds can all fail there while passing locally.
 ## Inputs
 
 - **`BRANCH`** — the pushed branch to watch.
-- **`TARGET_BRANCH`** — what its change request merges into (`main`). Needed to tell your
+- **`TARGET_BRANCH`** — what its change request merges into (`dev`). Needed to tell your
   failures apart from pre-existing ones.
 
 ## Watch

@@ -12,19 +12,23 @@
     },
     {
       "name": "Flotilla dashboard (Vite)",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "npx",
       "runtimeArgs": [
-        "run",
-        "start:web"
+        "vite",
+        "--config",
+        "vite.web.config.ts"
       ],
       "port": 4870
     },
     {
       "name": "Flotilla supervisor",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "npx",
       "runtimeArgs": [
-        "run",
-        "start:server"
+        "tsx",
+        "watch",
+        "--tsconfig",
+        "src/server/tsconfig.json",
+        "src/server/main.ts"
       ],
       "port": 4871
     },
@@ -33,7 +37,7 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",
-        "debug:tauri:cdp"
+        "dev:desktop"
       ],
       "port": 4870
     }

@@ -64,6 +64,12 @@ RestoreUnstagedChanges () {
 
 ### FUNCTIONS ###
 
+# A commit that concludes a merge stopped on conflicts skips pre-merge-commit,
+# so its rule on feature branches is applied here.
+if git rev-parse --quiet --verify MERGE_HEAD > /dev/null; then
+  "${PROJECT_ROOT_DIRECTORY}/gitHooks/pre-merge-commit" || exit 1
+fi
+
 # Collect staged files except deleted ones because we don't want to lint/format them, they are not anymore in the repo
 stagedFilesToProcess=$(git diff --diff-filter=d --cached --name-only)
 

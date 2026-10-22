@@ -10,7 +10,7 @@ Arguments: **$ARGUMENTS** — expected format `<ISSUE> <SOURCE_BRANCH>`.
 - First argument → **`ISSUE`**, the issue as its key or reference (`docs/agents/issue-tracker.md`,
   **Identifiers**), e.g. `FEAT-12` or `#12`.
 - Second argument → **`SOURCE_BRANCH`**, the branch to create the new branch from (e.g.
-  `main`). If it is missing, ask the user which source branch to use.
+  `dev`). If it is missing, ask the user which source branch to use.
 
 Rename this session to the issue key (`mcp__ccd_session_mgmt__set_session_title`, `session_id`
 `"self"`) unless it is titled so already. Then run three skills in order; they hand state to

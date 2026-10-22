@@ -1,11 +1,17 @@
+mod cli_tool;
 mod supervisor;
 
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  tauri::Builder::default()
-    .manage(supervisor::Supervisor::default())
+  let builder = tauri::Builder::default().manage(supervisor::Supervisor::default());
+  // Windows' installers and Linux's packages put `flotilla` on PATH; on macOS the app menu does.
+  #[cfg(target_os = "macos")]
+  let builder = builder
+    .menu(cli_tool::menu)
+    .on_menu_event(|app, event| cli_tool::handle(app, event.id().as_ref()));
+  builder
     .setup(|app| {
       app.handle().plugin(
         tauri_plugin_log::Builder::default()

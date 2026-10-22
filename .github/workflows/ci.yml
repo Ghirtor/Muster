@@ -5,7 +5,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [dev, master]
   pull_request:
 
 concurrency:
@@ -13,6 +13,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # A feature branch reaches dev rebased onto it, as one merge commit, so it may carry none of its
+  # own (gitHooks/pre-merge-commit refuses them locally). The PR from dev into master is the one
+  # that carries merges. It checks the PR's head, not the merge ref checkout makes by default.
+  linear-history:
+    if: github.event_name == 'pull_request' && github.head_ref != 'dev'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - run: |
+          merges=$(git rev-list --merges "origin/${{ github.base_ref }}..HEAD")
+          if [ -n "$merges" ]; then
+            git log --oneline --no-walk $merges
+            echo "::error::This branch has merge commits. Rebase it onto ${{ github.base_ref }} instead of merging: git rebase origin/${{ github.base_ref }}"
+            exit 1
+          fi
+
   lint:
     runs-on: windows-latest
     steps:

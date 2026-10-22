@@ -21,8 +21,8 @@ It stops before anything leaves the machine — no push, no change request, no t
   **Ticket** section, else the target of the branch's open change request
   (`docs/agents/code-host.md`, **Find the change request for a branch**), else ask the user.
 
-Work on the branch that is checked out. If it is `main`, stop and ask
-which branch to use.
+Work on the branch that is checked out. If it is `dev` or `master`, stop and
+ask which branch to use.
 
 ## Step 1 — Make sure the work log exists
 

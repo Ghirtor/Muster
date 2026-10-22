@@ -18,8 +18,8 @@ Read the code the change touches first; for a bug, diagnose it first (see **Bugs
   issue as `docs/agents/issue-tracker.md` describes when you need more), a review finding from
   `branch-review`, or a change the user describes.
 
-Work on the branch that is checked out. If it is `main`, stop and ask
-which branch to use.
+Work on the branch that is checked out. If it is `dev` or `master`, stop and
+ask which branch to use.
 
 The work log is `.claude/worklog/<branch-name>.md`, laid out as
 `.claude/skills/implement-change/worklog.md` describes. Create it if it is missing. Log each

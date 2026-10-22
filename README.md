@@ -8,7 +8,7 @@ lock and queue, streams logs, and shows all of it in a web dashboard.
 ## Run
 
 ```bash
-npm install        # also points git at gitHooks/ (or: npm run hooks)
+npm install        # also points git at gitHooks/ (or: node gitHooks/setup.mjs)
 npm run dev        # supervisor on :4871 + dashboard on http://localhost:4870
 ```
 
@@ -21,11 +21,26 @@ app's config. The config is `--config`, else `FLOTILLA_CONFIG`, else `./flotilla
 overrides the checkout the config names.
 
 ```bash
-npm run flotilla -- status --config design/sample.yaml
-npm run flotilla -- up --config design/sample.yaml --reason "checking the draw tool" --wait
-npm run flotilla -- release --config design/sample.yaml
-npm run flotilla -- down --config design/sample.yaml --force
+flotilla status --config design/sample.yaml
+flotilla up --config design/sample.yaml --reason "checking the draw tool" --wait
+flotilla release --config design/sample.yaml
+flotilla down --config design/sample.yaml --force
 ```
+
+`flotilla` on PATH is the installed desktop app's CLI, and the one skills call. It runs the bundled
+`server/cli.js` with the machine's `node`, and each platform puts it on PATH its own way; open a new
+terminal afterwards:
+
+- **Windows**: the installers ship `bin\flotilla.cmd` (and `bin/flotilla` for Git Bash) and add
+  `bin` to PATH — the NSIS installer the user's, the MSI the machine's — removing it on uninstall.
+- **macOS**: a `.dmg` has no install step, so the app menu has *Flotilla → Install Command Line
+  Tool*, which links `/usr/local/bin/flotilla` after asking for an administrator's password, and
+  *Uninstall Command Line Tool*, which removes that link.
+- **Linux**: the `.deb` and `.rpm` link `/usr/bin/flotilla` on install and remove it on uninstall
+  (the app itself is `flotilla-app` there). An AppImage installs nothing, so nothing is on PATH.
+
+Working on Flotilla itself, run the checkout's CLI instead, which nothing puts on PATH:
+`npm run flotilla -- status --config design/sample.yaml`.
 
 `design/sample.yaml` uses `rig.mjs`'s lock file (`~/.rig-ctl/lock.json`), so the two take turns on the
 same rig. Instance modes are `one-per-machine`, `one-per-checkout` and `up-to-n` (`max`); up to N
@@ -79,8 +94,7 @@ Flotilla also ships as a Tauri 2 desktop app (`src-tauri/`). Building it needs R
 (`rustup`); running it needs Node ≥ 22 on PATH, which it uses to start the bundled supervisor.
 
 ```bash
-npm run dev:desktop      # window over the dev servers, with hot reload
-npm run debug:tauri:cdp  # same, with Chrome DevTools Protocol on :4872
+npm run dev:desktop      # window over the dev servers, hot reload, DevTools Protocol on :4872
 npm run package          # release exe in src-tauri/target/release
 npm run bundle           # plus MSI / NSIS installers in src-tauri/target/release/bundle
 ```
@@ -89,6 +103,20 @@ npm run bundle           # plus MSI / NSIS installers in src-tauri/target/releas
 
 The remote is GitHub and tickets are GitHub Issues (`gh auth login` once). Branches and commits
 carry the issue as `FEAT-<n>`. CI is `.github/workflows/ci.yml`.
+
+Features merge into `dev`; `master` holds releases. A release is a merge of `dev` into `master`:
+`.github/workflows/release.yml` tags the merge commit `v` + the `version` in
+`src-tauri/tauri.conf.json`, then builds the installers for Windows, macOS and Linux and attaches
+them to the run as artifacts. A version already tagged fails the run, so set the next one on a
+clean `dev` that matches `origin/dev` before merging:
+
+```bash
+./version.sh 0.2.0 FEAT-12     # Windows: .\version.bat 0.2.0 FEAT-12
+```
+
+It sets the version in `tauri.conf.json`, `package.json` and `package-lock.json`, commits them as
+`FEAT-12: Version 0.2.0` (the issue key the commit hook asks for) and pushes `dev`
+(`scripts/version.mjs`). Then merge `dev` into `master`, by pull request or `git merge` and push.
 
 ## Layout
 

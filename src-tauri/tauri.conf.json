@@ -27,7 +27,8 @@
     ],
     "resources": {
       "../dist/server/": "server/",
-      "../dist/web/": "web/"
+      "../dist/web/": "web/",
+      "cli/flotilla": "bin/flotilla"
     }
   }
 }

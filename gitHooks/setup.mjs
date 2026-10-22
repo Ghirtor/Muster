@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const repoRoot = join(__dirname, '..')
 
-const hooks = ['pre-commit', 'post-commit', 'commit-msg']
+const hooks = ['pre-commit', 'pre-merge-commit', 'post-commit', 'commit-msg']
 
 const git = (...args) =>
   execFileSync('git', args, {
@@ -46,6 +46,6 @@ const legacyHooks = join(
   isAbsolute(gitCommonDir) ? gitCommonDir : resolve(repoRoot, gitCommonDir),
   'hooks'
 )
-;['pre-commit', 'post-commit', 'commit-msg'].forEach((hook) => {
+hooks.forEach((hook) => {
   rmSync(join(legacyHooks, hook), { force: true })
 })

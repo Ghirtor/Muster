@@ -1,0 +1,28 @@
+#!/bin/sh
+
+PREFIX="merge:"
+
+# Feature branches keep a linear history: they take dev's new commits by
+# rebasing onto it, and reach dev themselves as one merge commit, so the history
+# of dev and master stays semi-linear. A merge commit made on a feature branch
+# (merging dev or master into it, or a `git pull` that merges) is refused here
+# rather than at the push, where GitHub's ruleset and CI's linear-history job
+# would refuse it anyway. dev and master take merges: that is how a feature
+# lands and how a release is cut.
+#
+# git runs this hook before recording a merge that went through on its own. A
+# merge that stopped on conflicts is committed later by `git commit`, which runs
+# pre-commit instead, so pre-commit calls this too.
+
+branchName=$(git symbolic-ref --quiet --short HEAD 2>/dev/null)
+
+case "${branchName}" in
+  ""|dev|master)
+    exit 0
+    ;;
+esac
+
+echo "${PREFIX} ${branchName} is a feature branch, and feature branches take no merge commits." >&2
+echo "${PREFIX} Drop this merge and rebase onto dev instead:" >&2
+echo "${PREFIX}   git merge --abort && git fetch origin && git rebase origin/dev" >&2
+exit 1

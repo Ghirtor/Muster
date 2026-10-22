@@ -1,0 +1,10 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "mainBinaryName": "flotilla-app",
+  "bundle": {
+    "linux": {
+      "deb": { "postInstallScript": "linux/postinst.sh", "preRemoveScript": "linux/prerm.sh" },
+      "rpm": { "postInstallScript": "linux/postinst.sh", "preRemoveScript": "linux/prerm.sh" }
+    }
+  }
+}
