@@ -33,7 +33,7 @@ const StatusBadge: FC<StatusBadgeProps> = ({ status, label }) => (
   <span
     className={`inline-flex items-center gap-1.5 rounded-pill px-2.5 py-1 text-[13px] font-medium ${TONES[status]}`}
   >
-    <span aria-hidden="true" className={`size-[7px] rounded-full ${DOTS[status]}`} />
+    <span aria-hidden="true" className={`size-[7px] rounded-pill ${DOTS[status]}`} />
     {label ?? LABELS[status]}
   </span>
 )

@@ -14,7 +14,7 @@ const QueueCard: FC<QueueCardProps> = ({ queue, now }) => (
           key={`${entry.pid}-${entry.since}`}
           className="flex items-center gap-3 border-b border-line-subtle px-4 py-3.5"
         >
-          <span className="grid size-7 shrink-0 place-items-center rounded-full bg-status-warn-soft text-[13px] font-semibold text-status-warn">
+          <span className="grid size-7 shrink-0 place-items-center rounded-pill bg-status-warn-soft text-[13px] font-semibold text-status-warn">
             {index + 1}
           </span>
           <div className="min-w-0 flex-1">

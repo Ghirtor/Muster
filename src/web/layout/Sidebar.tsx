@@ -20,7 +20,8 @@ const DOTS = {
 const ROW =
   'relative flex h-11 items-center gap-3 rounded-sm px-3 text-[15px] font-medium text-ink no-underline hover:bg-brand-soft'
 
-const SELECTED = 'bg-selected shadow-[inset_3px_0_0_var(--color-brand)] hover:bg-selected'
+const SELECTED =
+  'overflow-hidden bg-selected before:absolute before:inset-y-0 before:left-0 before:w-(--border-rule) before:bg-brand hover:bg-selected'
 
 /** The app navigator: the fleet, then each app with how many of its ports listen. */
 const Sidebar: FC<SidebarProps> = ({ apps, route }) => (
@@ -49,7 +50,7 @@ const Sidebar: FC<SidebarProps> = ({ apps, route }) => (
           aria-current={current ? 'page' : undefined}
           className={`${ROW} ${current ? SELECTED : ''}`}
         >
-          <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${dot}`} />
+          <span aria-hidden="true" className={`size-2 shrink-0 rounded-pill ${dot}`} />
           <span className="min-w-0 flex-1 truncate">{app.ok ? app.config.name : app.id}</span>
           <span className="font-mono text-[13px] text-ink-faint">
             {app.ok ? `${app.snapshot.listening}/${app.snapshot.total}` : 'broken'}

@@ -57,7 +57,7 @@ const BusyDialog: FC<BusyDialogProps> = ({ app, now, onCancel, onWait, onTakeOve
         className="flex w-full max-w-[560px] flex-col gap-5 rounded-md bg-material-sheet p-8 shadow-elevation-2"
       >
         <div className="flex items-start gap-3.5">
-          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-status-warn-soft text-status-warn">
+          <span className="grid size-11 shrink-0 place-items-center rounded-pill bg-status-warn-soft text-status-warn">
             <Icon name="lock" size={20} />
           </span>
           <div className="flex-1">

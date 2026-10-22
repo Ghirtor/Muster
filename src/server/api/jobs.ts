@@ -12,6 +12,7 @@ interface Running {
   job: Job
   output: string
   child: ChildProcess | null
+  cancelling: boolean
 }
 
 /** The CLI flags that carry `request`. */
@@ -84,7 +85,7 @@ export class Jobs {
       startedAt: new Date().toISOString(),
       endedAt: null
     }
-    const run: Running = { job, output: '', child }
+    const run: Running = { job, output: '', child, cancelling: false }
     this.jobs.set(job.id, run)
     const append = (chunk: Buffer): void => {
       const text = chunk.toString('utf8')
@@ -107,12 +108,15 @@ export class Jobs {
 
   /**
    * Stops a running job with its whole process tree: an `up` cut short takes what it was starting
-   * with it, and its lock goes stale once those PIDs are gone. False when it was not running.
+   * with it, and its lock goes stale once those PIDs are gone. The job stays `running` until its
+   * process has exited, so no other action starts on the app while it dies. False when it was not
+   * running.
    */
   cancel(id: string): boolean {
     const run = this.jobs.get(id)
     if (run?.job.state !== 'running') return false
-    run.job = { ...run.job, state: 'cancelled' }
+    if (run.cancelling) return true
+    run.cancelling = true
     if (run.job.pid !== null) killTree(run.job.pid)
     else run.child?.kill()
     return true
@@ -126,7 +130,7 @@ export class Jobs {
   /** Records how a job ended, once. */
   private finish(run: Running, code: number | null): void {
     if (run.job.endedAt !== null) return
-    const cancelled = run.job.state === 'cancelled'
+    const cancelled = run.cancelling
     run.job = {
       ...run.job,
       state: cancelled ? 'cancelled' : 'done',
