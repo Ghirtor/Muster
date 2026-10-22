@@ -5,7 +5,7 @@ name: CI
 
 on:
   push:
-    branches: [dev, master]
+    branches: [dev, main]
   pull_request:
 
 concurrency:
@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   # A feature branch reaches dev rebased onto it, as one merge commit, so it may carry none of its
-  # own (gitHooks/pre-merge-commit refuses them locally). The PR from dev into master is the one
+  # own (gitHooks/pre-merge-commit refuses them locally). The PR from dev into main is the one
   # that carries merges. It checks the PR's head, not the merge ref checkout makes by default.
   linear-history:
     if: github.event_name == 'pull_request' && github.head_ref != 'dev'

@@ -10,7 +10,7 @@ them in another project means writing this file for it, not changing the skills.
 
 ## Branches and commits
 
-- **Protected branches** — `dev` and `master`. No skill works on them: stop and ask which branch
+- **Protected branches** — `dev` and `main`. No skill works on them: stop and ask which branch
   to use.
 - **Install a checkout** — from the checkout's root, worktrees included:
 

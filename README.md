@@ -104,7 +104,7 @@ npm run bundle           # plus MSI / NSIS installers in src-tauri/target/releas
 The remote is GitHub and tickets are GitHub Issues (`gh auth login` once). Branches and commits
 carry the issue as `FEAT-<n>`. CI is `.github/workflows/ci.yml`.
 
-Features merge into `dev`; `master` holds releases. A release is a merge of `dev` into `master`:
+Features merge into `dev`; `main` holds releases. A release is a merge of `dev` into `main`:
 `.github/workflows/release.yml` tags the merge commit `v` + the `version` in
 `src-tauri/tauri.conf.json`, then builds the installers for Windows, macOS and Linux and attaches
 them to the run as artifacts. A version already tagged fails the run, so set the next one first,
@@ -117,7 +117,7 @@ on whichever branch it should go with, from a clean working tree:
 It sets the version in `tauri.conf.json`, `package.json` and `package-lock.json`, commits them on
 the checked-out branch as `FEAT-12: Version 0.2.0` and pushes that branch (`scripts/version.mjs`).
 
-Then merge `dev` into `master`, by pull request or `git merge` and push.
+Then merge `dev` into `main`, by pull request or `git merge` and push.
 
 ## Layout
 

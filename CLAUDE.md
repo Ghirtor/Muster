@@ -109,7 +109,7 @@ Protected branches, commit format, checks and how to run the app for a check. Se
 
 The issue skills (`/issue-work`, `/issue-batch` and the skills they run) name operations in bold
 and look them up in these files. To move to another tracker, host or project, rewrite the files,
-not the skills; `/setup-issue-skills` writes them for a new repo.
+not the skills; `/project-skills:setup-project-skills` writes them for a new repo.
 
 ## Design
 

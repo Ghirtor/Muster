@@ -11,7 +11,7 @@ another host means rewriting this file, not the skills.
 ## Identifiers
 
 - **Change request** — a GitHub pull request, `#<n>`. Issues and PRs share one number space.
-- **Default branches** — `dev`: every change request targets it. `master` takes only merges of
+- **Default branches** — `dev`: every change request targets it. `main` takes only merges of
   `dev`, which release (see **CI**); never target it with a feature.
 - **Reviewers** — none set yet. Add GitHub logins here (`--reviewer a,b`) once the team is on the
   repo; until then open PRs without reviewers and say so in the report.
@@ -23,7 +23,7 @@ another host means rewriting this file, not the skills.
 - **Update a branch from its target**: rebase, never merge. Run `git fetch origin && git rebase
   origin/<target>`, then `git push --force-with-lease`. On GitHub, use **Update branch ▾ → Update
   with rebase**. `gitHooks/pre-merge-commit` refuses a merge commit on any branch but `dev` and
-  `master`. Don't pass `--no-verify` to get past it: CI's `linear-history` job and the repo's
+  `main`. Don't pass `--no-verify` to get past it: CI's `linear-history` job and the repo's
   ruleset refuse the branch anyway.
 - **Push**: `git push -u origin HEAD`.
 - **Find the change request for a branch**:
@@ -61,11 +61,11 @@ another host means rewriting this file, not the skills.
 
 CI is GitHub Actions, `.github/workflows/ci.yml`, on `windows-latest` runners. They `npm ci` from
 the lockfile and run the jobs `lint` (lint + format check), `type-check`, `test` (with coverage)
-and `build`. It runs on pushes to `dev` and `master` and on every pull request. Pull requests
+and `build`. It runs on pushes to `dev` and `main` and on every pull request. Pull requests
 also run `linear-history`, which fails if the branch has a merge commit that is not on its target.
-The fix is to rebase (**Update a branch from its target**). It doesn't run for the `dev` → `master`
+The fix is to rebase (**Update a branch from its target**). It doesn't run for the `dev` → `main`
 pull request. A separate
-workflow, `.github/workflows/release.yml`, runs on each push to `master`: it tags the commit `v` +
+workflow, `.github/workflows/release.yml`, runs on each push to `main`: it tags the commit `v` +
 `src-tauri/tauri.conf.json`'s `version` (set by `version.sh` / `version.bat` on the checked-out
 branch; a version already tagged fails it), then builds the desktop installers on Windows, macOS
 and Linux and keeps them as the run's artifacts (`gh run download <run-id>`).
