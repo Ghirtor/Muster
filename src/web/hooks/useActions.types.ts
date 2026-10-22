@@ -1,4 +1,4 @@
-import type { ActionRequest } from '../api/flotillaApi.types'
+import type { ActionRequest } from '../api/musterApi.types'
 
 export interface Blocked {
   app: string

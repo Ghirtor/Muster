@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FC } from 'react'
 
-import { useGetHealthQuery, useListAppsQuery, useListJobsQuery } from './api/flotillaApi'
+import { useGetHealthQuery, useListAppsQuery, useListJobsQuery } from './api/musterApi'
 import useActions from './hooks/useActions'
 import useNow from './hooks/useNow'
 import useRoute from './hooks/useRoute'

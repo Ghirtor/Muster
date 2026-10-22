@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import type { AppView } from '../api/flotillaApi.types'
+import type { AppView } from '../api/musterApi.types'
 import Icon from '../components/Icon'
 import { hrefOf } from '../routes'
 import type { Route } from '../routes.types'

@@ -1,8 +1,8 @@
 import type { BaseQueryFn } from '@reduxjs/toolkit/query'
 import { isAxiosError } from 'axios'
 
-import type { ApiFailure, HttpRequest } from './flotillaApi.types'
 import { http } from './http'
+import type { ApiFailure, HttpRequest } from './musterApi.types'
 
 /**
  * RTK Query's transport over axios. A refusal becomes an `ApiFailure` carrying the supervisor's

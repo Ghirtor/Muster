@@ -102,7 +102,7 @@ const writeConfig = (file: string, config: object): string => {
 }
 
 beforeEach(async () => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'flotilla-api-'))
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'muster-api-'))
   fs.writeFileSync(path.join(dir, 'server.js'), SERVER)
   const [fixturePort, queuedPort] = [await freePort(), await freePort()]
   files = [

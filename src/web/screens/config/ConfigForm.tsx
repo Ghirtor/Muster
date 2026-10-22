@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import type { FC } from 'react'
 
-import { useSaveConfigMutation, useValidateConfigMutation } from '../../api/flotillaApi'
-import type { ApiFailure, AppView } from '../../api/flotillaApi.types'
+import { useSaveConfigMutation, useValidateConfigMutation } from '../../api/musterApi'
+import type { ApiFailure, AppView } from '../../api/musterApi.types'
 import Button from '../../components/Button'
 import { baseName } from '../../format'
 import { hrefOf } from '../../routes'

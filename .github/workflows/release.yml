@@ -35,7 +35,7 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git tag --annotate "$tag" -m "Flotilla ${tag#v}" "$GITHUB_SHA"
+          git tag --annotate "$tag" -m "Muster ${tag#v}" "$GITHUB_SHA"
           git push origin "$tag"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 

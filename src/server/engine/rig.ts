@@ -91,7 +91,7 @@ export class Rig {
 
   /**
    * Who holds the rig, who waits for it and which ports listen, read without touching the lock.
-   * Foreign means one per machine's ports listen while nobody holds it: started outside Flotilla.
+   * Foreign means one per machine's ports listen while nobody holds it: started outside Muster.
    */
   async snapshot(): Promise<RigSnapshot> {
     const held = holders(this.ctx).map((slot) => slot.lock)
@@ -114,7 +114,7 @@ export class Rig {
     const snapshot = await this.snapshot()
     if (snapshot.holders.length === 0) {
       this.line(
-        snapshot.foreign ? '  holder: none recorded (started outside Flotilla)' : '  holder: free'
+        snapshot.foreign ? '  holder: none recorded (started outside Muster)' : '  holder: free'
       )
     }
     for (const lock of snapshot.holders) {
@@ -261,7 +261,7 @@ export class Rig {
    * process names it in `after`. A process whose `after` did not come up is skipped.
    */
   async up(): Promise<Outcome> {
-    this.line(`flotilla up — ${this.config.name}\n`)
+    this.line(`muster up — ${this.config.name}\n`)
     const taken = await acquire(this.ctx, {
       reason: this.options.reason,
       wait: this.options.wait || this.config.instances.whenBusy === 'wait',
@@ -328,7 +328,7 @@ export class Rig {
 
   /** Stops the rig and frees its slot — only this checkout's, unless `force`. */
   async release(): Promise<Outcome> {
-    this.line(`flotilla release — ${this.config.name}\n`)
+    this.line(`muster release — ${this.config.name}\n`)
     const slot = this.slot()
     if (slot === null) {
       this.line('  this checkout does not hold the rig — nothing to release')
@@ -351,7 +351,7 @@ export class Rig {
    * which already owns the rig, so it neither checks nor drops the lock.
    */
   async down(quiet = false): Promise<Outcome> {
-    if (!quiet) this.line(`flotilla down — ${this.config.name}\n`)
+    if (!quiet) this.line(`muster down — ${this.config.name}\n`)
     const slot = quiet ? null : this.slot()
     if (slot !== null && !isMine(slot.lock, this.ctx.repo) && !this.options.force) {
       this.line(

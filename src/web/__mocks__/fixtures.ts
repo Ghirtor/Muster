@@ -1,4 +1,4 @@
-import type { ConfigView, Job, Lock, ReadyApp, RigSnapshot } from '../api/flotillaApi.types'
+import type { ConfigView, Job, Lock, ReadyApp, RigSnapshot } from '../api/musterApi.types'
 
 export const REPO = 'C:\\dev\\Demo'
 
@@ -9,7 +9,7 @@ export const configOf = (overrides: Partial<ConfigView> = {}): ConfigView => ({
   instances: {
     mode: 'one-per-machine',
     max: 1,
-    lock: 'C:\\Users\\me\\.flotilla\\demo.lock',
+    lock: 'C:\\Users\\me\\.muster\\demo.lock',
     staleAfterMs: 4 * 3_600_000,
     whenBusy: 'fail',
     killImages: ['node.exe']
@@ -41,7 +41,7 @@ export const configOf = (overrides: Partial<ConfigView> = {}): ConfigView => ({
   ],
   ready: [{ kind: 'ports', ports: [7001, 7002], timeoutMs: 60_000 }],
   tools: [],
-  logs: 'C:\\Users\\me\\.flotilla\\logs\\demo',
+  logs: 'C:\\Users\\me\\.muster\\logs\\demo',
   ...overrides
 })
 
@@ -77,7 +77,7 @@ export const snapshotOf = (
 /** The Demo app as the supervisor lists it. */
 export const appOf = (snapshot: RigSnapshot = snapshotOf()): ReadyApp => ({
   id: 'demo',
-  file: 'C:\\Users\\me\\.flotilla\\sample.yaml',
+  file: 'C:\\Users\\me\\.muster\\sample.yaml',
   ok: true,
   config: configOf(),
   snapshot

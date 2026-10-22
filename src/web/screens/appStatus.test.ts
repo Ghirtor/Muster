@@ -1,5 +1,5 @@
 import { appOf, lockOf, REPO, snapshotOf } from '../__mocks__/fixtures'
-import type { BrokenApp } from '../api/flotillaApi.types'
+import type { BrokenApp } from '../api/musterApi.types'
 import { appName, appStatus, isTaken, matches, ownHold } from './appStatus'
 
 const broken: BrokenApp = { id: 'demo', file: 'sample.yaml', ok: false, problems: ['name: missing'] }

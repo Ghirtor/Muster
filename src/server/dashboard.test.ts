@@ -9,7 +9,7 @@ describe('dashboard', () => {
   let root: string
 
   beforeEach(() => {
-    root = fs.mkdtempSync(path.join(os.tmpdir(), 'flotilla-dashboard-'))
+    root = fs.mkdtempSync(path.join(os.tmpdir(), 'muster-dashboard-'))
     fs.writeFileSync(path.join(root, 'index.html'), '<div id="root"></div>')
     fs.mkdirSync(path.join(root, 'assets'))
     fs.writeFileSync(path.join(root, 'assets', 'main.js'), 'console.log(1)')

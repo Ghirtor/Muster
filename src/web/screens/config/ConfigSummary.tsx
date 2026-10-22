@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import type { ConfigView, InstanceMode } from '../../api/flotillaApi.types'
+import type { ConfigView, InstanceMode } from '../../api/musterApi.types'
 import Panel from '../../components/Panel'
 import { duration, modeLabel } from '../../format'
 

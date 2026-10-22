@@ -1,7 +1,7 @@
 import { runCommand } from './command'
 
 /**
- * `flotilla status|up|release|down`: rig.mjs's commands, flags and exit codes (0 ok, 1 failed,
+ * `muster status|up|release|down`: rig.mjs's commands, flags and exit codes (0 ok, 1 failed,
  * 2 usage, 3 busy) over any app's config, so the rig-ctl skill can call it unchanged.
  */
 const main = async (): Promise<void> => {

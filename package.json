@@ -1,5 +1,5 @@
 {
-  "name": "flotilla",
+  "name": "muster",
   "version": "0.1.0",
   "description": "Launch, watch and hand over local app rigs",
   "private": true,
@@ -20,7 +20,7 @@
     "test": "vitest run",
     "package": "tauri build --no-bundle",
     "bundle": "tauri build",
-    "flotilla": "cross-env SWC_NODE_PROJECT=src/server/tsconfig.json node --import @swc-node/register/esm-register src/server/cli.ts"
+    "muster": "cross-env SWC_NODE_PROJECT=src/server/tsconfig.json node --import @swc-node/register/esm-register src/server/cli.ts"
   },
   "browserslist": {
     "production": [

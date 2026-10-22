@@ -54,7 +54,7 @@ const freePorts = async (count: number): Promise<number[]> => {
 
 const rigOf = (config: object, out: Recorder): Rig => {
   current = config
-  return new Rig(parseConfig(JSON.stringify(config), path.join(dir, 'flotilla.yaml')), {
+  return new Rig(parseConfig(JSON.stringify(config), path.join(dir, 'muster.yaml')), {
     repo: dir,
     reason: 'integration test',
     wait: false,
@@ -74,7 +74,7 @@ const base = (processes: object[]): object => ({
 })
 
 beforeEach(() => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'flotilla-rig-'))
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'muster-rig-'))
   fs.writeFileSync(path.join(dir, 'server.js'), SERVER)
   fs.writeFileSync(path.join(dir, 'fix.js'), "require('node:fs').writeFileSync('installed', '')")
 })

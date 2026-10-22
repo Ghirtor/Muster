@@ -16,7 +16,7 @@ const write = (file: string, text: string): string => {
 }
 
 beforeEach(() => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'flotilla-registry-'))
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'muster-registry-'))
 })
 
 afterEach(() => {

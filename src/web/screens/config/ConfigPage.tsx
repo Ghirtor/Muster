@@ -1,7 +1,7 @@
 import type { FC } from 'react'
 
-import { useGetConfigQuery } from '../../api/flotillaApi'
-import type { AppView } from '../../api/flotillaApi.types'
+import { useGetConfigQuery } from '../../api/musterApi'
+import type { AppView } from '../../api/musterApi.types'
 import ConfigForm from './ConfigForm'
 
 type ConfigPageProps = Readonly<{ app: AppView }>

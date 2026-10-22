@@ -1,4 +1,4 @@
-import type { Job, Listener, ServerMessage } from './flotillaApi.types'
+import type { Job, Listener, ServerMessage } from './musterApi.types'
 
 const listeners = new Map<string, Set<Listener>>()
 let socket: WebSocket | null = null

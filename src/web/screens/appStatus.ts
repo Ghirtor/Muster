@@ -1,4 +1,4 @@
-import type { AppView, Lock, RigSnapshot } from '../api/flotillaApi.types'
+import type { AppView, Lock, RigSnapshot } from '../api/musterApi.types'
 import type { ProcessStatus } from '../components/StatusBadge.types'
 import { heldFrom } from '../format'
 
@@ -29,7 +29,7 @@ export const matches = (app: AppView, search: string): boolean => {
   return words.some((word) => word.toLowerCase().includes(needle))
 }
 
-/** Whether the rig is held, by a lock or by processes started outside Flotilla. */
+/** Whether the rig is held, by a lock or by processes started outside Muster. */
 export const isTaken = (snapshot: RigSnapshot): boolean =>
   snapshot.holders.length > 0 || snapshot.foreign
 

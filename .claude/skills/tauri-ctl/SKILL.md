@@ -1,6 +1,6 @@
 ---
 name: tauri-ctl
-description: Use when driving or inspecting the running Flotilla Tauri desktop app — clicking through its UI, reading its DOM, screenshotting, or checking the dashboard in the real WebView2 window instead of jsdom or the browser pane.
+description: Use when driving or inspecting the running Muster Tauri desktop app — clicking through its UI, reading its DOM, screenshotting, or checking the dashboard in the real WebView2 window instead of jsdom or the browser pane.
 ---
 
 # tauri-ctl
@@ -12,7 +12,7 @@ background (it runs the supervisor and Vite first, like `npm run dev`):
 npm run dev:desktop
 ```
 
-`4872` sits next to Flotilla's own ports because Demo's rig already holds `9222`. Attach to it
+`4872` sits next to Muster's own ports because Demo's rig already holds `9222`. Attach to it
 with the `dev-browser` CLI, **from Bash** — PowerShell wires stdin in a way it cannot tolerate,
 and the call hangs to timeout with zero output:
 

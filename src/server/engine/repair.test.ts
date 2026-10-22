@@ -37,7 +37,7 @@ describe('repairCommand', () => {
   let dir: string
 
   beforeEach(() => {
-    dir = fs.mkdtempSync(path.join(os.tmpdir(), 'flotilla-repair-'))
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), 'muster-repair-'))
   })
 
   afterEach(() => {

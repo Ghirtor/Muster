@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import type { PortRow } from '../../api/flotillaApi.types'
+import type { PortRow } from '../../api/musterApi.types'
 
 type PortBarProps = Readonly<{ ports: PortRow[] }>
 

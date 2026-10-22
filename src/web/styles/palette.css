@@ -1,4 +1,4 @@
-/* Raw values from design/tokens.json (the Flotilla design system, built on auxBulles new).
+/* Raw values from design/tokens.json (the Muster design system, built on auxBulles new).
    Nothing outside semantic.css reads these: a component uses a role, never a swatch. */
 
 :root {

@@ -33,7 +33,7 @@ const moduleShapeRestrictions = [
 ]
 
 const COLOUR_TOKEN_MESSAGE =
-  'Use a semantic colour token from src/web/styles/semantic.css (bg-brand, text-ink-muted, border-status-error, var(--color-…)), so the Flotilla tokens stay the one source of colour.'
+  'Use a semantic colour token from src/web/styles/semantic.css (bg-brand, text-ink-muted, border-status-error, var(--color-…)), so the Muster tokens stay the one source of colour.'
 
 const COLOUR_FUNCTION = String.raw`#[0-9a-fA-F]{3,8}\b|\b(rgba?|hsla?|oklch)\(`
 const PALETTE_UTILITY = String.raw`\b(bg|text|border(-[trblxyse])?|fill|stroke|from|to|via|ring(-offset)?|outline|shadow|inset-shadow|drop-shadow|divide|placeholder|accent|caret|decoration)-(white|black|gray|slate|zinc|neutral|stone|mauve|mist|olive|taupe|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)\b`

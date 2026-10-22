@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FC } from 'react'
 
-import type { ReadyApp } from '../../api/flotillaApi.types'
+import type { ReadyApp } from '../../api/musterApi.types'
 import Button from '../../components/Button'
 import Icon from '../../components/Icon'
 import { baseName, knownBranch, since } from '../../format'
@@ -20,7 +20,7 @@ const TERM = 'w-24 shrink-0 text-ink-faint'
 const ROW = 'flex gap-3 border-b border-surface px-4 py-3 last:border-b-0'
 
 /**
- * Shown when a launch finds the rig held by another checkout (or by processes Flotilla did not
+ * Shown when a launch finds the rig held by another checkout (or by processes Muster did not
  * start): wait in the queue for it, or stop it and take it over. Escape cancels.
  */
 const BusyDialog: FC<BusyDialogProps> = ({ app, now, onCancel, onWait, onTakeOver }) => {
@@ -66,7 +66,7 @@ const BusyDialog: FC<BusyDialogProps> = ({ app, now, onCancel, onWait, onTakeOve
               className="m-0 text-xl leading-[1.3] font-semibold tracking-[-0.01em]"
             >
               {holder === undefined
-                ? `${app.config.name} is already running outside Flotilla`
+                ? `${app.config.name} is already running outside Muster`
                 : `${app.config.name} is held by another checkout`}
             </h2>
             <p

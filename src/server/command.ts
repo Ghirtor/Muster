@@ -6,7 +6,7 @@ import { Rig } from './engine/rig'
 import type { Outcome } from './engine/rig.types'
 
 export const USAGE =
-  'usage: flotilla [status|up|release|down] [--config <file>] [--repo <path>] [--reason <text>] [--wait] [--force]'
+  'usage: muster [status|up|release|down] [--config <file>] [--repo <path>] [--reason <text>] [--wait] [--force]'
 
 export const EXIT = { ok: 0, failed: 1, usage: 2, busy: 3 } as const
 
@@ -42,8 +42,8 @@ export const exitCode = (outcome: Outcome): number => {
 }
 
 /**
- * Runs one `flotilla` command and returns its exit code. The config comes from `--config`, then
- * `FLOTILLA_CONFIG`, then `flotilla.yaml` in the working directory; `--repo` overrides its `repo`.
+ * Runs one `muster` command and returns its exit code. The config comes from `--config`, then
+ * `MUSTER_CONFIG`, then `muster.yaml` in the working directory; `--repo` overrides its `repo`.
  */
 export const runCommand = async (argv: string[], io: CommandIo): Promise<number> => {
   const first = argv.at(0)
@@ -53,7 +53,7 @@ export const runCommand = async (argv: string[], io: CommandIo): Promise<number>
     return EXIT.usage
   }
   const flags = parseFlags(argv)
-  const file = text(flags, 'config', io.env.FLOTILLA_CONFIG ?? path.join(io.cwd, 'flotilla.yaml'))
+  const file = text(flags, 'config', io.env.MUSTER_CONFIG ?? path.join(io.cwd, 'muster.yaml'))
   let rig: Rig
   try {
     const config = loadConfig(path.resolve(io.cwd, file))

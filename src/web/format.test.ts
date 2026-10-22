@@ -1,4 +1,4 @@
-import type { ProcessView } from './api/flotillaApi.types'
+import type { ProcessView } from './api/musterApi.types'
 import {
   baseName,
   checkoutOf,

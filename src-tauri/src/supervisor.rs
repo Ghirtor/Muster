@@ -60,8 +60,8 @@ pub fn start(app: &AppHandle) -> Result<tauri::Url, String> {
   let mut command = Command::new("node");
   command
     .arg(&script)
-    .env("FLOTILLA_PORT", PORT.to_string())
-    .env("FLOTILLA_WEB_ROOT", &web_root)
+    .env("MUSTER_PORT", PORT.to_string())
+    .env("MUSTER_WEB_ROOT", &web_root)
     .stdin(Stdio::null())
     .stdout(Stdio::from(log))
     .stderr(Stdio::from(log_err));
@@ -73,7 +73,7 @@ pub fn start(app: &AppHandle) -> Result<tauri::Url, String> {
   }
   let mut child = command
     .spawn()
-    .map_err(|e| format!("could not run node ({e}); Flotilla needs Node >= 22 on PATH"))?;
+    .map_err(|e| format!("could not run node ({e}); Muster needs Node >= 22 on PATH"))?;
 
   let started = Instant::now();
   while !listening() {

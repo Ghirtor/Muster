@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import type { AppView, Job, ReadyApp } from '../../api/flotillaApi.types'
+import type { AppView, Job, ReadyApp } from '../../api/musterApi.types'
 import Button from '../../components/Button'
 import Panel from '../../components/Panel'
 import { baseName, modeLabel } from '../../format'

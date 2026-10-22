@@ -204,7 +204,7 @@ export const acquire = async (
     if (machine && held.length === 0 && (await anyUp(ctx.ports))) {
       ctx.out.write(
         '  BUSY: its ports are in use but no checkout holds the rig — it was started by hand or\n' +
-          '  outside Flotilla. Which code it runs is unknown, so ask before stopping it with `down`,\n' +
+          '  outside Muster. Which code it runs is unknown, so ask before stopping it with `down`,\n' +
           '  then run `up` again.\n'
       )
       leaveQueue(ctx)

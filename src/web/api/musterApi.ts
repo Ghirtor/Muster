@@ -10,7 +10,7 @@ import type {
   JobDetail,
   ServerMessage,
   Validation
-} from './flotillaApi.types'
+} from './musterApi.types'
 import { subscribe } from './socket'
 
 export const APPS_TAG = 'Apps' as const
@@ -45,7 +45,7 @@ const segment = (value: string): string => encodeURIComponent(value)
  * to its topic while it is in use (`status` for the app list, `jobs` for jobs and their output,
  * `log:<app>:<key>` for a log) and folds the messages into its data.
  */
-export const flotillaApi = createApi({
+export const musterApi = createApi({
   reducerPath: 'api',
   baseQuery: axiosBaseQuery,
   tagTypes: [APPS_TAG, CONFIG_TAG],
@@ -61,7 +61,7 @@ export const flotillaApi = createApi({
           const apps = api.getCacheEntry().data
           if (apps === undefined) return
           const next = applyStatus(apps, message)
-          if (next === null) api.dispatch(flotillaApi.util.invalidateTags([APPS_TAG]))
+          if (next === null) api.dispatch(musterApi.util.invalidateTags([APPS_TAG]))
           else api.updateCachedData(() => next)
         })
         await api.cacheEntryRemoved
@@ -161,4 +161,4 @@ export const {
   useGetJobQuery,
   useCancelJobMutation,
   useFollowLogQuery
-} = flotillaApi
+} = musterApi

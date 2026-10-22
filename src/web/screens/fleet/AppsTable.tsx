@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import type { AppView } from '../../api/flotillaApi.types'
+import type { AppView } from '../../api/musterApi.types'
 import Button from '../../components/Button'
 import StatusBadge from '../../components/StatusBadge'
 import { baseName, knownBranch, modeLabel, since } from '../../format'
@@ -62,7 +62,7 @@ const AppsTable: FC<AppsTableProps> = ({ apps, now, busy, onLaunch, onRelease })
               <td className={CELL}>
                 {holder === undefined ? (
                   <span className="text-ink-faint">
-                    {app.ok && app.snapshot.foreign ? 'Outside Flotilla' : 'Nobody'}
+                    {app.ok && app.snapshot.foreign ? 'Outside Muster' : 'Nobody'}
                   </span>
                 ) : (
                   <>

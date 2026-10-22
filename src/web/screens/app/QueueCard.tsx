@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import type { QueueEntry } from '../../api/flotillaApi.types'
+import type { QueueEntry } from '../../api/musterApi.types'
 import { baseName, knownBranch, since } from '../../format'
 
 type QueueCardProps = Readonly<{ queue: QueueEntry[]; now: number }>

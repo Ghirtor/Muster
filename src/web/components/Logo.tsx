@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-/** Flotilla's mark: three hulls in formation. */
+/** Muster's mark: three hulls in formation. */
 const Logo: FC = () => (
   <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
     <rect x="1" y="3" width="10" height="20" rx="4" className="fill-brand-bright" />

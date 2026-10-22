@@ -1,5 +1,5 @@
 [package]
-name = "flotilla"
+name = "muster"
 version = "0.1.0"
 description = "Launch, watch and hand over local app rigs"
 authors = ["Ghirtor"]

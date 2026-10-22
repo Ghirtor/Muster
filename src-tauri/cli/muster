@@ -1,5 +1,5 @@
 #!/bin/sh
-# The installed `flotilla` CLI for POSIX shells (Git Bash included): the bundled cli.js, run with
+# The installed `muster` CLI for POSIX shells (Git Bash included): the bundled cli.js, run with
 # the machine's node (>= 22). macOS and Linux put it on PATH as a link, so it follows links to find
 # the app's resources.
 self=$0

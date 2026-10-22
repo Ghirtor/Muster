@@ -47,10 +47,10 @@ another host means rewriting this file, not the skills.
 
   ```
   git fetch origin evidence || true
-  git worktree add --orphan -b evidence ../flotilla-evidence   # first time; else: git worktree add ../flotilla-evidence evidence
-  cp <screenshots> ../flotilla-evidence/<branch>/ && cd ../flotilla-evidence
+  git worktree add --orphan -b evidence ../muster-evidence   # first time; else: git worktree add ../muster-evidence evidence
+  cp <screenshots> ../muster-evidence/<branch>/ && cd ../muster-evidence
   git add . && git commit -m "<ISSUE_KEY>: evidence" && git push origin evidence
-  cd - && git worktree remove ../flotilla-evidence
+  cd - && git worktree remove ../muster-evidence
   ```
 
   Link each as `![<scenario>](https://github.com/<owner>/<repo>/blob/evidence/<branch>/<file>?raw=true)`

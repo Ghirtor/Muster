@@ -3,12 +3,12 @@ import react from '@vitejs/plugin-react'
 import { type PluginOption, defineConfig } from 'vite'
 
 /**
- * Flotilla runs beside the rigs it manages, so it must never take one of their ports. Demo's rig
+ * Muster runs beside the rigs it manages, so it must never take one of their ports. Demo's rig
  * holds 1232, 1234, 5173, 8765, 8766, 8767 and 9222 — Vite's default 5173 among them. The dev
  * server never watches `src-tauri/`: cargo's locked build outputs there crash the watcher.
  */
 const WEB_PORT = 4870
-const SERVER_PORT = Number(process.env.FLOTILLA_PORT ?? 4871)
+const SERVER_PORT = Number(process.env.MUSTER_PORT ?? 4871)
 
 const reactDevTools = (): PluginOption => {
   return {

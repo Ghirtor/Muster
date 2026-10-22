@@ -1,7 +1,7 @@
 import type { FC } from 'react'
 
-import { useCancelJobMutation, useGetJobQuery } from '../../api/flotillaApi'
-import type { Job } from '../../api/flotillaApi.types'
+import { useCancelJobMutation, useGetJobQuery } from '../../api/musterApi'
+import type { Job } from '../../api/musterApi.types'
 import Button from '../../components/Button'
 import Console from '../../components/Console'
 import Panel from '../../components/Panel'

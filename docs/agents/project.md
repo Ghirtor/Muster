@@ -1,4 +1,4 @@
-# Project: Flotilla
+# Project: Muster
 
 How this repo installs, checks, commits and runs. Issues are the tracker's business
 (`docs/agents/issue-tracker.md`); change requests and CI are the code host's

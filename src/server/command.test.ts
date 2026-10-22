@@ -29,7 +29,7 @@ const record = (env: NodeJS.ProcessEnv = {}): Recorded => {
 }
 
 /** A one-per-machine config whose only process listens on a port nothing uses. */
-const writeConfig = (file = 'flotilla.yaml'): string => {
+const writeConfig = (file = 'muster.yaml'): string => {
   const config = {
     name: 'Fixture',
     instances: { mode: 'one-per-machine', lock: path.join(dir, 'lock.json') },
@@ -41,7 +41,7 @@ const writeConfig = (file = 'flotilla.yaml'): string => {
 }
 
 beforeEach(() => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'flotilla-cli-'))
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'muster-cli-'))
 })
 
 afterEach(() => {
@@ -78,14 +78,14 @@ describe('runCommand', () => {
   })
 
   it('reports an invalid config as a usage error', async () => {
-    fs.writeFileSync(path.join(dir, 'flotilla.yaml'), 'name: Broken\n')
+    fs.writeFileSync(path.join(dir, 'muster.yaml'), 'name: Broken\n')
     const run = record()
 
     await expect(runCommand(['status'], run.io)).resolves.toBe(EXIT.usage)
-    expect(run.err()).toMatch(/is not a valid Flotilla config/)
+    expect(run.err()).toMatch(/is not a valid Muster config/)
   })
 
-  it('runs status by default from flotilla.yaml in the working directory', async () => {
+  it('runs status by default from muster.yaml in the working directory', async () => {
     writeConfig()
     const run = record()
 
@@ -93,10 +93,10 @@ describe('runCommand', () => {
     expect(run.out()).toBe('  holder: free\n\n  1     Web  DOWN\n\n1 of 1 missing\n')
   })
 
-  it('takes the config from FLOTILLA_CONFIG, and --config over it', async () => {
+  it('takes the config from MUSTER_CONFIG, and --config over it', async () => {
     const other = writeConfig('other.yaml')
-    const fromEnv = record({ FLOTILLA_CONFIG: other })
-    const fromFlag = record({ FLOTILLA_CONFIG: path.join(dir, 'missing.yaml') })
+    const fromEnv = record({ MUSTER_CONFIG: other })
+    const fromFlag = record({ MUSTER_CONFIG: path.join(dir, 'missing.yaml') })
 
     await expect(runCommand(['status'], fromEnv.io)).resolves.toBe(EXIT.failed)
     await expect(runCommand(['status', '--config', other], fromFlag.io)).resolves.toBe(EXIT.failed)

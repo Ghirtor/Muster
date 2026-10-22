@@ -1,4 +1,4 @@
-import type { InstanceMode, Lock, PortRow, ProcessView } from './api/flotillaApi.types'
+import type { InstanceMode, Lock, PortRow, ProcessView } from './api/musterApi.types'
 import type { ProcessStatus } from './components/StatusBadge.types'
 
 const MODES: Record<InstanceMode, string> = {

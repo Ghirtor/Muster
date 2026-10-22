@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import type { ReadyApp, ReadyCheck } from '../../api/flotillaApi.types'
+import type { ReadyApp, ReadyCheck } from '../../api/musterApi.types'
 
 type ReadinessCardProps = Readonly<{ app: ReadyApp }>
 

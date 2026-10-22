@@ -5,7 +5,7 @@ paths:
 
 # Conventions
 
-Coding conventions for React with TypeScript. It defines how to write good components, props, hooks and styles with Tailwind 4 and the Flotilla tokens.
+Coding conventions for React with TypeScript. It defines how to write good components, props, hooks and styles with Tailwind 4 and the Muster tokens.
 By keeping in mind accessibility, performances with react-compiler and testability.
 
 They apply to every `.ts` and `.tsx` file written or changed under `src/`, whatever the

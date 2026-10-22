@@ -1,13 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 
-import { flotillaApi } from '../api/flotillaApi'
+import { musterApi } from '../api/musterApi'
 
 /** A store holding the API cache; tests make their own so no cache leaks between them. */
 export const makeStore = () => {
   const store = configureStore({
-    reducer: { [flotillaApi.reducerPath]: flotillaApi.reducer },
-    middleware: (getDefault) => getDefault().concat(flotillaApi.middleware)
+    reducer: { [musterApi.reducerPath]: musterApi.reducer },
+    middleware: (getDefault) => getDefault().concat(musterApi.middleware)
   })
   setupListeners(store.dispatch)
   return store

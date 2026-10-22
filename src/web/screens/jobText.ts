@@ -1,4 +1,4 @@
-import type { Action, Job } from '../api/flotillaApi.types'
+import type { Action, Job } from '../api/musterApi.types'
 
 const VERBS: Record<Action, string> = { up: 'Launch', down: 'Stop', release: 'Release' }
 

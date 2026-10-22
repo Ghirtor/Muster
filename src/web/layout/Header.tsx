@@ -31,7 +31,7 @@ const Header: FC<HeaderProps> = ({ search, onSearch, hostname }) => {
     <header className="sticky top-0 z-20 flex h-header items-center gap-6 bg-brand-deep px-6 text-ink-on-fill shadow-elevation-1">
       <a href="#/" className="flex items-center gap-2.5 text-ink-on-fill no-underline">
         <Logo />
-        <span className="font-display text-2xl tracking-tight">Flotilla</span>
+        <span className="font-display text-2xl tracking-tight">Muster</span>
       </a>
       <label className="flex h-10 w-full max-w-[520px] items-center gap-2.5 rounded-pill bg-material-window px-4">
         <Icon name="search" />

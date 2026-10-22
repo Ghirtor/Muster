@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
-import { flotillaApi, useStartActionMutation } from '../api/flotillaApi'
-import type { ActionRequest, ApiFailure, Job } from '../api/flotillaApi.types'
+import { musterApi, useStartActionMutation } from '../api/musterApi'
+import type { ActionRequest, ApiFailure, Job } from '../api/musterApi.types'
 import { waitForJob } from '../api/socket'
 import useAppDispatch from '../store/useAppDispatch'
 import type { Blocked, UseActionsReturn } from './useActions.types'
@@ -33,7 +33,7 @@ const useActions = (): UseActionsReturn => {
 
   const readJob = async (id: string): Promise<Job> => {
     const request = dispatch(
-      flotillaApi.endpoints.getJob.initiate(id, { subscribe: false, forceRefetch: true })
+      musterApi.endpoints.getJob.initiate(id, { subscribe: false, forceRefetch: true })
     )
     return (await request.unwrap()).job
   }

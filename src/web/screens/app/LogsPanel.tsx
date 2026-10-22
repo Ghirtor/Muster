@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import type { FC } from 'react'
 
-import { useFollowLogQuery } from '../../api/flotillaApi'
-import type { ReadyApp } from '../../api/flotillaApi.types'
+import { useFollowLogQuery } from '../../api/musterApi'
+import type { ReadyApp } from '../../api/musterApi.types'
 import Console from '../../components/Console'
 
 type LogsPanelProps = Readonly<{ app: ReadyApp }>

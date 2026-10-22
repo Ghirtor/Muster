@@ -1,5 +1,5 @@
 # A sample rig, written as Muster config.
-# This is the config format the Flotilla engine reads. Paths are relative to the checkout.
+# This is the config format the Muster engine reads. Paths are relative to the checkout.
 
 name: Demo
 repo: C:/Users/aymer/dev/demo

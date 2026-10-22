@@ -26,7 +26,7 @@ export const argsOf = (file: string, request: ActionRequest): string[] => [
 ]
 
 /**
- * Actions run as `flotilla` CLI processes, exactly as an agent runs them. The lock records the PID
+ * Actions run as `muster` CLI processes, exactly as an agent runs them. The lock records the PID
  * that took it and the queue orders waiters by PID, so each action needs a process of its own: run
  * inside the long-lived supervisor, every lock would look alive for as long as the supervisor
  * does. One action runs per app at a time; the last `keep` finished jobs stay readable.

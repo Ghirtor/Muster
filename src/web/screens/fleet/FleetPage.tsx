@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FC } from 'react'
 
-import type { AppView, Job } from '../../api/flotillaApi.types'
+import type { AppView, Job } from '../../api/musterApi.types'
 import Panel from '../../components/Panel'
 import { checkoutOf, since } from '../../format'
 import type { UseActionsReturn } from '../../hooks/useActions.types'
@@ -134,7 +134,7 @@ const FleetPage: FC<FleetPageProps> = ({ apps, jobs, hostname, search, now, acti
         {shown.length === 0 ? (
           <p className="m-0 border-t border-line-subtle px-5 py-6 text-sm text-ink-faint">
             {apps.length === 0
-              ? 'No app is configured. Point FLOTILLA_CONFIGS at a config, or add flotilla.yaml.'
+              ? 'No app is configured. Point MUSTER_CONFIGS at a config, or add muster.yaml.'
               : 'No app matches.'}
           </p>
         ) : (

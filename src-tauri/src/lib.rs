@@ -6,7 +6,7 @@ use tauri::{Manager, WebviewUrl, WebviewWindowBuilder};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   let builder = tauri::Builder::default().manage(supervisor::Supervisor::default());
-  // Windows' installers and Linux's packages put `flotilla` on PATH; on macOS the app menu does.
+  // Windows' installers and Linux's packages put `muster` on PATH; on macOS the app menu does.
   #[cfg(target_os = "macos")]
   let builder = builder
     .menu(cli_tool::menu)
@@ -50,7 +50,7 @@ pub fn run() {
 
 fn open_main_window(app: &tauri::AppHandle, url: WebviewUrl) -> tauri::Result<()> {
   WebviewWindowBuilder::new(app, "main", url)
-    .title("Flotilla")
+    .title("Muster")
     .inner_size(1440.0, 900.0)
     .min_inner_size(1024.0, 640.0)
     .build()?;

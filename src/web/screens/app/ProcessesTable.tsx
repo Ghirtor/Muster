@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import type { ReadyApp } from '../../api/flotillaApi.types'
+import type { ReadyApp } from '../../api/musterApi.types'
 import StatusBadge from '../../components/StatusBadge'
 import { processStatus } from '../../format'
 

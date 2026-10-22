@@ -37,7 +37,7 @@ export class ConfigError extends Error {
     readonly file: string,
     readonly problems: string[]
   ) {
-    super(`${file} is not a valid Flotilla config:\n  ${problems.join('\n  ')}`)
+    super(`${file} is not a valid Muster config:\n  ${problems.join('\n  ')}`)
   }
 }
 
@@ -216,7 +216,7 @@ class Reader {
 /** How many instances may run, and where they take turns. */
 const readInstances = (reader: Reader, raw: unknown, name: string): InstancesConfig => {
   const at = 'instances'
-  const fallbackLock = path.join(os.homedir(), '.flotilla', slug(name), 'lock.json')
+  const fallbackLock = path.join(os.homedir(), '.muster', slug(name), 'lock.json')
   const instances = isRecord(raw) ? raw : {}
   if (raw !== undefined && !isRecord(raw)) reader.fail(at, 'must be a mapping')
   reader.known(instances, ['mode', 'max', 'lock', 'staleAfter', 'whenBusy', 'killImages'], at)
@@ -480,7 +480,7 @@ export const parseConfig = (text: string, file: string): RigConfig => {
     : []
   if (processes.length === 0) reader.fail('config', '"processes" must list at least one process')
   checkProcesses(reader, processes)
-  const fallbackLogs = path.join(os.tmpdir(), 'flotilla-logs', slug(name), '{key}.log')
+  const fallbackLogs = path.join(os.tmpdir(), 'muster-logs', slug(name), '{key}.log')
   const logs = reader.optionalText(raw, 'logs', 'config', fallbackLogs)
   if (!logs.includes('{key}')) reader.fail('logs', 'must contain {key}, one log per process')
   const config: RigConfig = {

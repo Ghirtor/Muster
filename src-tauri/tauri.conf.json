@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Flotilla",
+  "productName": "Muster",
   "version": "0.1.0",
-  "identifier": "com.ghirtor.flotilla",
+  "identifier": "com.ghirtor.muster",
   "build": {
     "frontendDist": "../dist/web",
     "devUrl": "http://localhost:4870",
@@ -28,7 +28,7 @@
     "resources": {
       "../dist/server/": "server/",
       "../dist/web/": "web/",
-      "cli/flotilla": "bin/flotilla"
+      "cli/muster": "bin/muster"
     }
   }
 }

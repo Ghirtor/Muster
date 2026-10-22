@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import type { ReadyApp } from '../../api/flotillaApi.types'
+import type { ReadyApp } from '../../api/musterApi.types'
 import { baseName, clock, duration, heldFrom, knownBranch, since } from '../../format'
 
 type LockCardProps = Readonly<{ app: ReadyApp; now: number }>
@@ -17,7 +17,7 @@ const LockCard: FC<LockCardProps> = ({ app, now }) => {
     return (
       <p className="m-0 rounded-md bg-surface px-4 py-3 text-sm text-ink-muted shadow-elevation-1">
         {foreign
-          ? 'Ports are listening but no lock is recorded: the rig was started outside Flotilla.'
+          ? 'Ports are listening but no lock is recorded: the rig was started outside Muster.'
           : 'Nobody holds the rig. Launching it takes the lock.'}
       </p>
     )

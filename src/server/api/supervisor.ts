@@ -29,7 +29,7 @@ const dashboard =
 /**
  * The supervisor's HTTP and WebSocket API over the apps in `options.configs`, initialised but not
  * listening. Reads are answered from the configs, the lock files and port probes; actions start
- * `flotilla` CLI jobs. With `webRoot` it also serves the built dashboard, so the page and the API
+ * `muster` CLI jobs. With `webRoot` it also serves the built dashboard, so the page and the API
  * share one origin.
  */
 export const createSupervisor = async (options: SupervisorOptions): Promise<Supervisor> => {

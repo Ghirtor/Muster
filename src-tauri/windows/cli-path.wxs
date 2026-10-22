@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Puts the bundled `flotilla` CLI (bin\) on the machine's PATH; the MSI installs per machine. -->
+<!-- Puts the bundled `muster` CLI (bin\) on the machine's PATH; the MSI installs per machine. -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Fragment>
     <DirectoryRef Id="INSTALLDIR">
-      <Component Id="FlotillaCliPath" Guid="{5ADE697B-6541-4A0C-9310-854942F2F8FA}">
-        <RegistryValue Root="HKLM" Key="Software\Ghirtor\Flotilla" Name="CliOnPath" Type="integer" Value="1" KeyPath="yes" />
-        <Environment Id="FlotillaCliPathEntry" Name="PATH" Value="[INSTALLDIR]bin" Part="last" Action="set" System="yes" Permanent="no" />
+      <Component Id="MusterCliPath" Guid="{51F0CD14-9D90-4292-BD20-B33996C0D5CC}">
+        <RegistryValue Root="HKLM" Key="Software\Ghirtor\Muster" Name="CliOnPath" Type="integer" Value="1" KeyPath="yes" />
+        <Environment Id="MusterCliPathEntry" Name="PATH" Value="[INSTALLDIR]bin" Part="last" Action="set" System="yes" Permanent="no" />
       </Component>
     </DirectoryRef>
   </Fragment>

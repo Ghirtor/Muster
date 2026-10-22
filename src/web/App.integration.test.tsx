@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import type { Mock } from 'vitest'
 
 import { appOf, jobOf, lockOf, REPO, snapshotOf } from './__mocks__/fixtures'
-import type { AppView, HttpRequest, Job } from './api/flotillaApi.types'
+import type { AppView, HttpRequest, Job } from './api/musterApi.types'
 import { waitForJob } from './api/socket'
 import App from './App'
 import { makeStore } from './store/store'

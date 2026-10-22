@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 
-import type { AppView, Job } from '../../api/flotillaApi.types'
+import type { AppView, Job } from '../../api/musterApi.types'
 import { clock } from '../../format'
 import { hrefOf } from '../../routes'
 import { appName } from '../appStatus'

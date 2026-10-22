@@ -4,13 +4,13 @@ Guidance for Claude Code working in this repository.
 
 ## Project
 
-**Flotilla** manages local app rigs: it launches an app's required processes in order, watches
+**Muster** manages local app rigs: it launches an app's required processes in order, watches
 them, repairs known install failures, enforces how many instances may run (one per machine through a
 lock and queue, one per checkout, or up to N) and shows it all in a web dashboard. Agents and people
 use the same engine through a CLI and an HTTP/WebSocket API.
 
 It generalises Demo's `rig-ctl` skill. **`rig.mjs` is the behaviour to match**;
-`design/sample.yaml` is that same rig written as Flotilla config, and the first app it must run.
+`design/sample.yaml` is that same rig written as Muster config, and the first app it must run.
 
 ## Stack and tooling
 
@@ -45,8 +45,8 @@ Mirrors Demo's `Frontend/` — same versions (the lockfile was seeded from it), 
 
 ```bash
 npm run dev                         # supervisor :4871 + dashboard :4870
-npm run flotilla -- status --config design/sample.yaml   # this checkout's CLI: status|up|release|down
-FLOTILLA_CONFIGS=a.yaml;b.yaml npm run dev             # apps the supervisor serves (README: API)
+npm run muster -- status --config design/sample.yaml   # this checkout's CLI: status|up|release|down
+MUSTER_CONFIGS=a.yaml;b.yaml npm run dev             # apps the supervisor serves (README: API)
 node --run lint
 npm run type-check
 npm test                            # --project web|server for one
@@ -59,14 +59,14 @@ npm run package                     # release exe, no installer (bundle: with in
 
 The desktop app (`src-tauri/`, Tauri 2) needs Rust (`rustup`) to build and Node ≥ 22 on PATH to
 run: the packaged app starts the bundled supervisor with the machine's `node`, and the supervisor
-serves the built dashboard (`FLOTILLA_WEB_ROOT`) so page and API share one origin.
+serves the built dashboard (`MUSTER_WEB_ROOT`) so page and API share one origin.
 
-`flotilla` on PATH belongs to the installed app only, a shim (`src-tauri/cli/`) over the bundled
+`muster` on PATH belongs to the installed app only, a shim (`src-tauri/cli/`) over the bundled
 `server/cli.js`: Windows' installers add its `bin` to PATH (`tauri.windows.conf.json`,
-`src-tauri/windows/`), Linux's deb/rpm link `/usr/bin/flotilla` (`tauri.linux.conf.json`,
+`src-tauri/windows/`), Linux's deb/rpm link `/usr/bin/muster` (`tauri.linux.conf.json`,
 `src-tauri/linux/`), and on macOS the app menu's *Install Command Line Tool* links
-`/usr/local/bin/flotilla` (`src-tauri/src/cli_tool.rs`). Development never links it; use
-`npm run flotilla` from the checkout.
+`/usr/local/bin/muster` (`src-tauri/src/cli_tool.rs`). Development never links it; use
+`npm run muster` from the checkout.
 
 Run lint, type-check and the tests before calling any change done.
 
@@ -79,7 +79,7 @@ Run lint, type-check and the tests before calling any change done.
   refuses both. A token's `usage` note in `tokens.json` is the rule for its class.
 - `src/web` never imports from `src/server` or `node:*` (linted): it talks to the API.
 - Never bind a port the Demo rig uses: 1232, 1234, 5173, 8765, 8766, 8767, 9222. Tests listen on 0.
-  Flotilla's own: 4870 dashboard, 4871 supervisor, 4872 the desktop app's CDP.
+  Muster's own: 4870 dashboard, 4871 supervisor, 4872 the desktop app's CDP.
 - Windows first: the user's machine is Windows. Follow `rig.mjs` on shells (`execSync` for quoted
   args), killing (port → PID → `taskkill /T /F`, then image names) and logs (shell-owned redirection,
   no `detached`). Keep macOS/Linux paths working.
@@ -126,7 +126,7 @@ Build in phases; finish and test one before starting the next.
 1. **Engine + CLI** (`src/server/engine/`, `src/server/cli.ts`): load and validate config
    (`design/sample.yaml`), lock + queue, launch order with `after`, sequential build groups, port
    probes (`probe.ts` exists), slow start, repair-once-on-exit, readiness checks, stop by port tree
-   then image name, per-process logs. CLI `flotilla status|up|release|down` with `rig.mjs`'s flags
+   then image name, per-process logs. CLI `muster status|up|release|down` with `rig.mjs`'s flags
    and exit codes (3 = busy), so the rig-ctl skill can switch to it unchanged.
 2. **API**: HTTP for apps, instances, lock, queue, actions; WebSocket for status and log streams.
 3. **Dashboard**: Fleet, App detail, Config editor, Launch-blocked dialog, per `design/`.

@@ -64,7 +64,7 @@ const deadPid = async (): Promise<number> => {
 }
 
 beforeEach(() => {
-  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'flotilla-lock-'))
+  dir = fs.mkdtempSync(path.join(os.tmpdir(), 'muster-lock-'))
   options.onStale.mockClear()
 })
 
