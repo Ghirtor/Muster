@@ -55,7 +55,7 @@ them in another project means writing this file for it, not changing the skills.
 - **Run the app** — the suites stub processes, ports and the API boundary, so they never launch
   a real rig.
   - _Start_: `npm run dev` from the branch's checkout — supervisor on `:4871`, dashboard on
-    `http://localhost:4870`; `.claude/launch.json` has the same entries for the browser pane.
+    `http://localhost:4870`; `.claude/launch.json` starts the same for the browser pane.
     `tauri-ctl` drives the desktop app.
   - _Exercise the change where it lives_: for the engine or CLI, run the CLI against
     `design/sample.yaml` and check its output and exit code (3 = busy) against
