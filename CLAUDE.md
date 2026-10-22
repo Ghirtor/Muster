@@ -85,15 +85,26 @@ Run lint, type-check and the tests before calling any change done.
 
 ## Agent skills
 
-The remote is GitHub (`gh`), and tickets are GitHub Issues with the `FEAT-<n>` key. The skills
-under `.claude/` (`/issue-work`, `/issue-batch` and the skills they run) are tracker- and
-host-agnostic: they name operations and look them up in
+### Issue tracker
 
-- `docs/agents/issue-tracker.md` — fetching, labelling, starting and handing over issues;
-- `docs/agents/code-host.md` — pushing, pull requests, evidence and CI;
-- `docs/agents/triage-labels.md` — the triage label strings.
+GitHub Issues through `gh`, keyed `FEAT-<n>`. See `docs/agents/issue-tracker.md`.
 
-To move to another tracker or remote, rewrite those files, not the skills.
+### Triage labels
+
+The five default roles, each label named after its role. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` and `docs/adr/` at the root, created when first needed. See
+`docs/agents/domain.md`.
+
+### Code host
+
+GitHub (`gh`): pull requests target `dev`, CI and releases. See `docs/agents/code-host.md`.
+
+The project's skills under `.claude/` (`/issue-work`, `/issue-batch` and the skills they run) name
+operations and look them up in these files. To move to another tracker or remote, rewrite the
+files, not the skills.
 
 ## Design
 

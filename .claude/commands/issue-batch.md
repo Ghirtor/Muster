@@ -12,7 +12,7 @@ operations in **bold** are done as `docs/agents/issue-tracker.md` describes them
 1. **Find the tickets**: **List my ready issues**.
 
 2. **Skip the ones already started**: **Has it been started?**, or a work log
-   `.claude/worklog/<ISSUE_KEY>-*.md` or worktree `.claude/worktrees/<ISSUE_KEY>-*` exists.
+   `.claude/worklog/<ISSUE_KEY>/*.md` or worktree `.claude/worktrees/<ISSUE_KEY>/*` exists.
    Keep the first `MAX`; if none is left, say so and stop.
 
 3. **Start one session per ticket** with `mcp__ccd_session__start_session`: `initiation`

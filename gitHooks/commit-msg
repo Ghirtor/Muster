@@ -49,7 +49,7 @@ fi
 # with the branch is usually a typo or a copied message. Worth saying out loud,
 # not worth blocking: a branch legitimately carries the odd commit for another
 # issue, and there is no key at all on a detached HEAD. The key may sit anywhere
-# in the branch name (FEAT-12, feature/FEAT-12-lock-queue).
+# in the branch name (FEAT-12/Lock_queue_for_one_per_machine_rigs).
 branchName=$(git symbolic-ref --quiet --short HEAD 2>/dev/null)
 branchKey=$(echo "${branchName}" | grep -Eo "${KEY_PATTERN}" | head -n 1)
 messageKey=$(echo "${firstLine}" | grep -Eo "^${KEY_PATTERN}")
