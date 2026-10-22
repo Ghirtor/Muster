@@ -66,9 +66,9 @@ also run `linear-history`, which fails if the branch has a merge commit that is 
 The fix is to rebase (**Update a branch from its target**). It doesn't run for the `dev` → `master`
 pull request. A separate
 workflow, `.github/workflows/release.yml`, runs on each push to `master`: it tags the commit `v` +
-`src-tauri/tauri.conf.json`'s `version` (set on `dev` by `version.sh` / `version.bat`; a version
-already tagged fails it), then builds the desktop installers on Windows, macOS and Linux and keeps
-them as the run's artifacts (`gh run download <run-id>`).
+`src-tauri/tauri.conf.json`'s `version` (set by `version.sh` / `version.bat` on the checked-out
+branch; a version already tagged fails it), then builds the desktop installers on Windows, macOS
+and Linux and keeps them as the run's artifacts (`gh run download <run-id>`).
 
 - **Find the run for a push**:
   `gh run list --branch <branch> --limit 1 --json databaseId,headSha,status,conclusion`. Check its

@@ -4,16 +4,17 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 /**
- * Sets the next release's version on `dev`: `node scripts/version.mjs <x.y.z> <FEAT-n>`, or
- * `version.sh` / `version.bat` with the same arguments.
+ * Sets the next release's version on the checked-out branch:
+ * `node scripts/version.mjs <x.y.z> <FEAT-n>`, or `version.sh` / `version.bat` with the same
+ * arguments.
  *
  * It writes the version into `src-tauri/tauri.conf.json` (which names the installers) and
  * `package.json` (with `package-lock.json`), commits the three as `<FEAT-n>: Version <x.y.z>` and
- * pushes `dev`. Merging `dev` into `master` then releases it: `.github/workflows/release.yml` tags
- * the merge commit `v<x.y.z>` and builds the installers, and refuses a version already tagged.
+ * pushes the branch. Once that commit reaches `master`, `.github/workflows/release.yml` tags it
+ * `v<x.y.z>` and builds the installers, and refuses a version already tagged.
  *
- * It starts only from a clean `dev` that matches `origin/dev`, and takes only a version above the
- * current one that no tag has yet.
+ * It needs a branch (not a detached HEAD) and a clean working tree, and takes only a version above
+ * the branch's current one that no tag has yet.
  */
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const TAURI_CONF = path.join(ROOT, 'src-tauri', 'tauri.conf.json')
@@ -63,16 +64,15 @@ if (order(version, current) <= 0) {
   fail(`${version} is not above the current version ${current}`)
 }
 
-if (git('symbolic-ref', '--short', 'HEAD') !== 'dev') {
-  fail('versions are set on dev; switch to it first')
+// A detached HEAD reads as `HEAD`, and has no branch to push.
+const branch = git('rev-parse', '--abbrev-ref', 'HEAD')
+if (branch === 'HEAD') {
+  fail('HEAD is detached; switch to the branch the version goes on first')
 }
 if (git('status', '--porcelain') !== '') {
   fail('the working tree has changes; commit or stash them first')
 }
-git('fetch', 'origin', 'dev', '--tags')
-if (git('rev-parse', 'HEAD') !== git('rev-parse', 'origin/dev')) {
-  fail('dev differs from origin/dev; pull or push first')
-}
+git('fetch', 'origin', '--tags')
 if (git('tag', '--list', tag) !== '') {
   fail(`${tag} is already released`)
 }
@@ -87,6 +87,6 @@ fs.writeFileSync(LOCK, `${JSON.stringify(lock, null, 2)}\n`)
 
 git('add', TAURI_CONF, PACKAGE, LOCK)
 git('commit', '--quiet', '-m', `${key}: Version ${version}`)
-console.log(`version: ${current} -> ${version}, committed on dev; pushing`)
-git('push', 'origin', 'dev')
-console.log(`version: pushed dev; merging it into master releases ${tag}`)
+console.log(`version: ${current} -> ${version}, committed on ${branch}; pushing`)
+git('push', '--quiet', '-u', 'origin', 'HEAD')
+console.log(`version: pushed ${branch}; ${tag} is released once it reaches master`)

@@ -1,8 +1,9 @@
 # A release is a merge of dev into master. Each push to master tags its commit `v` +
-# src-tauri/tauri.conf.json's `version` (set on dev by version.sh / version.bat), then builds the
-# desktop installers on Windows (NSIS, MSI), macOS (dmg) and Linux (deb, rpm, AppImage), since Tauri
-# only bundles for the OS it runs on. A version that is already tagged fails the run: bump it on dev
-# before merging. The installers are kept as the run's artifacts; nothing is signed or published.
+# src-tauri/tauri.conf.json's `version` (set by version.sh / version.bat), then builds the
+# desktop installers on Windows (NSIS, MSI), macOS (dmg) and Linux (deb, rpm, AppImage), since
+# Tauri only bundles for the OS it runs on. A version that is already tagged fails the run: set the
+# next one before merging. The installers are kept as
+# the run's artifacts; nothing is signed or published.
 
 name: Release
 
@@ -29,7 +30,7 @@ jobs:
         run: |
           tag="v$(jq -r .version src-tauri/tauri.conf.json)"
           if git rev-parse --quiet --verify "refs/tags/$tag" > /dev/null; then
-            echo "::error::$tag is already released; bump the version on dev (version.sh) before merging into master."
+            echo "::error::$tag is already released; set the next version (version.sh) before merging into master."
             exit 1
           fi
           git config user.name 'github-actions[bot]'

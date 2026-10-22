@@ -53,7 +53,7 @@ node --run format                   # format:check to only report
 npm run build                       # dashboard → dist/web, supervisor → dist/server
 npm run dev:desktop                 # Tauri window over the dev servers, CDP on :4872
 npm run package                     # release exe, no installer (bundle: with installers)
-./version.sh 0.2.0 FEAT-12          # next version, on dev (.\version.bat); merge into master tags it
+./version.sh 0.2.0 FEAT-12          # next version, committed and pushed on this branch (.\version.bat)
 ```
 
 The desktop app (`src-tauri/`, Tauri 2) needs Rust (`rustup`) to build and Node ≥ 22 on PATH to

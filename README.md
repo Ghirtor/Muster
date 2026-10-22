@@ -107,16 +107,17 @@ carry the issue as `FEAT-<n>`. CI is `.github/workflows/ci.yml`.
 Features merge into `dev`; `master` holds releases. A release is a merge of `dev` into `master`:
 `.github/workflows/release.yml` tags the merge commit `v` + the `version` in
 `src-tauri/tauri.conf.json`, then builds the installers for Windows, macOS and Linux and attaches
-them to the run as artifacts. A version already tagged fails the run, so set the next one on a
-clean `dev` that matches `origin/dev` before merging:
+them to the run as artifacts. A version already tagged fails the run, so set the next one first,
+on whichever branch it should go with, from a clean working tree:
 
 ```bash
 ./version.sh 0.2.0 FEAT-12     # Windows: .\version.bat 0.2.0 FEAT-12
 ```
 
-It sets the version in `tauri.conf.json`, `package.json` and `package-lock.json`, commits them as
-`FEAT-12: Version 0.2.0` (the issue key the commit hook asks for) and pushes `dev`
-(`scripts/version.mjs`). Then merge `dev` into `master`, by pull request or `git merge` and push.
+It sets the version in `tauri.conf.json`, `package.json` and `package-lock.json`, commits them on
+the checked-out branch as `FEAT-12: Version 0.2.0` and pushes that branch (`scripts/version.mjs`).
+
+Then merge `dev` into `master`, by pull request or `git merge` and push.
 
 ## Layout
 
