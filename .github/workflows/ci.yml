@@ -32,6 +32,25 @@ jobs:
             exit 1
           fi
 
+  # Merging into main releases the version in tauri.conf.json (release.yml), which fails once the
+  # merge is done if that version is already tagged. Refusing the pull request catches a forgotten
+  # version.sh while it can still be fixed on dev. Skipped on other pull requests, which counts as
+  # passing for the ruleset that requires it.
+  release-version:
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - run: |
+          tag="v$(jq -r .version src-tauri/tauri.conf.json)"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null; then
+            echo "::error::$tag is already released. Set the next version on dev before merging: ./version.sh <x.y.z> FEAT-<n>"
+            exit 1
+          fi
+          echo "$tag is not tagged yet; merging releases it."
+
   lint:
     runs-on: windows-latest
     steps:
