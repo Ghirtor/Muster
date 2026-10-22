@@ -8,7 +8,6 @@
   },
   "enabledPlugins": {
     "figma@claude-plugins-official": true,
-    "mattpocock-skills@claude-plugins-official": true,
     "dev-browser@dev-browser-marketplace": true
   },
   "extraKnownMarketplaces": {
