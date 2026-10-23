@@ -99,21 +99,7 @@ The five default roles, each label named after its role. See `docs/agents/triage
 
 ### Domain docs
 
-Single-context: `GLOSSARY.md` and `docs/adr/` at the root, created when first needed. See
-`docs/agents/domain.md`.
-
-### Code host
-
-GitHub (`gh`): pull requests target `dev`, CI and releases. See `docs/agents/code-host.md`.
-
-### Project
-
-Protected branches, commit format, checks and how to run the app for a check. See
-`docs/agents/project.md`.
-
-The issue skills (`/issue-work`, `/issue-batch` and the skills they run) name operations in bold
-and look them up in these files. To move to another tracker, host or project, rewrite the files,
-not the skills; `/project-skills:setup-project-skills` writes them for a new repo.
+Single-context: `GLOSSARY.md` and `docs/adr/` at the root, created when first needed. See `docs/agents/domain.md`.
 
 ## Design
 

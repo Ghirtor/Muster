@@ -1,6 +1,3 @@
-# The same four jobs as Demo's frontend pipeline, on GitHub-hosted Windows runners since
-# the supervisor is Windows first. docs/agents/code-host.md is what the agent skills know of it.
-
 name: CI
 
 on:
