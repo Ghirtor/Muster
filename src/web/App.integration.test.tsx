@@ -31,7 +31,7 @@ const answer = (server: Server, { url, method = 'GET', data }: HttpRequest): { d
   if (url === '/apps') return { data: server.apps }
   if (url === '/jobs') return { data: [] }
   if (url === '/apps/demo/config' && method === 'GET') {
-    return { data: { file: 'sample.yaml', text: server.config ?? '', problems: null } }
+    return { data: { file: 'muster.yaml', text: server.config ?? '', problems: null } }
   }
   if (url === '/apps/demo/config/validate') {
     return { data: { ok: false, problems: ['processes.api.ports: expected a number'] } }
@@ -235,7 +235,7 @@ describe('Config editor', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Save config' }))
 
-    expect(await screen.findByRole('status')).toHaveTextContent('Saved sample.yaml.')
+    expect(await screen.findByRole('status')).toHaveTextContent('Saved muster.yaml.')
     expect(server.posted.map((post) => post.url)).toEqual([
       '/apps/demo/config/validate',
       '/apps/demo/config'

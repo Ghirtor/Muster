@@ -118,6 +118,20 @@ describe('acquire', () => {
     await expect(acquire(context('mine'), options)).resolves.toMatchObject({ held: true })
   })
 
+  it('records the recipe of a new up over a held rig, keeping the ports it launched', async () => {
+    const ctx = { ...context('mine'), ports: [2], recipe: { file: 'muster.yaml', hash: 'new' } }
+    hold(path.join(dir, 'lock.json'), 'mine', {
+      recipe: { file: 'muster.yaml', hash: 'old' },
+      ports: [1]
+    })
+
+    await expect(acquire(ctx, options)).resolves.toMatchObject({ held: true })
+    expect(readLock(path.join(dir, 'lock.json'))).toMatchObject({
+      recipe: { hash: 'new' },
+      ports: [1, 2]
+    })
+  })
+
   it('reports a rig another checkout holds as busy', async () => {
     hold(path.join(dir, 'lock.json'), 'theirs')
     const ctx = context('mine')
@@ -370,6 +384,19 @@ describe('isStale', () => {
       server.close(resolve)
     })
     await expect(isStale(ctx, ancient)).resolves.toBe(true)
+  })
+
+  it('keeps a one per machine lock while a port it recorded at launch listens', async () => {
+    const server = net.createServer()
+    await new Promise<void>((resolve) => {
+      server.listen(0, '127.0.0.1', resolve)
+    })
+    const launched = { ...ancient, ports: [(server.address() as AddressInfo).port] }
+
+    await expect(isStale(context('mine'), launched)).resolves.toBe(false)
+    await new Promise((resolve) => {
+      server.close(resolve)
+    })
   })
 })
 

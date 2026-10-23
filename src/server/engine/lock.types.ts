@@ -1,6 +1,11 @@
 import type { InstancesConfig } from './config.types'
 import type { Output } from './output.types'
 
+export interface LockRecipe {
+  file: string
+  hash: string
+}
+
 export interface Lock {
   repo: string
   branch: string
@@ -8,6 +13,8 @@ export interface Lock {
   since: string
   touched?: string
   pids?: number[]
+  recipe?: LockRecipe
+  ports?: number[]
 }
 
 export interface QueueEntry {
@@ -27,6 +34,7 @@ export interface LockContext {
   instances: InstancesConfig
   repo: string
   ports: number[]
+  recipe?: LockRecipe
   out: Output
   pollMs: number
 }

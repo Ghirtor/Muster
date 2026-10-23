@@ -1,3 +1,6 @@
+import fs from 'node:fs'
+import path from 'node:path'
+
 import { Body, Controller, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common'
 
 import type { RigSnapshot } from '../engine/rig.types'
@@ -5,7 +8,7 @@ import { ApiFailure } from './failure'
 import { Jobs } from './jobs'
 import type { Action, ActionRequest } from './jobs.types'
 import { tailLog } from './logs'
-import { Registry, validate } from './registry'
+import { Registry } from './registry'
 import type { AppEntry, LoadedEntry } from './registry.types'
 import { appView } from './views'
 import type { AppView } from './views.types'
@@ -35,7 +38,23 @@ const textOf = (body: unknown): string => {
   return text
 }
 
-/** One app's config, live state, lock, queue, logs and actions. */
+/** A registration from a JSON body: `file`, its path, and `text`, else the file's content. */
+const registrationOf = (body: unknown): { file: string; text: string } => {
+  const { file, text } = (body ?? {}) as { file?: unknown; text?: unknown }
+  if (typeof file !== 'string' || !path.isAbsolute(file)) {
+    throw new ApiFailure(400, 'expected {file} as an absolute path, and optionally {text}')
+  }
+  if (text !== undefined && typeof text !== 'string') throw new ApiFailure(400, 'text must be text')
+  try {
+    return { file, text: text ?? fs.readFileSync(file, 'utf8') }
+  } catch (error) {
+    throw new ApiFailure(422, 'cannot read the registration', {
+      problems: [error instanceof Error ? error.message : String(error)]
+    })
+  }
+}
+
+/** Every app's registration, recipe, live state, lock, queue, logs and actions. */
 @Controller('apps')
 export class AppsController {
   constructor(
@@ -43,12 +62,22 @@ export class AppsController {
     private readonly jobs: Jobs
   ) {}
 
-  /** Every app, whether or not its config loads. */
+  /** Every app, whether or not it loads. */
   @Get()
   async list(): Promise<AppView[]> {
     return await Promise.all(
       this.registry.list().map(async (entry) => await appView(this.registry, entry))
     )
+  }
+
+  /** Registers an app as `muster register` does, refusing (422) one that does not load. */
+  @Post()
+  @HttpCode(201)
+  async register(@Body() body: unknown): Promise<AppView> {
+    const { file, text } = registrationOf(body)
+    const result = this.registry.register(text, file)
+    if (!result.ok) throw new ApiFailure(422, 'invalid registration', { problems: result.problems })
+    return await this.one(result.config.id)
   }
 
   /** One app. */
@@ -57,7 +86,7 @@ export class AppsController {
     return await appView(this.registry, this.entryOf(id))
   }
 
-  /** The config's text and its problems. */
+  /** The edited file's text and the app's problems: the recipe, else the registration pinning it. */
   @Get(':id/config')
   config(@Param('id') id: string): { file: string; text: string; problems: string[] | null } {
     const entry = this.entryOf(id)
@@ -70,7 +99,7 @@ export class AppsController {
     const entry = this.entryOf(id)
     const saved = this.registry.save(entry, textOf(body))
     if (!saved.ok) throw new ApiFailure(422, 'invalid config', { problems: saved.problems })
-    const reloaded = this.registry.list().find((other) => other.file === entry.file) ?? entry
+    const reloaded = this.registry.get(entry.id) ?? entry
     return await appView(this.registry, reloaded)
   }
 
@@ -79,7 +108,7 @@ export class AppsController {
   @HttpCode(200)
   check(@Param('id') id: string, @Body() body: unknown): object {
     const entry = this.entryOf(id)
-    const result = validate(textOf(body), entry.file)
+    const result = this.registry.validate(entry, textOf(body))
     return result.ok ? { ok: true, problems: [] } : result
   }
 

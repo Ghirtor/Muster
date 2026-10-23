@@ -54,20 +54,23 @@ them in another project means writing this file for it, not changing the skills.
 
 - **Run the app** — the suites stub processes, ports and the API boundary, so they never launch
   a real rig.
-  - _Start_: `npm run dev` from the branch's checkout — supervisor on `:4871`, dashboard on
-    `http://localhost:4870`; `.claude/launch.json` starts the same for the browser pane.
-    `tauri-ctl` drives the desktop app.
-  - _Exercise the change where it lives_: for the engine or CLI, run the CLI against
-    `design/sample.yaml` and check its output and exit code (3 = busy) against
+  - _Start_: Muster id `muster`, from the recipe [muster.yaml](../../muster.yaml): supervisor on
+    `:4871`, dashboard on `http://localhost:4870`. `.claude/launch.json` attaches the browser
+    pane to the dashboard Muster launched. The desktop app starts its own servers on the same
+    ports: for a check only it can show, release `muster` and run it through `tauri-ctl`.
+  - _Exercise the change where it lives_: for the engine or CLI, run this checkout's CLI
+    (`npm run muster -- …`, with its own `MUSTER_HOME` in the scratchpad) against an app
+    registered there, and check its output and exit code (3 = busy) against
     `rig.mjs`'s for the same scenario; for the API, call the HTTP endpoints and open the
     WebSocket streams directly; for the dashboard, drive it in the browser pane and compare it
     with the matching screen in `design/`.
   - _Scenarios_: a busy lock, a queued checkout, a process that exits, a port that never opens.
   - _What landed_: the lock file, the per-process log, the processes and ports left behind.
-  - _Stop_: every process you started. Never bind a port the Demo rig uses (1232, 1234, 5173,
-    8765, 8766, 8767, 9222).
+  - _Stop_: the desktop app, and every app the scratch `MUSTER_HOME` launched. Never bind a port
+    the Demo rig uses (1232, 1234, 5173, 8765, 8766, 8767, 9222).
   - _Limits_: whatever this machine cannot stand in for, such as another OS's process tree.
 - **Test-plan edge cases** — ports already taken, processes that exit, Windows paths,
   simultaneous launches.
-- **Parallel sessions** — every session shares `:4870` and `:4871`, so stop the dev servers as
-  soon as the app is verified.
+- **Parallel sessions** — the `muster` app runs one per machine, since every session needs
+  `:4870` and `:4871`: launch it with `--wait` to queue, and release it as soon as the app is
+  verified.

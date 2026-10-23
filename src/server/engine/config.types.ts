@@ -61,9 +61,40 @@ export interface ToolConfig {
   onFailure: Repair[]
 }
 
-export interface RigConfig {
+export interface Recipe {
+  buildGroups: Record<string, BuildGroup>
+  processes: ProcessConfig[]
+  ready: ReadyCheck[]
+  tools: ToolConfig[]
+  logs: string
+}
+
+export interface RecipeSource {
+  file: string
+  hash: string
+  pinned: boolean
+}
+
+export interface RecipeText {
+  text: string
+  file: string
+}
+
+export interface Registration {
+  id: string
+  file: string
   name: string
   repo: string
+  recipe: string
+  instances: InstancesConfig
+  pinned: Record<string, unknown> | null
+}
+
+export interface RigConfig {
+  id: string
+  name: string
+  repo: string
+  recipe: RecipeSource
   instances: InstancesConfig
   buildGroups: Record<string, BuildGroup>
   processes: ProcessConfig[]

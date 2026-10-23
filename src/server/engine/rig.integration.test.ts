@@ -5,7 +5,8 @@ import os from 'node:os'
 import path from 'node:path'
 
 import { probe } from '../probe'
-import { parseConfig } from './config'
+import { parseRegistration, resolveApp } from './config'
+import type { RigConfig } from './config.types'
 import { Rig } from './rig'
 
 /**
@@ -30,6 +31,8 @@ interface Recorder {
 let dir: string
 let current: object | null = null
 
+const REGISTRATION_KEYS = new Set(['name', 'instances'])
+
 const recorder = (): Recorder => {
   const out: Recorder = { text: '', write: (text) => void (out.text += text) }
   return out
@@ -52,9 +55,18 @@ const freePorts = async (count: number): Promise<number[]> => {
   return ports
 }
 
-const rigOf = (config: object, out: Recorder): Rig => {
+/** `config` as one app: pinned in its registration, else committed as the checkout's recipe. */
+const appOf = (config: object, committed: boolean): RigConfig => {
+  const registration = parseRegistration(JSON.stringify(config), path.join(dir, 'app.yaml'))
+  if (!committed) return resolveApp(registration, null)
+  const recipe = Object.entries(config).filter(([key]) => !REGISTRATION_KEYS.has(key))
+  const text = JSON.stringify(Object.fromEntries(recipe))
+  return resolveApp(registration, { text, file: path.join(dir, 'muster.yaml') })
+}
+
+const rigOf = (config: object, out: Recorder, committed = false): Rig => {
   current = config
-  return new Rig(parseConfig(JSON.stringify(config), path.join(dir, 'muster.yaml')), {
+  return new Rig(appOf(config, committed), {
     repo: dir,
     reason: 'integration test',
     wait: false,
@@ -189,5 +201,51 @@ describe('Rig', () => {
     const nothing = recorder()
     await expect(rigOf(config, nothing).release()).resolves.toMatchObject({ ok: true })
     expect(nothing.text).toContain('nothing to release')
+  }, 60_000)
+
+  it('warns when the recipe changed since launch, and still stops what it launched', async () => {
+    const [launched = 0, renamed = 0] = await freePorts(2)
+    const before = base([{ key: 'one', ports: [launched], cmd: `node server.js ${launched} 0` }])
+    await rigOf(before, recorder()).up()
+    const after = base([{ key: 'one', ports: [renamed], cmd: `node server.js ${renamed} 0` }])
+
+    const status = recorder()
+    await rigOf(after, status).status()
+    expect(status.text).toContain('changed since this instance launched')
+    await expect(rigOf(after, recorder()).snapshot()).resolves.toMatchObject({
+      holders: [expect.objectContaining({ recipeChanged: true })]
+    })
+
+    await rigOf(after, recorder()).down()
+    await expect(probe(launched)).resolves.toBe(false)
+  }, 60_000)
+
+  it('warns when a recipe is committed over the pinned one an instance launched with', async () => {
+    const [port = 0] = await freePorts(1)
+    const config = base([{ key: 'one', ports: [port], cmd: `node server.js ${port} 0` }])
+    await rigOf(config, recorder()).up()
+
+    const committed = { ...config, ready: [{ ports: 'all', timeout: '20s' }] }
+    const status = recorder()
+    await rigOf(committed, status, true).status()
+    expect(status.text).toContain('changed since this instance launched')
+  }, 60_000)
+
+  it('runs a changed recipe on a new up without a release, and stops both', async () => {
+    const [launched = 0, added = 0] = await freePorts(2)
+    const before = base([{ key: 'one', ports: [launched], cmd: `node server.js ${launched} 0` }])
+    await rigOf(before, recorder()).up()
+    const after = base([
+      { key: 'one', ports: [launched], cmd: `node server.js ${launched} 0` },
+      { key: 'two', ports: [added], cmd: `node server.js ${added} 0` }
+    ])
+    await expect(rigOf(after, recorder()).up()).resolves.toMatchObject({ ok: true })
+
+    const status = recorder()
+    await rigOf(after, status).status()
+    expect(status.text).not.toContain('changed since this instance launched')
+
+    await rigOf(before, recorder()).down()
+    for (const port of [launched, added]) await expect(probe(port)).resolves.toBe(false)
   }, 60_000)
 })

@@ -96,7 +96,7 @@ export const snapshotOf = (
 /** The Demo app as the supervisor lists it. */
 export const appOf = (snapshot: RigSnapshot = snapshotOf()): ReadyApp => ({
   id: 'demo',
-  file: 'C:\\Users\\me\\.muster\\sample.yaml',
+  file: 'C:\\Users\\me\\dev\\demo\\muster.yaml',
   ok: true,
   config: configOf(),
   snapshot
@@ -107,7 +107,7 @@ export const jobOf = (overrides: Partial<Job> = {}): Job => ({
   id: 'job-1',
   app: 'demo',
   action: 'up',
-  args: ['up', '--config', 'sample.yaml'],
+  args: ['up', '--app', 'demo'],
   state: 'done',
   pid: 42,
   exitCode: 0,
