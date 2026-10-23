@@ -78,7 +78,9 @@ export const readLock = (file: string): Lock | null => {
     reason: value.reason ?? '',
     since: value.since ?? new Date(0).toISOString(),
     ...(value.touched === undefined ? {} : { touched: value.touched }),
-    ...(value.pids === undefined ? {} : { pids: value.pids })
+    ...(value.pids === undefined ? {} : { pids: value.pids }),
+    ...(value.recipe === undefined ? {} : { recipe: value.recipe }),
+    ...(value.ports === undefined ? {} : { ports: value.ports })
   }
 }
 
@@ -114,11 +116,13 @@ export const mySlot = (ctx: LockContext): HeldSlot | null =>
 /**
  * A session can vanish holding a lock. The lock records the `up` that took it and every process it
  * launched: while one of them lives the app is starting — a build listens on nothing for minutes —
- * and once all are gone, nobody is using it. One per machine also needs every port down, since
- * those ports are the instance; `staleAfter` is the backstop for PIDs that cannot be trusted.
+ * and once all are gone, nobody is using it. One per machine also needs every port down, the
+ * recipe's and the ones the lock recorded at launch, since those ports are the instance;
+ * `staleAfter` is the backstop for PIDs that cannot be trusted.
  */
 export const isStale = async (ctx: LockContext, lock: Lock): Promise<boolean> => {
-  if (ctx.instances.mode === 'one-per-machine' && (await anyUp(ctx.ports))) return false
+  const ports = [...new Set([...ctx.ports, ...(lock.ports ?? [])])]
+  if (ctx.instances.mode === 'one-per-machine' && (await anyUp(ports))) return false
   const last = Date.parse(lock.touched ?? lock.since)
   const old = Date.now() - last > ctx.instances.staleAfterMs
   return lock.pids === undefined ? old : old || !lock.pids.some(alive)
@@ -226,7 +230,8 @@ export const launchVerdict = async (ctx: LockContext): Promise<LaunchVerdict> =>
 /**
  * Takes a slot for `ctx.repo`. The exclusive create is the atomic step: two checkouts racing for a
  * free slot cannot both win it. Waiting joins a queue, so slots go to waiters in the order they
- * asked. `onStale` runs after a stale lock is dropped, while the slot is still free.
+ * asked. `onStale` runs after a stale lock is dropped, while the slot is still free. Taking a slot
+ * this checkout already holds records this launch's recipe, keeping the ports the earlier ones took.
  */
 export const acquire = async (
   ctx: LockContext,
@@ -240,7 +245,9 @@ export const acquire = async (
     if (decision.kind === 'held') {
       const own = decision.slot
       const reason = options.reason === '' ? own.lock.reason : options.reason
-      writeLock(own.file, { ...own.lock, reason, touched: now }, false)
+      const ports = [...new Set([...(own.lock.ports ?? []), ...ctx.ports])]
+      const launched = ctx.recipe === undefined ? {} : { recipe: ctx.recipe }
+      writeLock(own.file, { ...own.lock, reason, touched: now, ...launched, ports }, false)
       recordPid(ctx, process.pid)
       leaveQueue(ctx)
       return { held: true, file: own.file }
@@ -266,7 +273,12 @@ export const acquire = async (
       const branch = branchOf(ctx.repo)
       try {
         const lock = { repo: ctx.repo, branch, reason: options.reason, since: now, touched: now }
-        writeLock(decision.file, { ...lock, pids: [process.pid] }, true)
+        const launched = ctx.recipe === undefined ? {} : { recipe: ctx.recipe }
+        writeLock(
+          decision.file,
+          { ...lock, ...launched, ports: ctx.ports, pids: [process.pid] },
+          true
+        )
         ctx.out.write(`  rig taken for ${ctx.repo} (${branch})\n`)
         leaveQueue(ctx)
         return { held: true, file: decision.file }

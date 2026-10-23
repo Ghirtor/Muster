@@ -27,6 +27,7 @@ export type RigState = 'up' | 'partial' | 'down'
 
 export interface Holder extends Lock {
   mine: boolean
+  recipeChanged: boolean
 }
 
 export interface RigSnapshot {

@@ -14,10 +14,11 @@ import {
   mySlot,
   readLock,
   recordPid,
+  samePath,
   slotFiles,
   waiting
 } from './lock'
-import type { HeldSlot, LockContext } from './lock.types'
+import type { HeldSlot, Lock, LockContext } from './lock.types'
 import { launchOrder } from './order'
 import { waitReady } from './ready'
 import { fill, findRepair, repairCommand } from './repair'
@@ -49,6 +50,7 @@ export class Rig {
       instances: config.instances,
       repo: path.resolve(options.repo),
       ports: config.processes.flatMap((p) => p.ports),
+      recipe: { file: config.recipe.file, hash: config.recipe.hash },
       out: options.out,
       pollMs: options.pollMs ?? 10_000
     }
@@ -98,7 +100,8 @@ export class Rig {
   async snapshot(): Promise<RigSnapshot> {
     const held = holders(this.ctx).map(({ lock }) => ({
       ...lock,
-      mine: isMine(lock, this.ctx.repo)
+      mine: isMine(lock, this.ctx.repo),
+      recipeChanged: this.recipeChanged(lock)
     }))
     const ports = await this.ports()
     const listening = ports.filter((row) => row.up).length
@@ -115,6 +118,17 @@ export class Rig {
     }
   }
 
+  /**
+   * Whether `lock` was taken with another recipe than the one a launch would run now: another
+   * version of the same file, or for this checkout any other recipe, as a committed one replacing
+   * the pinned one. A running instance keeps the recipe it launched with until a new `up`.
+   */
+  private recipeChanged(lock: Lock): boolean {
+    const launched = lock.recipe
+    if (launched === undefined || launched.hash === this.config.recipe.hash) return false
+    return isMine(lock, this.ctx.repo) || samePath(launched.file, this.config.recipe.file)
+  }
+
   /** Prints who holds the rig and which ports listen. Ok when every port listens. */
   async status(): Promise<Outcome> {
     const snapshot = await this.snapshot()
@@ -126,6 +140,12 @@ export class Rig {
     for (const lock of snapshot.holders) {
       const mine = lock.mine ? '  ← this checkout' : ''
       this.line(`  holder: ${describeLock(lock)}${mine}`)
+      if (lock.recipeChanged) {
+        this.line(
+          `  recipe: ${this.config.recipe.file} changed since this instance launched;` +
+            ' up again to run the new one'
+        )
+      }
     }
     if (this.config.instances.mode === 'up-to-n') {
       this.line(`  instances: ${snapshot.holders.length} of ${this.config.instances.max} taken`)
@@ -368,7 +388,8 @@ export class Rig {
     if (slot !== null) dropLock(slot.file)
 
     const victims = new Set<number>()
-    for (const port of this.ctx.ports) for (const pid of pidsOn(port)) victims.add(pid)
+    const ports = [...new Set([...this.ctx.ports, ...(slot?.lock.ports ?? [])])]
+    for (const port of ports) for (const pid of pidsOn(port)) victims.add(pid)
     if (this.machine)
       for (const pid of imagePids(this.config.instances.killImages)) victims.add(pid)
     else for (const pid of slot?.lock.pids ?? []) victims.add(pid)
@@ -383,8 +404,8 @@ export class Rig {
 
     let still: number[] = []
     for (let attempt = 0; attempt < 10; attempt++) {
-      const probes = await Promise.all(this.ctx.ports.map(async (port) => await probe(port)))
-      still = this.ctx.ports.filter((_, i) => probes.at(i) === true)
+      const probes = await Promise.all(ports.map(async (port) => await probe(port)))
+      still = ports.filter((_, i) => probes.at(i) === true)
       if (still.length === 0 || victims.size === 0) break
       await new Promise((resolve) => setTimeout(resolve, 300))
     }

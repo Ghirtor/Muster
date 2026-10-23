@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -10,10 +11,13 @@ import type {
   InstancesConfig,
   ProcessConfig,
   ReadyCheck,
+  Recipe,
+  Registration,
   Repair,
   RepairStep,
   RigConfig,
   SlowStart,
+  RecipeText,
   ToolConfig
 } from './config.types'
 import { launchOrder } from './order'
@@ -30,6 +34,9 @@ const MODES: InstanceMode[] = ['one-per-machine', 'one-per-checkout', 'up-to-n']
 const UNITS: Record<string, number> = { ms: 1, s: SECOND, m: MINUTE, h: 60 * MINUTE }
 const PLACEHOLDER = /\{(\w+)\}/g
 const REPAIR_KEYS = new Set(['match', 'run', 'cleanup', 'cwd'])
+const REGISTRATION_KEYS = ['name', 'id', 'repo', 'recipe', 'instances']
+const RECIPE_KEYS = ['buildGroups', 'repairs', 'processes', 'ready', 'tools', 'logs']
+const DEFAULT_RECIPE = 'muster.yaml'
 
 /** Every problem found in one config file, each prefixed with where in the file it sits. */
 export class ConfigError extends Error {
@@ -37,7 +44,10 @@ export class ConfigError extends Error {
     readonly file: string,
     readonly problems: string[]
   ) {
-    super(`${file} is not a valid Muster config:\n  ${problems.join('\n  ')}`)
+    super(
+      `${file} is not a valid Muster config:\n  ${problems.join('\n  ')}\n` +
+        '  The muster skill (project-skills) describes the format.'
+    )
   }
 }
 
@@ -214,9 +224,9 @@ class Reader {
 }
 
 /** How many instances may run, and where they take turns. */
-const readInstances = (reader: Reader, raw: unknown, name: string): InstancesConfig => {
+const readInstances = (reader: Reader, raw: unknown, id: string, home: string): InstancesConfig => {
   const at = 'instances'
-  const fallbackLock = path.join(os.homedir(), '.muster', slug(name), 'lock.json')
+  const fallbackLock = path.join(home, id, 'lock.json')
   const instances = isRecord(raw) ? raw : {}
   if (raw !== undefined && !isRecord(raw)) reader.fail(at, 'must be a mapping')
   reader.known(instances, ['mode', 'max', 'lock', 'staleAfter', 'whenBusy', 'killImages'], at)
@@ -451,54 +461,151 @@ export const slug = (name: string): string =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '') || 'app'
 
-/**
- * Parses and validates a config's text. `file` resolves a relative `repo` and names the file in
- * errors. Throws a ConfigError listing every problem.
- */
-export const parseConfig = (text: string, file: string): RigConfig => {
+/** Where Muster keeps its registrations and default locks: `MUSTER_HOME`, else `~/.muster`. */
+export const musterHome = (env: NodeJS.ProcessEnv = process.env): string => {
+  const home = env.MUSTER_HOME ?? ''
+  return path.resolve(home === '' ? path.join(os.homedir(), '.muster') : expandPath(home, env))
+}
+
+/** The YAML mapping in `source`, or a ConfigError naming its file. */
+const parseYaml = (source: RecipeText): Raw => {
   let raw: unknown
   try {
-    raw = parse(text, { merge: true })
+    raw = parse(source.text, { merge: true })
   } catch (error) {
-    throw new ConfigError(file, [error instanceof Error ? error.message : String(error)])
+    throw new ConfigError(source.file, [error instanceof Error ? error.message : String(error)])
   }
-  if (!isRecord(raw)) throw new ConfigError(file, ['the file must be a mapping'])
-  const reader = new Reader(isRecord(raw.repairs) ? raw.repairs : {})
-  reader.known(
-    raw,
-    ['name', 'repo', 'instances', 'buildGroups', 'repairs', 'processes', 'ready', 'tools', 'logs'],
-    'config'
-  )
+  if (!isRecord(raw)) throw new ConfigError(source.file, ['the file must be a mapping'])
+  return raw
+}
+
+/** The launch keys of `raw`, read by `reader`, which also collects their problems. */
+const readRecipe = (reader: Reader, raw: Raw, name: string): Recipe => {
   if (raw.repairs !== undefined && !isRecord(raw.repairs)) {
     reader.fail('repairs', 'must be a mapping of name to repair')
   }
-  const name = reader.text(raw, 'name', 'config')
-  const repoText = reader.optionalText(raw, 'repo', 'config', '.')
   const groups = readBuildGroups(reader, raw.buildGroups)
   const processes = Array.isArray(raw.processes)
     ? raw.processes.flatMap((p, i) => readProcess(reader, p, `processes[${i}]`, groups) ?? [])
     : []
-  if (processes.length === 0) reader.fail('config', '"processes" must list at least one process')
+  if (processes.length === 0) reader.fail('recipe', '"processes" must list at least one process')
   checkProcesses(reader, processes)
   const fallbackLogs = path.join(os.tmpdir(), 'muster-logs', slug(name), '{key}.log')
-  const logs = reader.optionalText(raw, 'logs', 'config', fallbackLogs)
+  const logs = reader.optionalText(raw, 'logs', 'recipe', fallbackLogs)
   if (!logs.includes('{key}')) reader.fail('logs', 'must contain {key}, one log per process')
-  const config: RigConfig = {
-    name,
-    repo: path.resolve(path.dirname(file), expandPath(repoText)),
-    instances: readInstances(reader, raw.instances, name),
+  return {
     buildGroups: groups,
     processes,
     ready: readReady(reader, raw.ready, processes),
     tools: readTools(reader, raw.tools),
     logs: path.resolve(expandPath(logs))
   }
-  if (reader.problems.length > 0) throw new ConfigError(file, reader.problems)
-  return config
 }
 
-/** Reads and validates the config at `file`. */
-export const loadConfig = (file: string): RigConfig => {
+/** A short digest of a recipe, to tell whether it changed since an instance launched with it. */
+const digest = (text: string): string =>
+  createHash('sha256').update(text).digest('hex').slice(0, 12)
+
+/**
+ * Parses a registration: which app, its checkout, where the checkout keeps its recipe and how many
+ * instances may run. The id defaults to the name's slug; a relative `repo` resolves from the file's
+ * folder. Recipe keys written beside
+ * these pin a recipe, used when the checkout has none. Throws a ConfigError listing every problem.
+ */
+export const parseRegistration = (
+  text: string,
+  file: string,
+  home: string = musterHome()
+): Registration => {
+  const raw = parseYaml({ text, file })
+  const reader = new Reader({})
+  reader.known(raw, [...REGISTRATION_KEYS, ...RECIPE_KEYS], 'registration')
+  const name = reader.text(raw, 'name', 'registration')
+  const id = reader.optionalText(raw, 'id', 'registration', slug(name))
+  if (slug(id) !== id) reader.fail('id', 'must be lowercase letters, digits and dashes')
+  const repo = reader.optionalText(raw, 'repo', 'registration', '.')
+  const recipe = reader.optionalText(raw, 'recipe', 'registration', DEFAULT_RECIPE)
+  if (path.isAbsolute(recipe)) reader.fail('recipe', 'must be a path inside the checkout')
+  const pinned = Object.fromEntries(
+    Object.entries(raw).filter(([key]) => RECIPE_KEYS.includes(key))
+  )
+  const registration: Registration = {
+    id,
+    file,
+    name,
+    repo: path.resolve(path.dirname(file), expandPath(repo)),
+    recipe,
+    instances: readInstances(reader, raw.instances, id, home),
+    pinned: Object.keys(pinned).length === 0 ? null : pinned
+  }
+  if (reader.problems.length > 0) throw new ConfigError(file, reader.problems)
+  return registration
+}
+
+/** The recipe file a launch from `checkout` reads, else the registered checkout's. */
+export const recipeFile = (registration: Registration, checkout?: string): string =>
+  path.resolve(checkout ?? registration.repo, registration.recipe)
+
+/** The recipe text at `file`, or null when the checkout has none. */
+export const readRecipeText = (file: string): RecipeText | null => {
+  try {
+    return { text: fs.readFileSync(file, 'utf8'), file }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null
+    throw new ConfigError(file, [error instanceof Error ? error.message : String(error)])
+  }
+}
+
+/**
+ * The app a launch from `checkout` runs: `registration` with `recipe`, the checkout's recipe, or
+ * the pinned one when that is null. Throws a ConfigError naming the file the problems are in.
+ */
+export const resolveApp = (
+  registration: Registration,
+  recipe: RecipeText | null,
+  checkout?: string
+): RigConfig => {
+  const pinned = recipe === null
+  if (pinned && registration.pinned === null) {
+    throw new ConfigError(registration.file, [
+      `recipe: ${recipeFile(registration, checkout)} does not exist and no recipe is pinned`
+    ])
+  }
+  const raw = recipe === null ? (registration.pinned ?? {}) : parseYaml(recipe)
+  const file = recipe === null ? registration.file : recipe.file
+  const reader = new Reader(isRecord(raw.repairs) ? raw.repairs : {})
+  if (!pinned) {
+    const misplaced = REGISTRATION_KEYS.filter((key) => key in raw)
+    for (const key of misplaced) {
+      reader.fail(
+        'recipe',
+        `"${key}" belongs to the registration (muster register), not the recipe`
+      )
+    }
+    reader.known(raw, [...RECIPE_KEYS, ...misplaced], 'recipe')
+  }
+  const parsed = readRecipe(reader, raw, registration.name)
+  if (reader.problems.length > 0) throw new ConfigError(file, reader.problems)
+  return {
+    id: registration.id,
+    name: registration.name,
+    repo: checkout === undefined ? registration.repo : path.resolve(checkout),
+    recipe: { file, hash: digest(recipe?.text ?? JSON.stringify(raw)), pinned },
+    instances: registration.instances,
+    ...parsed
+  }
+}
+
+/** Whether a launch from `checkout` runs the pinned recipe, the checkout having no recipe file. */
+export const runsPinned = (registration: Registration, checkout?: string): boolean =>
+  registration.pinned !== null && !fs.existsSync(recipeFile(registration, checkout))
+
+/** The app a launch from `checkout` runs, with the recipe it reads there. */
+export const appOf = (registration: Registration, checkout?: string): RigConfig =>
+  resolveApp(registration, readRecipeText(recipeFile(registration, checkout)), checkout)
+
+/** The registration stored at `file`. Throws a ConfigError naming the file. */
+export const readRegistration = (file: string, home?: string): Registration => {
   const resolved = path.resolve(file)
   let text: string
   try {
@@ -506,5 +613,11 @@ export const loadConfig = (file: string): RigConfig => {
   } catch (error) {
     throw new ConfigError(resolved, [error instanceof Error ? error.message : String(error)])
   }
-  return parseConfig(text, resolved)
+  return parseRegistration(text, resolved, home)
 }
+
+/** Reads the registration at `file`, then the recipe of `checkout`, else of the registered one. */
+export const loadApp = (
+  file: string,
+  options: { checkout?: string; home?: string } = {}
+): RigConfig => appOf(readRegistration(file, options.home), options.checkout)

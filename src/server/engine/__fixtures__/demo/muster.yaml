@@ -1,0 +1,85 @@
+# The launch recipe the demo.yaml registration points at, as a checkout commits it.
+
+buildGroups:
+  dotnet:
+    sequential: true # shared project refs: concurrent builds die with CS2012
+    cmd: dotnet build {project} --nologo -v q
+
+repairs:
+  venv: &venv
+    match: ENOENT|cannot find|is not recognized|No such file|ModuleNotFoundError
+    run: # steps run in order; a step whose `unlessExists` path is there is skipped
+      - { run: python -m venv .venv, unlessExists: .venv }
+      - .venv\Scripts\python.exe -m pip install -e ".{extras}"
+  nuget: &nuget
+    match: NU110[12]|Unable to find package
+    run: dotnet restore --packages .nuget
+
+processes: # launched in this order
+  - key: vision
+    label: Vision service
+    ports: [8766]
+    cwd: vision
+    cmd: .venv\Scripts\python.exe -m vision.service --host 127.0.0.1 --port 8766
+    onFailure: [{ <<: *venv, extras: '[dev,service]', cwd: vision }]
+
+  - key: bridge
+    label: Bridge
+    ports: [8767]
+    cmd: dotnet run --project Backend/Bridge
+    build: { group: dotnet, project: Backend/Bridge }
+    onFailure: [*nuget]
+
+  - key: converter
+    label: File converter
+    ports: [8765]
+    cwd: converter
+    cmd: .venv\Scripts\python.exe converter.py
+    onFailure: [{ <<: *venv, extras: '[dev]', cwd: converter }]
+
+  - key: api
+    label: REST API
+    ports: [1234]
+    after: [vision, bridge] # Bridge delegates INIT to Vision; the API comes after both
+    cmd: dotnet run --project Backend/Api --launch-profile "Simulated"
+    env:
+      DEMO_SIMULATOR_MODE: '1' # floor under the launch profile, which fails silently
+      ASPNETCORE_ENVIRONMENT: Development
+    build: { group: dotnet, project: Backend/Api }
+    onFailure: [*nuget]
+
+  - key: simulator
+    label: Simulator
+    ports: [1232]
+    cmd: dotnet run --project Backend/Simulator
+    build: { group: dotnet, project: Backend/Simulator }
+    onFailure: [*nuget]
+
+  - key: tauri
+    label: Vite + Tauri WebView2 (CDP)
+    ports: [5173, 9222]
+    cwd: Frontend
+    cmd: npm run debug:tauri
+    env:
+      VITE_TARGET: module
+      WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: --remote-debugging-port=9222
+      DEMO_KEEP_PAGE_VISIBLE: '${DEMO_KEEP_PAGE_VISIBLE:-1}' # the caller may override it
+    slow: { startFirst: true, timeout: 15m } # cargo build; everything else gives up at 120 s
+    onFailure:
+      - { match: EPERM, cleanup: true }
+      - match: not recognized|not found|ENOENT|Cannot find module
+        run: npm install --cache .npm --no-audit --no-fund
+
+ready:
+  - ports: all # connect on 127.0.0.1 or ::1
+  - cdp: { port: 9222, anyOf: [Draw, Connect] }
+
+tools:
+  - key: dev-browser
+    probe: dev-browser --help
+    onFailure:
+      - { match: Embedded daemon dependencies are missing, run: dev-browser install }
+      - match: not found|not recognized|ENOENT
+        run: npm install -g dev-browser && dev-browser install
+
+logs: '%TEMP%/rig-ctl-logs/{key}.log'

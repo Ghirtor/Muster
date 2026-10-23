@@ -1,23 +1,9 @@
-import fs from 'node:fs'
 import path from 'node:path'
 
 import { createSupervisor } from './api/supervisor'
+import { musterHome } from './engine/config'
 
 const PORT = Number(process.env.MUSTER_PORT ?? 4871)
-
-/**
- * The configs the supervisor serves: `MUSTER_CONFIGS`, a path list, else whichever of
- * `muster.yaml` and `design/sample.yaml` sit in the working directory.
- */
-const configFiles = (): string[] => {
-  const listed = process.env.MUSTER_CONFIGS
-  if (listed !== undefined && listed.trim() !== '') {
-    return listed.split(path.delimiter).filter((file) => file.trim() !== '')
-  }
-  return ['muster.yaml', path.join('design', 'sample.yaml')]
-    .map((file) => path.resolve(file))
-    .filter((file) => fs.existsSync(file))
-}
 
 /**
  * How to run the CLI beside this file: the same node with the same loaders (swc-node in
@@ -31,12 +17,12 @@ const cliCommand = (): string[] => {
 }
 
 /**
- * The supervisor: the API over every configured app, and with `MUSTER_WEB_ROOT` set (the desktop
- * app sets it) the built dashboard too.
+ * The supervisor: the API over every app registered in the Muster home (`MUSTER_HOME`, else
+ * `~/.muster`), and with `MUSTER_WEB_ROOT` set (the desktop app sets it) the built dashboard too.
  */
 const main = async (): Promise<void> => {
   const { server } = await createSupervisor({
-    configs: configFiles(),
+    home: musterHome(),
     cli: cliCommand(),
     ...(process.env.MUSTER_WEB_ROOT === undefined ? {} : { webRoot: process.env.MUSTER_WEB_ROOT })
   })

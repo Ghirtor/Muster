@@ -4,7 +4,7 @@ import { appName, appStatus, matches } from './appStatus'
 
 const broken: BrokenApp = {
   id: 'demo',
-  file: 'sample.yaml',
+  file: 'muster.yaml',
   ok: false,
   problems: ['name: missing']
 }

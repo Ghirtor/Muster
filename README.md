@@ -1,8 +1,7 @@
 # Muster
 
 Launch, watch and hand over local app rigs. Muster is the generic form of Demo's
-`rig-ctl`: an app is described once in a config (`design/sample.yaml` for Demo), and Muster starts
-its processes in order, probes their ports, repairs known install failures, holds the one-per-machine
+`rig-ctl`: an app is registered once on the machine and keeps its launch recipe in its checkout, and Muster starts its processes in order, probes their ports, repairs known install failures, holds the one-per-machine
 lock and queue, streams logs, and shows all of it in a web dashboard.
 
 ## Run
@@ -17,14 +16,17 @@ Ports 4870/4871 are deliberate: Demo's rig holds 5173 (Vite's default), 1232, 12
 ## CLI
 
 `rig.mjs`'s commands, flags and exit codes (0 ok, 1 failed, 2 usage or bad config, 3 busy), for any
-app's config. The config is `--config`, else `MUSTER_CONFIG`, else `./muster.yaml`; `--repo`
-overrides the checkout the config names.
+registered app. The app is `--app <id>`, else `MUSTER_APP`; `--repo` picks the checkout whose
+recipe runs, else the registered one. An app is registered first, as the `muster` skill of
+project-skills describes; agents run every app, Muster included, through that skill.
 
 ```bash
-muster status --config design/sample.yaml
-muster up --config design/sample.yaml --reason "checking the draw tool" --wait
-muster release --config design/sample.yaml
-muster down --config design/sample.yaml --force
+muster register demo.yaml                 # prints the id, or every problem (exit 2)
+muster apps
+muster status --app demo
+muster up --app demo --reason "checking the draw tool" --wait
+muster release --app demo
+muster down --app demo --force
 ```
 
 `muster` on PATH is the installed desktop app's CLI, and the one skills call. It runs the bundled
@@ -40,23 +42,23 @@ terminal afterwards:
   (the app itself is `muster-app` there). An AppImage installs nothing, so nothing is on PATH.
 
 Working on Muster itself, run the checkout's CLI instead, which nothing puts on PATH:
-`npm run muster -- status --config design/sample.yaml`.
+`npm run muster -- status --app <id>`.
 
-`design/sample.yaml` uses `rig.mjs`'s lock file (`~/.rig-ctl/lock.json`), so the two take turns on the
-same rig. Instance modes are `one-per-machine`, `one-per-checkout` and `up-to-n` (`max`); up to N
+A registration may name `rig.mjs`'s lock file (`~/.rig-ctl/lock.json`), so the two take turns on
+the same rig. Instance modes are `one-per-machine`, `one-per-checkout` and `up-to-n` (`max`); up to N
 gives each instance a slot but not yet its own ports.
 
 ## API
 
 The supervisor (`src/server/main.ts`, a NestJS app, port `MUSTER_PORT` or 4871, loopback only) serves every
-config in `MUSTER_CONFIGS` (paths joined by `;` on Windows, `:` elsewhere), else whichever of
-`./muster.yaml` and `design/sample.yaml` exist. Each app's id is its name as a slug.
+app registered in `MUSTER_HOME` (else `~/.muster`), by the id it was registered as.
 
 | Route                                          | What                                              |
 | ---------------------------------------------- | ------------------------------------------------- |
-| `GET /api/health`, `POST /api/reload`          | Alive; re-read the configs                        |
+| `GET /api/health`, `POST /api/reload`          | Alive; re-read the registrations and recipes      |
 | `GET /api/apps`, `GET /api/apps/:id`           | Config and live snapshot (state, ports, lock)     |
-| `GET`/`PUT /api/apps/:id/config`               | Config text `{text}`; an invalid one is 422       |
+| `POST /api/apps`                               | Register `{file, text?}` → 201 app; invalid is 422 |
+| `GET`/`PUT /api/apps/:id/config`               | Recipe text `{text}` (the registration's when it pins the recipe); invalid is 422 |
 | `POST /api/apps/:id/config/validate`           | Problems with `{text}`, nothing saved             |
 | `GET /api/apps/:id/status`, `/lock`, `/queue`  | Snapshot, holders, waiters                        |
 | `GET /api/apps/:id/logs/:key?bytes=`           | Tail of one process log                           |
@@ -75,7 +77,7 @@ dashboard's, or with a non-loopback `Host`, get 403. Health also gives the machi
 config (`#/apps/:id/config`) and the launch-blocked dialog, offered when a launch finds the rig
 held by another checkout (join the queue, or stop it and take it over). It talks to the API with
 axios and RTK Query (`src/web/api/musterApi.ts`); the WebSocket topics keep the query caches
-current, so nothing polls. The config page edits the YAML text and validates it on the supervisor;
+current, so nothing polls. The config page edits the recipe's YAML text and validates it on the supervisor;
 its structured summary is read-only.
 
 ## Check
@@ -125,7 +127,7 @@ Then merge `dev` into `main`, by pull request or `git merge` and push.
 | --------------- | ---------------------------------------------------------------- |
 | `src/server/`   | The supervisor (Node + TS, run with SWC): engine, NestJS API, CLI |
 | `src/web/`      | The dashboard (React 19, Vite, Tailwind 4, React Compiler)       |
-| `design/`       | Screens (`*.dc.html`), tokens (`tokens.json`), Demo's config     |
+| `design/`       | Screens (`*.dc.html`), tokens (`tokens.json`), a mockup config   |
 | `src-tauri/`    | The desktop app (Tauri 2): window + supervisor process           |
 | `docs/agents/`  | How the agent skills reach the issue tracker and the code host   |
 | `gitHooks/`     | pre-commit (oxfmt), post-commit, commit-msg (issue key required) |
