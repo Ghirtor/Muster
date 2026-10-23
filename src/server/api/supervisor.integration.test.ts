@@ -159,7 +159,7 @@ afterEach(async () => {
     const config = loadApp(file, { home })
     await new Rig(config, { repo: dir, reason: '', wait: false, force: true, out }).down(true)
   }
-  fs.rmSync(dir, { recursive: true, force: true })
+  fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 })
 })
 
 describe('supervisor API', () => {

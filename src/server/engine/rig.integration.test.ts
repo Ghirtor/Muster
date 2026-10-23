@@ -94,7 +94,7 @@ beforeEach(() => {
 afterEach(async () => {
   if (current !== null) await rigOf(current, recorder()).down(true)
   current = null
-  fs.rmSync(dir, { recursive: true, force: true })
+  fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 })
 })
 
 describe('Rig', () => {
