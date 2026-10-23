@@ -3,7 +3,7 @@ import type http from 'node:http'
 import type { HubOptions } from './hub.types'
 
 export interface SupervisorOptions {
-  configs: string[]
+  home: string
   cli: string[]
   webRoot?: string
   origins?: string[]

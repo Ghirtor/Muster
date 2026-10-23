@@ -6,7 +6,7 @@ import { Registry } from './registry'
 import { appView } from './views'
 import type { AppView } from './views.types'
 
-/** The supervisor as a whole: whether it is alive, and re-reading every config. */
+/** The supervisor as a whole: whether it is alive, and re-reading every registration. */
 @Controller()
 export class FleetController {
   constructor(private readonly registry: Registry) {}
@@ -17,7 +17,7 @@ export class FleetController {
     return { ok: true, hostname: os.hostname() }
   }
 
-  /** Re-reads the configs, then lists the apps as `GET /apps` does. */
+  /** Re-reads the registrations and recipes, then lists the apps as `GET /apps` does. */
   @Post('reload')
   @HttpCode(200)
   async reload(): Promise<AppView[]> {

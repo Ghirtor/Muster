@@ -1,0 +1,21 @@
+repairs:
+  deps:
+    match: Cannot find (module|package)|ERR_MODULE_NOT_FOUND
+    run: node scripts/check-deps.mjs
+
+processes:
+  - key: supervisor
+    label: Supervisor
+    ports: [4871]
+    cmd: node --watch --import @swc-node/register/esm-register src/server/main.ts
+    env: { SWC_NODE_PROJECT: src/server/tsconfig.json }
+    onFailure: [deps]
+  - key: dashboard
+    label: Dashboard
+    ports: [4870]
+    cmd: node node_modules/vite/bin/vite.js --config vite.web.config.ts
+    after: [supervisor]
+    onFailure: [deps]
+
+ready:
+  - ports: all

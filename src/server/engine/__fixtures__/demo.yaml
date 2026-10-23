@@ -1,0 +1,13 @@
+# A registration, as `muster register` takes it: the app, its checkout and its instance rules.
+# The launch recipe is demo/muster.yaml, in the checkout. Tests read it; nothing launches it.
+
+name: Demo
+repo: demo
+recipe: muster.yaml
+
+instances:
+  mode: one-per-machine
+  lock: ~/.rig-ctl/lock.json
+  staleAfter: 20m
+  whenBusy: fail
+  killImages: [Demo.exe, Api.exe, Simulator.exe, Bridge.exe]

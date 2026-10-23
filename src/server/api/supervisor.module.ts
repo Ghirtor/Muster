@@ -14,8 +14,8 @@ import { SUPERVISOR_OPTIONS } from './supervisor.options'
 import type { SupervisorOptions } from './supervisor.types'
 
 /**
- * The supervisor's API over the apps in `options.configs`. Classes are injected by type, from the
- * decorator metadata SWC emits; the providers built from `options` come from factories.
+ * The supervisor's API over the apps registered in `options.home`. Classes are injected by type,
+ * from the decorator metadata SWC emits; the providers built from `options` come from factories.
  */
 @Module({})
 export class SupervisorModule implements NestModule {
@@ -26,8 +26,12 @@ export class SupervisorModule implements NestModule {
       controllers: [FleetController, AppsController, JobsController],
       providers: [
         { provide: SUPERVISOR_OPTIONS, useValue: options },
-        { provide: Registry, useFactory: () => new Registry(options.configs) },
-        { provide: Jobs, useFactory: () => new Jobs(options.cli, options.env) },
+        { provide: Registry, useFactory: () => new Registry(options.home) },
+        {
+          provide: Jobs,
+          useFactory: () =>
+            new Jobs(options.cli, { ...(options.env ?? process.env), MUSTER_HOME: options.home })
+        },
         {
           provide: Hub,
           useFactory: (registry: Registry, jobs: Jobs) => new Hub(registry, jobs, options.hub),

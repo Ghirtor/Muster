@@ -1,73 +1,75 @@
 # Project: Muster
 
-How this repo installs, checks, commits and runs. Issues are the tracker's business
-(`docs/agents/issue-tracker.md`); change requests and CI are the code host's
-(`docs/agents/code-host.md`).
+## Issues
 
-This file is the only place the skills learn what is particular to this project. The skills name
-its sections (**Checks**, **Run the app**, ...) and do what the matching section says, so reusing
-them in another project means writing this file for it, not changing the skills.
+- **Issue key** — `FEAT-<n>`, where `<n>` is the GitHub issue number (`#12` is `FEAT-12`).
+- **Branch name** — `FEAT-<n>/<Title_words>`: the key, a slash, then 6–8 words of the title in
+  ASCII letters, digits and underscores, e.g. `FEAT-12/Lock_queue_for_one_per_machine_rigs`.
+  Paths named after a branch nest under a `FEAT-<n>/` folder: `mkdir -p` it first.
+- **Issue states** — the Status field of the Muster board (project 2, owner `Ghirtor`): `Ready`,
+  `In progress`, `In review`, `Done`.
+
+  ```
+  gh project item-add 2 --owner Ghirtor --url <issue-url>
+  gh project item-edit 2 --owner Ghirtor --url <issue-url> --field Status --value "In progress"
+  ```
+
+  Started: `In progress`, assigned with `gh issue edit <n> --add-assignee @me`. In review:
+  `In review`. Ready issues by urgency: the board's Priority, `P0` first, then oldest
+  (`gh project item-list 2 --owner Ghirtor --format json`).
+- **Link an issue from a change request** — `Closes #<n>` in the PR body.
+
+## Code host
+
+- **Change requests** — GitHub pull requests, through `gh`. Find a branch's:
+  `gh pr list --head <branch> --json number,url,baseRefName`. Open one:
+  `gh pr create --head <branch> --base <target> --title "FEAT-<n>: <title>" --body-file <file> --assignee @me`;
+  it prints the URL. No reviewers yet.
+- **Default branches** — `dev`: every feature targets it. `main` takes only merges of `dev`;
+  each push to `main` releases (`.github/workflows/release.yml`).
+- **Stacked change request** — `--base <parent-branch>`; GitHub retargets it once the parent
+  merges. Write `Depends on #<n>` in the description.
+- **Attach evidence** — `gh` cannot upload images: commit them to the orphan `evidence` branch
+  (not created yet: `git worktree add --orphan -b evidence <dir>`) under `<branch>/` and link `https://github.com/Ghirtor/Muster/blob/evidence/<branch>/<file>?raw=true`.
+
+## CI
+
+- **CI** — GitHub Actions, `.github/workflows/ci.yml`, on pushes to `dev` and `main` and on
+  every pull request. `windows-latest`, except `linear-history` (ubuntu, pull requests only).
+
+  | Job              | Locally                                                  |
+  | ---------------- | -------------------------------------------------------- |
+  | `linear-history` | `git rev-list --merges origin/<target>..HEAD` is empty   |
+  | `lint`           | `node --run lint && node --run format:check`             |
+  | `type-check`     | `npm run type-check`                                     |
+  | `test`           | `npm test -- --coverage`                                 |
+  | `build`          | `npm run build`                                          |
+
+  Run for a push: `gh run list --branch <branch> --limit 1 --json databaseId,headSha,status`.
+  Wait: `gh run watch <run-id> --exit-status`, in the background (3–8 min). Failed log:
+  `gh run view <run-id> --log-failed`. Target's result: `gh run list --branch <target> --limit 1`.
+  Re-run: `gh run rerun <run-id> --failed`.
 
 ## Branches and commits
 
-- **Protected branches** — `dev` and `main`. No skill works on them: stop and ask which branch
-  to use.
-- **Install a checkout** — from the checkout's root, worktrees included:
-
-  ```
-  npm ci
-  ```
-
-  It also wires the git hooks (`core.hooksPath` = `gitHooks/`).
-
-- **Commit messages** — `<ISSUE_KEY>: <summary>`, e.g. `FEAT-12: Queue a second checkout`. The
-  `commit-msg` hook rejects anything else; never pass `--no-verify` to get past it.
-
-## Code
-
-- **Test rules** — `.claude/rules/testing.md`: Vitest, in the `web` (jsdom, `src/web/`) or `server`
-  (node, `src/server/`) project.
-- **Untestable changes** — a change no Vitest suite can observe: pure styling, config, or OS
-  behaviour (Windows process trees, shells) no test can stand in for.
-- **Code conventions** — `.claude/rules/conventions.md`, for every `.ts` or `.tsx` file under
-  `src/`; it loads on its own once you touch one. When the next behaviour needs a mode flag on a
-  shared component or would grow one past a single job, write it as its own hook or component.
-  What the linter cannot catch, and so what review weighs first: a component doing more than one
-  job, a mode flag or extra branch added to a shared component, the hooks → derived → handlers →
-  render order, and comments that are not docstrings on a function.
-- **Checks** — run them all before calling a change done:
-
-  ```
-  node --run lint && npm run type-check && npm test && node --run format:check
-  ```
-
-  Each CI job (the code-host doc's **CI**) reproduces locally with one command:
-
-  | CI job       | Reproduce locally                                 |
-  | ------------ | ------------------------------------------------- |
-  | `lint`       | `node --run lint`, then `node --run format:check` |
-  | `type-check` | `npm run type-check`                              |
-  | `build`      | `npm run build`                                   |
-  | `test`       | `npm test -- --ci --coverage`                     |
+- **Install a checkout** — `npm ci`; its `preinstall` wires `gitHooks/`.
+- **Commit messages** — `FEAT-<n>: <summary>`, enforced by `gitHooks/commit-msg`.
 
 ## Running it
 
-- **Run the app** — the suites stub processes, ports and the API boundary, so they never launch
-  a real rig.
-  - _Start_: `npm run dev` from the branch's checkout — supervisor on `:4871`, dashboard on
-    `http://localhost:4870`; `.claude/launch.json` starts the same for the browser pane.
-    `tauri-ctl` drives the desktop app.
-  - _Exercise the change where it lives_: for the engine or CLI, run the CLI against
-    `design/sample.yaml` and check its output and exit code (3 = busy) against
-    `rig.mjs`'s for the same scenario; for the API, call the HTTP endpoints and open the
-    WebSocket streams directly; for the dashboard, drive it in the browser pane and compare it
-    with the matching screen in `design/`.
-  - _Scenarios_: a busy lock, a queued checkout, a process that exits, a port that never opens.
-  - _What landed_: the lock file, the per-process log, the processes and ports left behind.
-  - _Stop_: every process you started. Never bind a port the Demo rig uses (1232, 1234, 5173,
-    8765, 8766, 8767, 9222).
-  - _Limits_: whatever this machine cannot stand in for, such as another OS's process tree.
-- **Test-plan edge cases** — ports already taken, processes that exit, Windows paths,
-  simultaneous launches.
-- **Parallel sessions** — every session shares `:4870` and `:4871`, so stop the dev servers as
-  soon as the app is verified.
+- **Run the app** — the suites stub processes, ports and the API.
+  - _Start_: Muster id `muster` (recipe `muster.yaml`): supervisor on `:4871`, dashboard on
+    `http://localhost:4870`. The desktop shell: `npm run dev:desktop`, after releasing `muster`
+    (same ports).
+  - _Drive the UI_: the dashboard at `http://localhost:4870/` in a browser; the desktop app is
+    Tauri, CDP on `http://localhost:4872`, target `http://localhost:4870/`. Status streams over a
+    WebSocket, so refs go stale fast.
+  - _Scenarios_: a busy lock, a queued checkout, a process that exits, a port that never opens,
+    Windows paths, simultaneous launches.
+  - _What landed_: the lock file, the per-process logs, the processes and ports left behind. For
+    the CLI, `npm run muster -- …` with its own `MUSTER_HOME`; exit code 3 means busy.
+  - _Limits_: another OS's process tree. Never bind the Demo rig's ports (1232, 1234, 5173,
+    8765–8767, 9222).
+  - _Instances_: one per machine (`:4870`, `:4871`); `--wait` queues.
+
+Open PR #3 (FEAT-2) moves the issue workflow onto the board and adds a `release-version` job.

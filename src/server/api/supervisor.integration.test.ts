@@ -5,7 +5,7 @@ import type { AddressInfo } from 'node:net'
 import os from 'node:os'
 import path from 'node:path'
 
-import { loadConfig } from '../engine/config'
+import { loadApp } from '../engine/config'
 import { Rig } from '../engine/rig'
 import { probe } from '../probe'
 import { createSupervisor } from './supervisor'
@@ -28,6 +28,7 @@ type Message = Record<string, unknown>
 let dir: string
 let supervisor: Supervisor
 let base: string
+let home: string
 let files: string[]
 
 /** A port nothing listens on, from the OS rather than a guess, so no Demo port is ever taken. */
@@ -95,38 +96,47 @@ const connect = async (): Promise<{ socket: WebSocket; messages: Message[] }> =>
   return { socket, messages }
 }
 
-/** Writes a config file into the temp dir. */
-const writeConfig = (file: string, config: object): string => {
-  fs.writeFileSync(path.join(dir, file), JSON.stringify(config))
-  return path.join(dir, file)
+/** Writes `content` as JSON, which is YAML too, into `file` and returns its path. */
+const writeJson = (file: string, content: object): string => {
+  fs.mkdirSync(path.dirname(file), { recursive: true })
+  fs.writeFileSync(file, JSON.stringify(content))
+  return file
 }
+
+/** Registers an app straight into the Muster home, as `muster register` stores it. */
+const writeRegistration = (id: string, registration: object): string =>
+  writeJson(path.join(home, 'apps', `${id}.yaml`), registration)
 
 beforeEach(async () => {
   dir = fs.mkdtempSync(path.join(os.tmpdir(), 'muster-api-'))
+  home = path.join(dir, 'home')
   fs.writeFileSync(path.join(dir, 'server.js'), SERVER)
   const [fixturePort, queuedPort] = [await freePort(), await freePort()]
   files = [
-    writeConfig('fixture.yaml', {
+    writeRegistration('fixture', {
       name: 'Fixture',
       repo: dir,
-      instances: { mode: 'one-per-checkout', lock: path.join(dir, 'locks', 'lock.json') },
-      processes: [
-        { key: 'web', label: 'Web', ports: [fixturePort], cmd: `node server.js ${fixturePort}` }
-      ],
-      ready: [{ ports: 'all', timeout: '20s' }],
-      logs: path.join(dir, 'logs', '{key}.log')
+      instances: { mode: 'one-per-checkout', lock: path.join(dir, 'locks', 'lock.json') }
     }),
-    writeConfig('machine.yaml', {
+    writeRegistration('machine', {
       name: 'Machine',
       repo: dir,
+      recipe: 'none.yaml',
       instances: { mode: 'one-per-machine', lock: path.join(dir, 'machine.json') },
       processes: [{ key: 'web', ports: [queuedPort], cmd: `node server.js ${queuedPort}` }],
       logs: path.join(dir, 'machine-logs', '{key}.log')
     }),
-    writeConfig('broken.yaml', { name: 'Broken' })
+    writeRegistration('broken', { name: 'Broken' })
   ]
+  writeJson(path.join(dir, 'muster.yaml'), {
+    processes: [
+      { key: 'web', label: 'Web', ports: [fixturePort], cmd: `node server.js ${fixturePort}` }
+    ],
+    ready: [{ ports: 'all', timeout: '20s' }],
+    logs: path.join(dir, 'logs', '{key}.log')
+  })
   supervisor = await createSupervisor({
-    configs: files,
+    home,
     cli: [
       process.execPath,
       '--import',
@@ -146,18 +156,19 @@ afterEach(async () => {
   await supervisor.close()
   const out = { write: () => undefined }
   for (const file of files.slice(0, 2)) {
-    const config = loadConfig(file)
+    const config = loadApp(file, { home })
     await new Rig(config, { repo: dir, reason: '', wait: false, force: true, out }).down(true)
   }
-  fs.rmSync(dir, { recursive: true, force: true })
+  fs.rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 })
 })
 
 describe('supervisor API', () => {
-  it('lists every app, a broken config with its problems', async () => {
+  it('lists every registered app, a broken one with its problems', async () => {
     const apps = await call('GET', '/api/apps')
 
     expect(apps.status).toBe(200)
     expect(apps.body).toEqual([
+      expect.objectContaining({ id: 'broken', ok: false, problems: [expect.any(String)] }),
       expect.objectContaining({
         id: 'fixture',
         ok: true,
@@ -168,12 +179,15 @@ describe('supervisor API', () => {
           holders: []
         }) as unknown
       }),
-      expect.objectContaining({ id: 'machine', ok: true }),
-      expect.objectContaining({ id: 'broken', ok: false, problems: [expect.any(String)] })
+      expect.objectContaining({ id: 'machine', ok: true })
     ])
     await expect(call('GET', '/api/apps/fixture/config')).resolves.toMatchObject({
       status: 200,
-      body: { file: files[0], problems: null }
+      body: { file: path.join(dir, 'muster.yaml'), problems: null }
+    })
+    await expect(call('GET', '/api/apps/machine/config')).resolves.toMatchObject({
+      status: 200,
+      body: { file: files[1], problems: null }
     })
     await expect(call('GET', '/api/apps/nobody')).resolves.toMatchObject({ status: 404 })
   })
@@ -201,13 +215,32 @@ describe('supervisor API', () => {
     )
   })
 
-  it('validates a config without saving it', async () => {
+  it('validates a recipe without saving it', async () => {
     await expect(
-      call('POST', '/api/apps/fixture/config/validate', { text: 'name: X\n' })
+      call('POST', '/api/apps/fixture/config/validate', { text: 'processes: []\n' })
     ).resolves.toMatchObject({ status: 200, body: { ok: false, problems: [expect.any(String)] } })
     await expect(
-      call('PUT', '/api/apps/fixture/config', { text: 'name: X\n' })
+      call('PUT', '/api/apps/fixture/config', { text: 'processes: []\n' })
     ).resolves.toMatchObject({ status: 422 })
+  })
+
+  it('registers an app, refusing one that does not load', async () => {
+    const file = writeJson(path.join(dir, 'other', 'register.yaml'), {
+      name: 'Other',
+      processes: [{ key: 'web', ports: [1], cmd: 'run' }]
+    })
+
+    await expect(call('POST', '/api/apps', { file: 'relative.yaml' })).resolves.toMatchObject({
+      status: 400
+    })
+    await expect(call('POST', '/api/apps', { file, text: 'name: Other\n' })).resolves.toMatchObject(
+      { status: 422, body: { problems: [expect.any(String)] } }
+    )
+    await expect(call('POST', '/api/apps', { file })).resolves.toMatchObject({
+      status: 201,
+      body: { id: 'other', ok: true, config: { repo: path.join(dir, 'other') } }
+    })
+    expect(fs.existsSync(path.join(home, 'apps', 'other.yaml'))).toBe(true)
   })
 
   it('runs actions as CLI jobs and streams status, output and logs', async () => {
@@ -302,7 +335,7 @@ describe('supervisor API', () => {
     await expect(call('DELETE', `/api/jobs/${id}`)).resolves.toMatchObject({ status: 409 })
     await expect(
       probe(
-        loadConfig(files[1] ?? '')
+        loadApp(files[1] ?? '', { home })
           .processes.at(0)
           ?.ports.at(0) ?? 0
       )

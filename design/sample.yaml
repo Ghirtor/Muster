@@ -1,5 +1,5 @@
-# A sample rig, written as Muster config.
-# This is the config format the Muster engine reads. Paths are relative to the checkout.
+# Mockup data for the design screens. Muster never reads this file: an app is registered with
+# `muster register` and keeps its recipe in its checkout (project-skills' muster skill).
 
 name: Demo
 repo: C:/Users/aymer/dev/demo

@@ -134,7 +134,7 @@ const FleetPage: FC<FleetPageProps> = ({ apps, jobs, hostname, search, now, acti
         {shown.length === 0 ? (
           <p className="m-0 border-t border-line-subtle px-5 py-6 text-sm text-ink-faint">
             {apps.length === 0
-              ? 'No app is configured. Point MUSTER_CONFIGS at a config, or add muster.yaml.'
+              ? 'No app is registered. Register one with muster register <file>.'
               : 'No app matches.'}
           </p>
         ) : (
