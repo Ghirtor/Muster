@@ -1,40 +1,16 @@
 # Issue tracker: GitHub
 
 Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all operations.
-Pull requests and CI are the code host's business: `docs/agents/code-host.md`.
-
-This file is the only place the skills learn how the tracker works. The project's skills
-(`/issue-work`, `/issue-batch` and the skills they run) name operations (**Fetch an issue**,
-**Mark started**, ...) and do what the matching section says, so moving to another tracker means
-rewriting this file, not the skills.
-
-## Identifiers
-
-- **Issue reference** — how the tracker names an issue: `#<n>`, where `<n>` is its number.
-- **Issue key** — how commits and branches name it: `FEAT-<n>`, the same number (`#12` is
-  `FEAT-12`). The `commit-msg` hook requires `FEAT-<n>: <summary>`.
-- **Branch name** — `FEAT-<n>/<Title_words_joined_by_underscores>`: the key, a slash, then the
-  title in alphanumerics and underscores only, accents dropped, 6–8 meaningful words at most, e.g.
-  `FEAT-12/Lock_queue_for_one_per_machine_rigs`. The key of the work in progress is read off the
-  checked-out branch. The slash nests whatever is named after the branch (work log, worktree,
-  evidence folder) under a `FEAT-<n>/` folder; create it first. Never name a branch `FEAT-<n>`
-  alone: git cannot keep it beside `FEAT-<n>/...`.
 
 ## Conventions
 
-- **Create an issue**: `gh issue create --project Muster --title "..." --body "..."`. Use a heredoc
-  for multi-line bodies. `--project` puts it on the board (**The board** below), in Backlog.
-- **Read an issue** (**Fetch an issue**): `gh issue view <number> --json number,title,body,labels,assignees,state,comments,projectItems`.
-  The comments are part of the ticket, and triage's Agent Brief lives in one. `projectItems` holds
-  its board Status.
+- **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
+- **Read an issue**: `gh issue view <number> --json number,title,body,labels,comments`.
 - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.
 - **Make an issue a sub-issue of a parent**: `gh issue create --parent <parent> ...`, or `gh issue edit <parent> --add-sub-issue <child>` afterwards (`gh` 2.94+). Older `gh`: `gh api --method POST repos/<owner>/<repo>/issues/<parent>/sub_issues -F sub_issue_id=<child-db-id>` (database id, as in **Blocking** below). Without sub-issues, put `Part of #<parent>` at the top of the child body.
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
-- **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`.
-  A label must exist first: `gh label create <name> --color <hex>` once per repo.
-- **Assign**: `gh issue edit <number> --add-assignee <login>` (`@me` for yourself).
-- **Close**: `gh issue close <number> --comment "..."`. Merging a PR whose body says `Closes #<n>`
-  closes it on its own.
+- **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
+- **Close**: `gh issue close <number> --comment "..."`
 
 Infer the repo from `git remote -v`; `gh` does this automatically when run inside a clone.
 
@@ -49,88 +25,6 @@ When set to `yes`, PRs run through the same labels and states as issues, using t
 - **Comment / label / close**: `gh pr comment`, `gh pr edit --add-label`/`--remove-label`, `gh pr close`.
 
 GitHub shares one number space across issues and PRs, so a bare `#42` may be either: resolve with `gh pr view 42` and fall back to `gh issue view 42`.
-
-## The board
-
-The GitHub Project **Muster** (`https://github.com/users/Ghirtor/projects/2`) drives the work: an
-issue's state is its card's **Status**, not a label. Moving a card on the board is how a person
-hands work to an agent, and the agent moves it on from there.
-
-| Status        | Means                                                        |
-| ------------- | ------------------------------------------------------------ |
-| `Backlog`     | Not triaged yet, or waiting on information                   |
-| `Ready`       | Triaged and free to pick up                                  |
-| `In progress` | An agent or a person is on it                                |
-| `In review`   | Its pull request awaits review                               |
-| `Done`        | Closed, or its pull request merged                           |
-
-The board also has a **Priority** field (`P0` most urgent, then `P1`, `P2`) and **Size**.
-
-IDs the commands below need (`gh project field-list 2 --owner Ghirtor --format json` re-reads them
-if the board's fields change):
-
-- Project: `PVT_kwHOAiYoDc4BoS6g`
-- Status field: `PVTSSF_lAHOAiYoDc4BoS6gzhmzrDQ`, options `Backlog` `f75ad846`, `Ready`
-  `61e4505c`, `In progress` `47fc9ee4`, `In review` `df73e18b`, `Done` `98236657`
-
-`gh` needs the `project` scope: `gh auth refresh -h github.com -s project`.
-
-- **Board query**: every issue on the board, with its card. Read an issue's card through the issue
-  (this query or `gh issue view <n> --json projectItems`), never `gh project item-list`, which lags
-  minutes behind a change. Add `is:open`, `assignee:@me` or `<n>` to `q` to narrow it.
-
-  ```sh
-  gh api graphql -f q='repo:Ghirtor/Muster is:issue project:Ghirtor/2' -f query='
-    query($q: String!) { search(type: ISSUE, first: 100, query: $q) { nodes { ... on Issue {
-      number title state createdAt
-      assignees(first: 5) { nodes { login } }
-      projectItems(first: 5) { nodes { id project { number }
-        status: fieldValueByName(name: "Status") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
-        priority: fieldValueByName(name: "Priority") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
-      } } } } } }' --jq '[.data.search.nodes[] | {number, title, state, createdAt,
-      assignees: [.assignees.nodes[].login],
-      card: (.projectItems.nodes[] | select(.project.number == 2) | {id, status: .status.name, priority: .priority.name})}]'
-  ```
-
-- **Put an issue on the board**: `gh project item-add 2 --owner Ghirtor --url <issue url> --format json --jq .id`
-  prints the card's id; then **Set the status** to `Backlog`. Do this when an issue has no card.
-- **Find an issue's card**: search lags a few seconds behind a new issue, so look one card up
-  through its issue:
-  `gh api graphql -F n=<n> -f query='query($n: Int!) { repository(owner: "Ghirtor", name: "Muster") { issue(number: $n) { projectItems(first: 5) { nodes { id project { number } } } } } }' --jq '.data.repository.issue.projectItems.nodes[] | select(.project.number == 2) | .id'`.
-  Nothing printed means it has no card.
-- **Set the status**: `gh project item-edit --id <card id> --project-id PVT_kwHOAiYoDc4BoS6g --field-id PVTSSF_lAHOAiYoDc4BoS6gzhmzrDQ --single-select-option-id <option id>`,
-  the card id from **Find an issue's card**.
-
-## Workflow operations
-
-The issue-work flow (`issue-start`, `issue-handoff`, `/issue-batch`) moves a card from `Ready`
-through `In progress` and `In review`; closing the issue or merging its PR takes it to `Done`.
-
-- **Is it ready for an agent?** — its card's Status is `Ready`, a comment holds an
-  `## Agent Brief` (the latest one wins), and it is not labelled `ready-for-human`. An issue with
-  no card is not ready: it has not been through the board.
-- **Mark started**: `gh issue edit <n> --add-assignee @me`, then **Set the status** to
-  `In progress`. Skip it when the card is already `In progress`.
-- **Mark in review**: **Set the status** to `In review`, then assign the reviewers listed in
-  `docs/agents/code-host.md` (**Reviewers**), if any.
-- **Post the test plan**: **Comment on an issue** with this body:
-
-  ```markdown
-  PR: <PR url>
-
-  ## Test plan
-
-  - [ ] <scenario>
-  ```
-
-- **Has it been started?** — its card is `In progress` or `In review`, an open PR names it
-  (`gh pr list --search "FEAT-<n> in:title" --state open`), or this machine has its work log or
-  worktree (`.claude/worklog/FEAT-<n>*` or `.claude/worktrees/FEAT-<n>*` exists).
-- **List my ready issues** (for `/issue-batch`), most urgent first: the **Board query** with
-  `is:open` in `q`, keeping the cards in `Ready` that are assigned to me or to no one. Sort by
-  Priority (`P0`, `P1`, `P2`, then none), then oldest first. Each still has to pass **Is it ready
-  for an agent?**.
-- **Link an issue from a change request**: put `Closes #<n>` in the PR body.
 
 ## When a skill says "publish to the issue tracker"
 
