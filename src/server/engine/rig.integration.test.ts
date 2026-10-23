@@ -229,6 +229,9 @@ describe('Rig', () => {
     const status = recorder()
     await rigOf(committed, status, true).status()
     expect(status.text).toContain('changed since this instance launched')
+
+    await rigOf(committed, recorder(), true).down()
+    await expect(probe(port)).resolves.toBe(false)
   }, 60_000)
 
   it('runs a changed recipe on a new up without a release, and stops both', async () => {
