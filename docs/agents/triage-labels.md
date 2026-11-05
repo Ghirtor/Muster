@@ -17,9 +17,22 @@ Edit the "Label in our tracker" column to match whatever vocabulary you actually
 ## GitHub specifics
 
 An issue carries at most one triage label at a time, next to any area labels (`server`, `web`,
-...) and the workflow labels `in-progress` / `in-review` that `docs/agents/issue-tracker.md`
-describes. When moving it to a new role, remove the old triage label and add the new one; leave
-the others alone.
+...). When moving it to a new role, remove the old triage label and add the new one; leave the
+others alone.
+
+The board's Status drives the work (`docs/agents/issue-tracker.md`, **The board**), so a role
+change also moves the card, putting it on the board first if it has none:
+
+| Role              | Card Status                       |
+| ----------------- | --------------------------------- |
+| `needs-triage`    | `Backlog`                         |
+| `needs-info`      | `Backlog`                         |
+| `ready-for-agent` | `Ready`                           |
+| `ready-for-human` | `Ready` (agents skip it)          |
+| `wontfix`         | `Done`, and the issue is closed   |
+
+A person may also drag a card to `Ready` without the label; an agent takes it once it has an
+Agent Brief.
 
 GitHub refuses a label that does not exist yet, so create the five once per repo:
 

@@ -64,7 +64,9 @@ the lockfile and run the jobs `lint` (lint + format check), `type-check`, `test`
 and `build`. It runs on pushes to `dev` and `main` and on every pull request. Pull requests
 also run `linear-history`, which fails if the branch has a merge commit that is not on its target.
 The fix is to rebase (**Update a branch from its target**). It doesn't run for the `dev` → `main`
-pull request. A separate
+pull request. That one runs `release-version` instead, which fails if `src-tauri/tauri.conf.json`'s
+`version` is already tagged: run `version.sh` / `version.bat` on `dev` with the next version, and
+the pull request picks it up. Both are required checks on `dev` and `main`. A separate
 workflow, `.github/workflows/release.yml`, runs on each push to `main`: it tags the commit `v` +
 `src-tauri/tauri.conf.json`'s `version` (set by `version.sh` / `version.bat` on the checked-out
 branch; a version already tagged fails it), then builds the desktop installers on Windows, macOS
