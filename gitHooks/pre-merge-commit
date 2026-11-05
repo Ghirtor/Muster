@@ -2,17 +2,24 @@
 
 PREFIX="merge:"
 
-# Feature branches keep a linear history: they take dev's new commits by
+# Feature branches keep a near-linear history: they take dev's new commits by
 # rebasing onto it, and reach dev themselves as one merge commit, so the history
-# of dev and main stays semi-linear. A merge commit made on a feature branch
-# (merging dev or main into it, or a `git pull` that merges) is refused here
-# rather than at the push, where GitHub's ruleset and CI's linear-history job
-# would refuse it anyway. dev and main take merges: that is how a feature
-# lands and how a release is cut.
+# of dev and main stays semi-linear. The one merge a feature branch may make is
+# a first-time merge of another feature branch. Refused here:
 #
-# git runs this hook before recording a merge that went through on its own. A
-# merge that stopped on conflicts is committed later by `git commit`, which runs
-# pre-commit instead, so pre-commit calls this too.
+# - merging dev or main in (to take their new commits or settle conflicts), and
+# - re-syncing with a branch it already shares work with beyond dev: merging the
+#   same feature branch again after it moved, or the branch it was started from.
+#
+# Both are told apart from a first-time merge the way CI's linear-history job
+# does it, which refuses the pull request anyway: the merged commit is already
+# in dev, or the branches' merge base is not. dev and main take any merge: that
+# is how a feature lands and how a release is cut.
+#
+# Both tests need the merged heads in MERGE_HEAD, which git writes only after
+# running this as its pre-merge-commit hook, so that call finds none and passes.
+# commit-msg calls this again once MERGE_HEAD is there, for a merge that went
+# through on its own and for one concluded by `git commit` after conflicts.
 
 branchName=$(git symbolic-ref --quiet --short HEAD 2>/dev/null)
 
@@ -22,7 +29,36 @@ case "${branchName}" in
     ;;
 esac
 
-echo "${PREFIX} ${branchName} is a feature branch, and feature branches take no merge commits." >&2
-echo "${PREFIX} Drop this merge and rebase onto dev instead:" >&2
-echo "${PREFIX}   git merge --abort && git fetch origin && git rebase origin/dev" >&2
-exit 1
+# The local branches count too: a dev ahead of origin/dev is still dev.
+bases=""
+for ref in origin/dev origin/main dev main; do
+  if git rev-parse --quiet --verify "${ref}^{commit}" > /dev/null; then
+    bases="${bases} ${ref}"
+  fi
+done
+
+# No dev to measure against (a clone that never fetched it): CI still checks.
+[ -n "${bases}" ] || exit 0
+
+inBase () {
+  for base in ${bases}; do
+    git merge-base --is-ancestor "$1" "${base}" && return 0
+  done
+  return 1
+}
+
+gitDir=$(git rev-parse --git-dir)
+for parent in $(cat "${gitDir}/MERGE_HEAD" 2>/dev/null); do
+  if inBase "${parent}"; then
+    echo "${PREFIX} This merges dev or main into ${branchName}, which takes no such merge." >&2
+  elif ! inBase "$(git merge-base HEAD "${parent}")"; then
+    echo "${PREFIX} ${branchName} already shares work with the branch it merges (merged it before, or started from it)." >&2
+  else
+    continue
+  fi
+  echo "${PREFIX} Drop this merge and rebase instead:" >&2
+  echo "${PREFIX}   git merge --abort && git fetch origin && git rebase origin/dev   (or onto that branch)" >&2
+  exit 1
+done
+
+exit 0
