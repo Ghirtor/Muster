@@ -16,10 +16,10 @@ interface Running {
 }
 
 /** The CLI flags that carry `request`. */
-export const argsOf = (file: string, request: ActionRequest): string[] => [
+export const argsOf = (id: string, request: ActionRequest): string[] => [
   request.action,
-  '--config',
-  file,
+  '--app',
+  id,
   ...(request.repo === undefined ? [] : ['--repo', request.repo]),
   ...(request.reason === undefined ? [] : ['--reason', request.reason]),
   ...(request.wait === true ? ['--wait'] : []),
@@ -67,7 +67,7 @@ export class Jobs {
     )
     if (running !== undefined) return { ok: false, running: running.job }
     const [command = process.execPath, ...prefix] = this.cli
-    const args = argsOf(app.file, request)
+    const args = argsOf(app.id, request)
     const child = spawn(command, [...prefix, ...args], {
       env: this.env,
       stdio: ['ignore', 'pipe', 'pipe'],

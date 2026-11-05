@@ -2,7 +2,13 @@ import { Jobs } from './jobs'
 import type { Job, JobEvent } from './jobs.types'
 import type { AppEntry } from './registry.types'
 
-const app: AppEntry = { id: 'fixture', file: 'fixture.yaml', config: null, problems: ['unused'] }
+const app: AppEntry = {
+  id: 'fixture',
+  file: 'fixture.yaml',
+  registration: 'fixture.yaml',
+  config: null,
+  problems: ['unused']
+}
 
 /** Resolves with the job once `jobs` reports it ended. */
 const ended = async (jobs: Jobs, id: string): Promise<Job> =>

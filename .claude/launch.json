@@ -3,8 +3,7 @@
   "configurations": [
     {
       "name": "Muster",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "url": "http://localhost:4870",
       "port": 4870
     }
   ]

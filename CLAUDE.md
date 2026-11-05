@@ -10,7 +10,9 @@ lock and queue, one per checkout, or up to N) and shows it all in a web dashboar
 use the same engine through a CLI and an HTTP/WebSocket API.
 
 It generalises Demo's `rig-ctl` skill. **`rig.mjs` is the behaviour to match**;
-`design/sample.yaml` is that same rig written as Muster config, and the first app it must run.
+Demo is the first app it must run, registered as project-skills' `muster` skill describes;
+Muster itself runs from its own recipe, [muster.yaml](muster.yaml).
+`design/sample.yaml` is mockup data for the screens only; Muster never reads it.
 
 ## Stack and tooling
 
@@ -45,8 +47,9 @@ Mirrors Demo's `Frontend/` — same versions (the lockfile was seeded from it), 
 
 ```bash
 npm run dev                         # supervisor :4871 + dashboard :4870
-npm run muster -- status --config design/sample.yaml   # this checkout's CLI: status|up|release|down
-MUSTER_CONFIGS=a.yaml;b.yaml npm run dev             # apps the supervisor serves (README: API)
+npm run muster -- register app.yaml                   # this checkout's CLI: register|apps
+npm run muster -- status --app demo                   # status|up|release|down of a registered app
+MUSTER_HOME=~/.muster npm run dev                     # whose registrations the supervisor serves
 node --run lint
 npm run type-check
 npm test                            # --project web|server for one
@@ -96,21 +99,7 @@ The five default roles, each label named after its role. See `docs/agents/triage
 
 ### Domain docs
 
-Single-context: `GLOSSARY.md` and `docs/adr/` at the root, created when first needed. See
-`docs/agents/domain.md`.
-
-### Code host
-
-GitHub (`gh`): pull requests target `dev`, CI and releases. See `docs/agents/code-host.md`.
-
-### Project
-
-Protected branches, commit format, checks and how to run the app for a check. See
-`docs/agents/project.md`.
-
-The issue skills (`/issue-work`, `/issue-batch` and the skills they run) name operations in bold
-and look them up in these files. To move to another tracker, host or project, rewrite the files,
-not the skills; `/project-skills:setup-project-skills` writes them for a new repo.
+Single-context: `GLOSSARY.md` and `docs/adr/` at the root, created when first needed. See `docs/agents/domain.md`.
 
 ## Design
 
@@ -123,8 +112,8 @@ styles or sample numbers.
 
 Build in phases; finish and test one before starting the next.
 
-1. **Engine + CLI** (`src/server/engine/`, `src/server/cli.ts`): load and validate config
-   (`design/sample.yaml`), lock + queue, launch order with `after`, sequential build groups, port
+1. **Engine + CLI** (`src/server/engine/`, `src/server/cli.ts`): load and validate the
+   registration and recipe (the `muster` skill), lock + queue, launch order with `after`, sequential build groups, port
    probes (`probe.ts` exists), slow start, repair-once-on-exit, readiness checks, stop by port tree
    then image name, per-process logs. CLI `muster status|up|release|down` with `rig.mjs`'s flags
    and exit codes (3 = busy), so the rig-ctl skill can switch to it unchanged.

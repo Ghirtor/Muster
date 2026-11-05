@@ -13,33 +13,3 @@ The skills speak in terms of five canonical triage roles. This file maps those r
 When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.
 
 Edit the "Label in our tracker" column to match whatever vocabulary you actually use.
-
-## GitHub specifics
-
-An issue carries at most one triage label at a time, next to any area labels (`server`, `web`,
-...). When moving it to a new role, remove the old triage label and add the new one; leave the
-others alone.
-
-The board's Status drives the work (`docs/agents/issue-tracker.md`, **The board**), so a role
-change also moves the card, putting it on the board first if it has none:
-
-| Role              | Card Status                       |
-| ----------------- | --------------------------------- |
-| `needs-triage`    | `Backlog`                         |
-| `needs-info`      | `Backlog`                         |
-| `ready-for-agent` | `Ready`                           |
-| `ready-for-human` | `Ready` (agents skip it)          |
-| `wontfix`         | `Done`, and the issue is closed   |
-
-A person may also drag a card to `Ready` without the label; an agent takes it once it has an
-Agent Brief.
-
-GitHub refuses a label that does not exist yet, so create the five once per repo:
-
-```
-gh label create needs-triage --color D4C5F9
-gh label create needs-info --color FEF2C0
-gh label create ready-for-agent --color 0052CC
-gh label create ready-for-human --color 5319E7
-gh label create wontfix --color FFFFFF
-```
