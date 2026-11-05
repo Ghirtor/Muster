@@ -10,8 +10,8 @@ import { fileURLToPath } from 'node:url'
  *
  * It writes the version into `src-tauri/tauri.conf.json` (which names the installers) and
  * `package.json` (with `package-lock.json`), commits the three as `<FEAT-n>: Version <x.y.z>` and
- * pushes the branch. Once that commit reaches `main`, `.github/workflows/release.yml` tags it
- * `v<x.y.z>` and builds the installers, and refuses a version already tagged.
+ * pushes the branch. Once that commit reaches `main`, pushing the tag `v<x.y.z>` on it releases:
+ * `.github/workflows/release.yml` builds the installers.
  *
  * It needs a branch (not a detached HEAD) and a clean working tree, and takes only a version above
  * the branch's current one that no tag has yet.
@@ -89,4 +89,4 @@ git('add', TAURI_CONF, PACKAGE, LOCK)
 git('commit', '--quiet', '-m', `${key}: Version ${version}`)
 console.log(`version: ${current} -> ${version}, committed on ${branch}; pushing`)
 git('push', '--quiet', '-u', 'origin', 'HEAD')
-console.log(`version: pushed ${branch}; ${tag} is released once it reaches main`)
+console.log(`version: pushed ${branch}; once it is on main, push ${tag} there to release it`)
