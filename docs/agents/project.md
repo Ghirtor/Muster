@@ -40,11 +40,12 @@
   `gh pr list --head <branch> --json number,url,baseRefName`. Open one:
   `gh pr create --head <branch> --base <target> --title "FEAT-<n>: <title>" --body-file <file> --assignee @me`;
   it prints the URL. No reviewers yet.
-- **Default branches** — `dev`: every feature targets it. `main` takes only merges of `dev`;
-  each push to `main` releases (`.github/workflows/release.yml`).
+- **Default branch** — `main`: every feature targets it, and `Closes #<n>` closes the issue as
+  the PR merges. A merge never releases: pushing a tag `v<x.y.z>` on `main` does
+  (`.github/workflows/release.yml`), after `version.sh` / `version.bat` set that version.
 - **Update a branch from its target** — rebase, never merge: `git fetch origin && git rebase
   origin/<target>`, then `git push --force-with-lease`; on GitHub, **Update branch ▾ → Update with
-  rebase**. The same for conflicts with `dev`, and for catching up with a feature branch this one
+  rebase**. The same for conflicts with `main`, and for catching up with a feature branch this one
   already shares work with (one it merged before, or the one it was started from): rebase onto
   it. The one merge a feature branch may carry is a first-time merge of another feature branch;
   `gitHooks/pre-merge-commit` and CI's `linear-history` refuse the rest. Never pass
@@ -56,9 +57,8 @@
 
 ## CI
 
-- **CI** — GitHub Actions, `.github/workflows/ci.yml`, on pushes to `dev` and `main` and on
-  every pull request. `windows-latest`, except `linear-history` and `release-version` (ubuntu,
-  pull requests only).
+- **CI** — GitHub Actions, `.github/workflows/ci.yml`, on pushes to `main` and on every pull
+  request. `windows-latest`, except `linear-history` (ubuntu, pull requests only).
 
   | Job               | Locally                                                      |
   | ----------------- | ------------------------------------------------------------ |
@@ -67,13 +67,12 @@
   | `type-check`      | `npm run type-check`                                         |
   | `test`            | `npm test -- --coverage`                                     |
   | `build`           | `npm run build`                                              |
-  | `release-version` | `dev` → `main` only: `tauri.conf.json`'s version is untagged |
 
   Run for a push: `gh run list --branch <branch> --limit 1 --json databaseId,headSha,status`.
   Wait: `gh run watch <run-id> --exit-status`, in the background (3–8 min). Failed log:
   `gh run view <run-id> --log-failed`. Target's result: `gh run list --branch <target> --limit 1`.
-  Re-run: `gh run rerun <run-id> --failed`. A failed `release-version` means `version.sh` /
-  `version.bat` on `dev` with the next version; the PR picks it up.
+  Re-run: `gh run rerun <run-id> --failed`. A release run: `gh run list --workflow release.yml
+  --limit 1`; it fails when the tag is off `main` or not `tauri.conf.json`'s version.
 
 ## Branches and commits
 

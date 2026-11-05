@@ -1,15 +1,14 @@
-# A release is a merge of dev into main. Each push to main tags its commit `v` +
-# src-tauri/tauri.conf.json's `version` (set by version.sh / version.bat), then builds the
+# A release is a pushed tag `v<x.y.z>` on a commit of main whose src-tauri/tauri.conf.json
+# `version` is x.y.z (set by version.sh / version.bat); any other tag fails the run. It builds the
 # desktop installers on Windows (NSIS, MSI), macOS (dmg) and Linux (deb, rpm, AppImage), since
-# Tauri only bundles for the OS it runs on. A version that is already tagged fails the run: set the
-# next one before merging. The installers are kept as
-# the run's artifacts; nothing is signed or published.
+# Tauri only bundles for the OS it runs on. The installers are kept as the run's artifacts; nothing
+# is signed or published.
 
 name: Release
 
 on:
   push:
-    branches: [main]
+    tags: ['v*']
 
 concurrency:
   group: release
@@ -18,8 +17,6 @@ concurrency:
 jobs:
   tag:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
@@ -28,15 +25,16 @@ jobs:
           fetch-depth: 0
       - id: tag
         run: |
-          tag="v$(jq -r .version src-tauri/tauri.conf.json)"
-          if git rev-parse --quiet --verify "refs/tags/$tag" > /dev/null; then
-            echo "::error::$tag is already released; set the next version (version.sh) before merging into main."
+          tag="$GITHUB_REF_NAME"
+          version="v$(jq -r .version src-tauri/tauri.conf.json)"
+          if [ "$tag" != "$version" ]; then
+            echo "::error::$tag is on a commit whose tauri.conf.json says $version. Tag the commit that set the version."
             exit 1
           fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git tag --annotate "$tag" -m "Muster ${tag#v}" "$GITHUB_SHA"
-          git push origin "$tag"
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$tag is not on main. Tag a commit of main."
+            exit 1
+          fi
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
   bundle:
