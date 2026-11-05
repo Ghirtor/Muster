@@ -13,8 +13,8 @@ PREFIX="merge:"
 #
 # Both are told apart from a first-time merge the way CI's linear-history job
 # does it, which refuses the pull request anyway: the merged commit is already
-# in dev, or the branches' merge base is not. dev and
-# main take any merge: that is how a feature lands and how a release is cut.
+# in dev, or the branches' merge base is not. dev and main take any merge: that
+# is how a feature lands and how a release is cut.
 #
 # Both tests need the merged heads in MERGE_HEAD, which git writes only after
 # running this as its pre-merge-commit hook, so that call finds none and passes.
