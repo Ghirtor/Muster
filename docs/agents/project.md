@@ -42,6 +42,13 @@
   it prints the URL. No reviewers yet.
 - **Default branches** — `dev`: every feature targets it. `main` takes only merges of `dev`;
   each push to `main` releases (`.github/workflows/release.yml`).
+- **Update a branch from its target** — rebase, never merge: `git fetch origin && git rebase
+  origin/<target>`, then `git push --force-with-lease`; on GitHub, **Update branch ▾ → Update with
+  rebase**. The same for conflicts with `dev`, and for catching up with a feature branch this one
+  already shares work with (one it merged before, or the one it was started from): rebase onto
+  it. The one merge a feature branch may carry is a first-time merge of another feature branch;
+  `gitHooks/pre-merge-commit` and CI's `linear-history` refuse the rest. Never pass
+  `--no-verify` to get past the hook.
 - **Stacked change request** — `--base <parent-branch>`; GitHub retargets it once the parent
   merges. Write `Depends on #<n>` in the description.
 - **Attach evidence** — `gh` cannot upload images: commit them to the orphan `evidence` branch
@@ -55,7 +62,7 @@
 
   | Job               | Locally                                                      |
   | ----------------- | ------------------------------------------------------------ |
-  | `linear-history`  | `git rev-list --merges origin/<target>..HEAD` is empty       |
+  | `linear-history`  | `gitHooks/pre-merge-commit`, as you merge                    |
   | `lint`            | `node --run lint && node --run format:check`                 |
   | `type-check`      | `npm run type-check`                                         |
   | `test`            | `npm test -- --coverage`                                     |

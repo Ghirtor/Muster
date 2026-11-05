@@ -10,9 +10,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # A feature branch reaches dev rebased onto it, as one merge commit, so it may carry none of its
-  # own (gitHooks/pre-merge-commit refuses them locally). The PR from dev into main is the one
-  # that carries merges. It checks the PR's head, not the merge ref checkout makes by default.
+  # A feature branch reaches dev rebased onto it, as one merge commit. Of its own merge commits it
+  # may keep only a first-time merge of another feature branch: one that merges its base in (to
+  # take dev's new commits or settle conflicts) or re-syncs with a branch it already shares work
+  # with (merging the same branch again, or the branch it was started from) must be a rebase.
+  # gitHooks/pre-merge-commit refuses the same merges locally. The PR from dev into main is the
+  # one that carries any merge. It checks the PR's head, not the merge ref checkout makes.
   linear-history:
     if: github.event_name == 'pull_request' && github.head_ref != 'dev'
     runs-on: ubuntu-latest
@@ -22,12 +25,22 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - run: |
-          merges=$(git rev-list --merges "origin/${{ github.base_ref }}..HEAD")
-          if [ -n "$merges" ]; then
-            git log --oneline --no-walk $merges
-            echo "::error::This branch has merge commits. Rebase it onto ${{ github.base_ref }} instead of merging: git rebase origin/${{ github.base_ref }}"
-            exit 1
-          fi
+          base="origin/${{ github.base_ref }}"
+          for merge in $(git rev-list --merges "$base..HEAD"); do
+            first=$(git rev-parse "$merge^1")
+            for parent in $(git rev-list --parents -n 1 "$merge" | cut -d' ' -f3-); do
+              if git merge-base --is-ancestor "$parent" "$base"; then
+                reason="merges ${{ github.base_ref }} in"
+              elif ! git merge-base --is-ancestor "$(git merge-base "$first" "$parent")" "$base"; then
+                reason="syncs with a branch it already shares work with"
+              else
+                continue
+              fi
+              git log --oneline --no-walk "$merge"
+              echo "::error::$merge $reason. Rebase instead: git rebase origin/${{ github.base_ref }}, or onto the branch it shares work with."
+              exit 1
+            done
+          done
 
   # Merging into main releases the version in tauri.conf.json (release.yml), which fails once the
   # merge is done if that version is already tagged. Refusing the pull request catches a forgotten

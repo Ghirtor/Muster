@@ -5,6 +5,13 @@ PREFIX="commit-msg:"
 commitMsgFile="$1"
 commitMsgSource="$2"
 
+# Every merge commit passes here with MERGE_HEAD written, whether the merge went
+# through on its own or stopped on conflicts, which pre-merge-commit itself does
+# not see: git runs it before writing MERGE_HEAD. So its rule runs from here.
+if git rev-parse --quiet --verify MERGE_HEAD > /dev/null; then
+  sh "$(git rev-parse --show-toplevel)/gitHooks/pre-merge-commit" || exit 1
+fi
+
 # git names the source of the message it is about to use. A merge or a squash
 # gets its subject generated, so there is nothing the author could fix.
 # "commit" (-c / -C / --amend) is deliberately not exempt: those messages are
